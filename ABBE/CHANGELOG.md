@@ -4,7 +4,16 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v5.9.0 — 2026-04-21 (ACTUAL)
+## v5.9.1 — 2026-04-21 (ACTUAL)
+
+### UI: Ocultar botón Wake Word
+
+- Botón "Hola, Abbe · off" ocultado en welcome y chat screens via `display: none` en CSS.
+- HTML y JS preservados intactos para reactivación futura (quitar `display: none` en `.wake-word-toggle`).
+
+---
+
+## v5.9.0 — 2026-04-21
 
 ### Rebrand y ajustes de UX
 

@@ -3501,8 +3501,9 @@ body[data-mood-active] .message.assistant {
    Wake Word — "Hola, Abbe" toggle & feedback
    ============================================ */
 
-/* Wake Word toggle — M3 text button, coherent with header-icon-btn height */
+/* Wake Word toggle — oculto (funcionalidad preservada, reactivar quitando display:none) */
 .wake-word-toggle {
+    display: none;
     height: 40px;
     border-radius: var(--md-sys-shape-full);
     border: 1px solid var(--md-sys-color-outline-variant);
