@@ -92,8 +92,9 @@ Usuario → WebSocket /ws/chat
 
 ## Versionado y CHANGELOG
 
-- **Cada cambio funcional debe incrementar la versión** en `ABBE/CHANGELOG.md`
-- Usar versionado semántico: `MAJOR.MINOR.PATCH` (ej: v5.9.0 → v5.9.1 para fix, v5.10.0 para feature)
+- **Cualquier cambio en el código implica una nueva versión.** Actualizar `ABBE/CHANGELOG.md` inmediatamente al hacer el cambio en local, NO esperar al commit.
+- Solo hacer commit y push cuando el usuario lo pida explícitamente.
+- Usar versionado semántico: `MAJOR.MINOR.PATCH` (ej: v3.8.3 → v3.8.4 para fix, v3.9.0 para feature)
 - Marcar la versión actual con `(ACTUAL)` y quitar esa etiqueta de la anterior
 - Incluir fecha en formato `YYYY-MM-DD`
 - Describir brevemente qué cambió y por qué

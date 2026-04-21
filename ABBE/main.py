@@ -110,7 +110,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Abbe - Asistente de Ventas Novacutan",
-    version="3.0.0",
+    version="3.8.4",
     lifespan=lifespan
 )
 
@@ -129,7 +129,7 @@ async def health_check():
     """Verificar estado del sistema"""
     return {
         "status": "ok",
-        "version": "3.0.0",
+        "version": "3.8.4",
         "agents": ["productos", "objeciones", "argumentos"],
         "knowledge_base_size": len(orchestrator.agents['productos'].rag.qa_pairs) if orchestrator else 0
     }
