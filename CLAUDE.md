@@ -1,8 +1,8 @@
-# CLAUDE.md — NOVIA (Above Pharma / Novacutan)
+# CLAUDE.md — ABBE (Above Pharma / Novacutan)
 
 ## Qué es este proyecto
 
-NOVIA es un asistente de ventas IA para representantes médicos de Novacutan (marca de Above Pharma). Es una aplicación web con backend FastAPI y frontend vanilla JS, desplegada en Hugging Face Spaces via Docker.
+ABBE es un asistente de ventas IA para representantes médicos de Novacutan (marca de Above Pharma). Es una aplicación web con backend FastAPI y frontend vanilla JS, desplegada en Hugging Face Spaces via Docker.
 
 El asistente ayuda a los representantes con información de productos (biomoduladores y rellenos dérmicos), manejo de objeciones y argumentos de venta por especialidad médica.
 
@@ -87,7 +87,7 @@ Usuario → WebSocket /ws/chat
 
 ## Puertos
 
-- NOVIA (Novacutan): `7862`
+- ABBE (Novacutan): `7862`
 - Puro Omega (proyecto hermano): `7860`
 
 ## Notas importantes

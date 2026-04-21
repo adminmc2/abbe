@@ -1,4 +1,4 @@
-# CHANGELOG - Novacutan (Novia)
+# CHANGELOG - Novacutan (Abbe)
 
 Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
@@ -27,7 +27,7 @@ integrando la librer\u00eda `streaming-markdown` para renderizado incremental de
 **S\u00edntomas:**
 - Al seleccionar un chip de FAQ y elegir "Respuesta Extendida" (1000 tokens), el browser
   se congelaba completamente. No se pod\u00eda hacer scroll, abrir DevTools ni interactuar.
-- El status "Novia escribiendo..." se quedaba permanente, nunca cambiaba a "En l\u00ednea".
+- El status "Abbe escribiendo..." se quedaba permanente, nunca cambiaba a "En l\u00ednea".
 - Las respuestas cortas ("Resumida", 500 tokens) funcionaban correctamente.
 - El problema exist\u00eda en TODOS los proyectos: Novacutan local, Puro Omega local y
   Omia en Railway producci\u00f3n.
@@ -218,8 +218,8 @@ El proyecto se cre\u00f3 duplicando `puro_omega/` y adaptando todo para la marca
 
 | Campo | Puro Omega | Novacutan |
 |-------|-----------|-----------|
-| Asistente IA | Omia | **Novia** |
-| Wake word | "Hola, Omia" | **"Hola, Novia"** |
+| Asistente IA | Omia | **Abbe** |
+| Wake word | "Hola, Omia" | **"Hola, Abbe"** |
 | Usuario demo | Pablo | **Jos\u00e9 Luis** |
 | Puerto | 7860 | **7862** |
 | Marca | Puro Omega | **Novacutan** |

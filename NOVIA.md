@@ -1,19 +1,19 @@
-# NOVIA — Asistente IA de Ventas
+# ABBE — Asistente IA de Ventas
 
 > Tu copiloto inteligente de ventas, listo para usar en días, no meses
 
 ---
 
-## ¿Qué es NOVIA?
+## ¿Qué es ABBE?
 
-NOVIA es una plataforma de asistente IA especializada en ventas que se personaliza para tu marca y productos. Ya está desarrollada, solo la configuramos para ti.
+ABBE es una plataforma de asistente IA especializada en ventas que se personaliza para tu marca y productos. Ya está desarrollada, solo la configuramos para ti.
 
 ### Funcionalidades principales
 
 - Responde preguntas sobre TUS productos al instante
 - Sugiere cómo manejar objeciones de clientes
 - Compara vs competencia con argumentos sólidos
-- Funciona por voz ("Hola, Novia") o texto
+- Funciona por voz ("Hola, Abbe") o texto
 - Disponible en cualquier dispositivo (web, móvil)
 - **Plataforma de gestión** para supervisar el uso del equipo
 
@@ -43,7 +43,7 @@ NOVIA es una plataforma de asistente IA especializada en ventas que se personali
 └─────────────────────────────────────────────────────┘
 ```
 
-El desarrollo incluye la personalización completa de NOVIA para tu empresa: carga de productos, entrenamiento con tu contenido, configuración de marca y capacitación inicial.
+El desarrollo incluye la personalización completa de ABBE para tu empresa: carga de productos, entrenamiento con tu contenido, configuración de marca y capacitación inicial.
 
 ### Planes de Suscripción
 
@@ -127,7 +127,7 @@ Para empresas con equipos grandes y necesidades avanzadas de control.
 
 ## Plataforma de Gestión (Admin)
 
-Incluida en ambos planes. Permite supervisar y controlar el uso de NOVIA por parte del equipo.
+Incluida en ambos planes. Permite supervisar y controlar el uso de ABBE por parte del equipo.
 
 ### Funcionalidades por Plan
 
@@ -172,7 +172,7 @@ Incluida en ambos planes. Permite supervisar y controlar el uso de NOVIA por par
 
 ## ¿Qué incluye el Desarrollo Inicial?
 
-El desarrollo es el trabajo de personalización para que NOVIA conozca TU negocio:
+El desarrollo es el trabajo de personalización para que ABBE conozca TU negocio:
 
 - Configuración de tu cuenta y usuarios
 - Personalización de interfaz (logo, colores corporativos)
@@ -208,13 +208,13 @@ El desarrollo es el trabajo de personalización para que NOVIA conozca TU negoci
 | Integración CRM adicional | 250-400€ | $5,000-8,000 | Una vez |
 | Carga masiva de contenido nuevo | 100€ | $2,000 | Una vez |
 | Capacitación adicional (2 horas) | 80€ | $1,600 | Una vez |
-| Dominio personalizado (novia.tumarca.com) | 40€/mes | $800/mes | Mensual |
+| Dominio personalizado (abbe.tumarca.com) | 40€/mes | $800/mes | Mensual |
 
 ---
 
-## Ejemplo: NOVIA para Novacutan
+## Ejemplo: ABBE para Novacutan
 
-Así quedaría configurado NOVIA específicamente para el equipo de ventas de Novacutan:
+Así quedaría configurado ABBE específicamente para el equipo de ventas de Novacutan:
 
 ### Contenido a cargar:
 - **Productos:** BioPRO, FBio DVS Light, FBio DVS Medium, FBio DVS Volume
@@ -241,7 +241,7 @@ Así quedaría configurado NOVIA específicamente para el equipo de ventas de No
 
 ---
 
-*© 2026 NOVIA para Novacutan - Prisma Soluciones AI. Todos los derechos reservados.*
+*© 2026 ABBE para Novacutan - Prisma Soluciones AI. Todos los derechos reservados.*
 
 ---
 
@@ -268,17 +268,17 @@ Así quedaría configurado NOVIA específicamente para el equipo de ventas de No
 
 ---
 
-## ¿Por qué NOVIA es competitivo?
+## ¿Por qué ABBE es competitivo?
 
 | Solución | Precio base | Usuarios | IA incluida |
 |----------|-------------|----------|-------------|
-| **NOVIA Profesional** | **99€/mes** | 10 | ✓ Completa |
+| **ABBE Profesional** | **99€/mes** | 10 | ✓ Completa |
 | Gong.io | ~$1,200/mes | 3 | Parcial |
 | Outreach | ~$100/usuario | 1 | Limitada |
 | Salesforce Einstein | ~$150/usuario | 1 | Add-on |
 | Clari | ~$80/usuario | 1 | Limitada |
 
-**NOVIA ofrece más valor por menos inversión.**
+**ABBE ofrece más valor por menos inversión.**
 
 ---
 
@@ -287,17 +287,17 @@ Así quedaría configurado NOVIA específicamente para el equipo de ventas de No
 1. Elige tu plan
 2. Envíanos tu material (fichas de productos, objeciones)
 3. Pago del desarrollo (500€ / $10,000 MXN con oferta)
-4. Configuramos NOVIA en 3-5 días
+4. Configuramos ABBE en 3-5 días
 5. Capacitamos a tu equipo
 6. ¡2 meses GRATIS para probar!
 7. Si te convence, continúas con la suscripción
 
 ---
 
-> *"Hola, Novia... ayúdame a cerrar esta venta"*
+> *"Hola, Abbe... ayúdame a cerrar esta venta"*
 
 ---
 
 *Precios + IVA | Tipo de cambio referencia: $20 MXN/EUR | Febrero 2026*
 
-*© 2026 NOVIA - Prisma Soluciones AI. Todos los derechos reservados.*
+*© 2026 ABBE - Prisma Soluciones AI. Todos los derechos reservados.*

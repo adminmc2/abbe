@@ -1,4 +1,4 @@
-# Novia - Novacutan Assistant
+# Abbe - Novacutan Assistant
 # Dockerfile para Hugging Face Spaces
 
 FROM python:3.11-slim

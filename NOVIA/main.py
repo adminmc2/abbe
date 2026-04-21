@@ -1,5 +1,5 @@
 """
-Novia - Asistente de Ventas Novacutan RAG v3.0
+Abbe - Asistente de Ventas Novacutan RAG v3.0
 Backend FastAPI con WebSocket para streaming
 """
 
@@ -86,7 +86,7 @@ groq_client = Groq(api_key=groq_api_key) if groq_api_key else None
 if not groq_api_key:
     print("⚠️  GROQ_API_KEY no configurada - LLM y transcripción deshabilitados")
 
-# ElevenLabs TTS (voz de Novia)
+# ElevenLabs TTS (voz de Abbe)
 elevenlabs_api_key = os.getenv("ELEVENLABS_API_KEY")
 elevenlabs_voice_id = os.getenv("ELEVENLABS_VOICE_ID", "NWqMOQLlMBaUbjKYdhbW")
 
@@ -109,7 +109,7 @@ async def lifespan(app: FastAPI):
     print("Cerrando aplicación...")
 
 app = FastAPI(
-    title="Novia - Asistente de Ventas Novacutan",
+    title="Abbe - Asistente de Ventas Novacutan",
     version="3.0.0",
     lifespan=lifespan
 )
@@ -227,7 +227,7 @@ async def transcribe_voice(audio: UploadFile = File(...)):
 
 
 # Prompt para generar resumen conversacional para TTS
-TTS_SUMMARY_PROMPT = """Eres Novia, una asistente de ventas de Novacutan. Convierte la siguiente respuesta escrita en un RESUMEN HABLADO conversacional y natural.
+TTS_SUMMARY_PROMPT = """Eres Abbe, una asistente de ventas de Novacutan. Convierte la siguiente respuesta escrita en un RESUMEN HABLADO conversacional y natural.
 
 REGLAS:
 1. Habla como si estuvieras conversando con el representante de ventas, en tono cercano y profesional.
@@ -454,14 +454,14 @@ async def handle_infographic_request(websocket: WebSocket, agent_response: str):
 
 
 def strip_wake_word(message: str) -> str:
-    """Elimina variantes del wake word 'Hola Novia' del mensaje.
+    """Elimina variantes del wake word 'Hola Abbe' del mensaje.
     Si lo que queda es solo un saludo vacío, retorna cadena vacía."""
     import unicodedata
     t = message.strip()
     # Remove wake word patterns (case-insensitive)
     wake_patterns = [
-        r'(?:hola|hey|oye|ok|ola)\s*novia',
-        r'\bnovia\b',
+        r'(?:hola|hey|oye|ok|ola)\s*abbe',
+        r'\babbe\b',
     ]
     for p in wake_patterns:
         t = re.sub(p, '', t, flags=re.IGNORECASE).strip()
@@ -551,7 +551,7 @@ def is_greeting_or_vague(message: str) -> bool:
     return not any(re.search(p, t) for p in pharma_patterns)
 
 
-GREETING_RESPONSE = """Soy **Novia**, tu asistente de ventas de Novacutan. Para poder ayudarte, cuéntame qué necesitas. Por ejemplo:
+GREETING_RESPONSE = """Soy **Abbe**, tu asistente de ventas de Novacutan. Para poder ayudarte, cuéntame qué necesitas. Por ejemplo:
 
 - **Producto**: *"¿Qué es BioPRO y para qué sirve?"*
 - **Objeción**: *"Un médico dice que es caro, ¿cómo respondo?"*
@@ -605,7 +605,7 @@ async def websocket_chat(websocket: WebSocket):
             if not user_message.strip():
                 continue
 
-            # Strip wake word ("Hola Novia") from the message
+            # Strip wake word ("Hola Abbe") from the message
             cleaned = strip_wake_word(user_message)
             if not cleaned:
                 # Message was only a wake word — ignore silently

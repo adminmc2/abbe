@@ -1814,7 +1814,7 @@ body[data-mood-active] .message.assistant {
     animation: pulse-record 1.5s ease-in-out infinite;
 }
 
-/* Botón de voz de Novia — mismo estilo que los demás (sin azul) */
+/* Botón de voz de Abbe — mismo estilo que los demás (sin azul) */
 .chat-action-btn--voice {
     background: rgba(234, 231, 241, 0.35);
     color: var(--md-sys-color-on-surface-variant);
@@ -3498,7 +3498,7 @@ body[data-mood-active] .message.assistant {
 }
 
 /* ============================================
-   Wake Word — "Hola, Novia" toggle & feedback
+   Wake Word — "Hola, Abbe" toggle & feedback
    ============================================ */
 
 /* Wake Word toggle — M3 text button, coherent with header-icon-btn height */

@@ -1,5 +1,5 @@
 /**
- * Novia - App Principal Novacutan
+ * Abbe - App Principal Novacutan
  * Chat con voz y transiciones
  */
 
@@ -429,7 +429,7 @@ function loadRecentSearches() {
  * Sincroniza el historial con el servidor (carga desde servidor si hay datos más recientes)
  */
 async function syncSearchHistory() {
-    const username = localStorage.getItem('novia_user');
+    const username = localStorage.getItem('abbe_user');
     if (!username) return;
 
     try {
@@ -467,7 +467,7 @@ async function syncSearchHistory() {
  * Sube el historial local al servidor
  */
 async function pushSearchHistory() {
-    const username = localStorage.getItem('novia_user');
+    const username = localStorage.getItem('abbe_user');
     if (!username) return;
 
     const searches = loadRecentSearches();
@@ -1725,7 +1725,7 @@ async function transcribeAudio(audioBlob, extension = 'webm') {
         const data = await response.json();
 
         if (data.success && data.text) {
-            // Strip wake word from transcription so "Hola Novia, ..." becomes just "..."
+            // Strip wake word from transcription so "Hola Abbe, ..." becomes just "..."
             const cleanText = stripWakeWord(data.text);
 
             // If the transcription was ONLY a wake word (nothing else), skip sending
@@ -1995,7 +1995,7 @@ async function askResponseModeByVoice(message) {
     indicator.className = 'voice-mode-asking';
     indicator.innerHTML = `
         <i class="ph ph-speaker-high"></i>
-        <span>Novia pregunta: ¿Resumida o extendida?</span>
+        <span>Abbe pregunta: ¿Resumida o extendida?</span>
     `;
     elements.chatMessages.appendChild(indicator);
     elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
@@ -2249,7 +2249,7 @@ function renderInfographic(data, afterElement) {
         <div class="infographic-card__header">
             <div class="infographic-card__brand">
                 <i class="ph-bold ph-pulse"></i>
-                <span>Novia</span>
+                <span>Abbe</span>
             </div>
             <h3 class="infographic-card__title">${data.titulo || 'Resumen'}</h3>
             ${data.subtitulo ? `<p class="infographic-card__subtitle">${data.subtitulo}</p>` : ''}
@@ -2261,7 +2261,7 @@ function renderInfographic(data, afterElement) {
             ${quoteHTML}
         </div>
         <div class="infographic-card__footer">
-            <span>Novia &middot; Infograf&iacute;a generada por IA</span>
+            <span>Abbe &middot; Infograf&iacute;a generada por IA</span>
         </div>
         <div class="infographic-actions">
             <button class="infographic-actions__download" title="Descargar PNG">
@@ -2319,20 +2319,20 @@ function downloadInfographicAsPNG(cardElement) {
 
 
 // ============================================
-// Wake Word Detection — "Hola Novia" / "Hey Novia" / "Novia"
+// Wake Word Detection — "Hola Abbe" / "Hey Abbe" / "Abbe"
 // ============================================
 // Flexible patterns — no \b boundaries (Spanish SpeechRecognition
 // transcripts often lack proper word spacing/punctuation)
 const WAKE_WORD_PATTERNS = [
-    /hola\s*novia/i,
-    /hey\s*novia/i,
-    /oye\s*novia/i,
-    /ok\s*novia/i,
-    /ola\s*novia/i,     // common speech-to-text typo
+    /hola\s*abbe/i,
+    /hey\s*abbe/i,
+    /oye\s*abbe/i,
+    /ok\s*abbe/i,
+    /ola\s*abbe/i,     // common speech-to-text typo
 ];
 
-// Single-word fallback: standalone "novia" only if it's the whole transcript
-const WAKE_WORD_SOLO = /^\s*novia\s*$/i;
+// Single-word fallback: standalone "abbe" only if it's the whole transcript
+const WAKE_WORD_SOLO = /^\s*abbe\s*$/i;
 
 /**
  * Checks if the transcript contains a wake word.
@@ -2342,7 +2342,7 @@ function containsWakeWord(transcript) {
     if (!t) return false;
     // Multi-word patterns first (more specific)
     if (WAKE_WORD_PATTERNS.some(p => p.test(t))) return true;
-    // Solo "novia" only if the entire transcript is just the word
+    // Solo "abbe" only if the entire transcript is just the word
     if (WAKE_WORD_SOLO.test(t)) return true;
     return false;
 }
@@ -2359,8 +2359,8 @@ function stripWakeWord(text) {
         t = t.replace(new RegExp(pattern.source + '[,\\s.!?]*', 'gi'), '').trim();
     }
 
-    // 2) Strip standalone "novia" variations
-    t = t.replace(/\bnovia\b[,\s.!?]*/gi, '').trim();
+    // 2) Strip standalone "abbe" variations
+    t = t.replace(/\babbe\b[,\s.!?]*/gi, '').trim();
 
     // 3) If what remains is just a greeting word or nothing, return empty
     const leftover = t.toLowerCase()
@@ -2463,7 +2463,7 @@ function startWakeWordListening() {
         if (event.error === 'not-allowed') {
             state.wakeWordEnabled = false;
             updateWakeWordToggle(false);
-            localStorage.setItem('novia_wake_word', 'off');
+            localStorage.setItem('abbe_wake_word', 'off');
             return;
         }
     };
@@ -2517,11 +2517,11 @@ function stopWakeWordListening() {
 /**
  * Called when the wake word is detected.
  * Plays beep, shows visual feedback, navigates to chat and starts recording.
- * Like Siri: say "Hola Novia" → it listens to everything you say.
+ * Like Siri: say "Hola Abbe" → it listens to everything you say.
  */
 function onWakeWordDetected() {
     // No activar si el usuario no ha hecho login
-    if (localStorage.getItem('novia_logged_in') !== 'true') {
+    if (localStorage.getItem('abbe_logged_in') !== 'true') {
         console.log('[WakeWord] Ignorado — usuario no logueado');
         return;
     }
@@ -2558,7 +2558,7 @@ function showWakeWordFeedback() {
             <div class="wake-word-toast__icon">
                 <i class="ph ph-chat-circle-dots"></i>
             </div>
-            <span class="wake-word-toast__text">Hola, soy Novia</span>
+            <span class="wake-word-toast__text">Hola, soy Abbe</span>
             <span class="wake-word-toast__hint">Abriendo chat...</span>
         </div>`;
     document.body.appendChild(toast);
@@ -2584,10 +2584,10 @@ function toggleWakeWord() {
 
     if (state.wakeWordEnabled) {
         startWakeWordListening();
-        localStorage.setItem('novia_wake_word', 'on');
+        localStorage.setItem('abbe_wake_word', 'on');
     } else {
         stopWakeWordListening();
-        localStorage.setItem('novia_wake_word', 'off');
+        localStorage.setItem('abbe_wake_word', 'off');
     }
 }
 
@@ -2599,9 +2599,9 @@ function updateWakeWordToggle(enabled) {
         const btn = document.getElementById(id);
         if (!btn) return;
         btn.classList.toggle('wake-word-toggle--active', enabled);
-        btn.title = enabled ? 'Desactivar Hola, Novia' : 'Activar Hola, Novia';
+        btn.title = enabled ? 'Desactivar Hola, Abbe' : 'Activar Hola, Abbe';
         const label = btn.querySelector('.wake-word-label');
-        if (label) label.textContent = enabled ? 'Hola, Novia · on' : 'Hola, Novia · off';
+        if (label) label.textContent = enabled ? 'Hola, Abbe · on' : 'Hola, Abbe · off';
         const icon = btn.querySelector('.ph');
         if (icon) {
             icon.className = enabled ? 'ph ph-microphone' : 'ph ph-microphone-slash';
@@ -2645,10 +2645,10 @@ function toggleTTS() {
     updateVoiceButton(state.ttsEnabled);
 
     if (state.ttsEnabled) {
-        localStorage.setItem('novia_tts', 'on');
+        localStorage.setItem('abbe_tts', 'on');
     } else {
         stopTTS();
-        localStorage.setItem('novia_tts', 'off');
+        localStorage.setItem('abbe_tts', 'off');
     }
 }
 
@@ -2660,7 +2660,7 @@ function enableTTS() {
     if (!state.ttsEnabled) {
         state.ttsEnabled = true;
         updateVoiceButton(true);
-        localStorage.setItem('novia_tts', 'on');
+        localStorage.setItem('abbe_tts', 'on');
     }
 }
 
@@ -2672,10 +2672,10 @@ function updateVoiceButton(enabled) {
     if (!btn) return;
     if (enabled) {
         btn.classList.add('voice-orb--active');
-        btn.title = 'Voz de Novia activada';
+        btn.title = 'Voz de Abbe activada';
     } else {
         btn.classList.remove('voice-orb--active');
-        btn.title = 'Voz de Novia desactivada';
+        btn.title = 'Voz de Abbe desactivada';
     }
 }
 
@@ -2944,8 +2944,8 @@ function handleLogout() {
     stopTTS();
 
     // Limpiar estado de sesión
-    localStorage.removeItem('novia_logged_in');
-    localStorage.removeItem('novia_user');
+    localStorage.removeItem('abbe_logged_in');
+    localStorage.removeItem('abbe_user');
 
     // Limpiar campos de login
     if (elements.loginUser) elements.loginUser.value = '';
@@ -2970,8 +2970,8 @@ function hideLoginScreen() {
 function handleLogin(username, password) {
     // Demo: validación simple (en producción sería un API call)
     if (username === VALID_CREDENTIALS.usuario && password === VALID_CREDENTIALS.password) {
-        localStorage.setItem('novia_logged_in', 'true');
-        localStorage.setItem('novia_user', username);
+        localStorage.setItem('abbe_logged_in', 'true');
+        localStorage.setItem('abbe_user', username);
         hideLoginScreen();
         // Sincronizar historial después de login
         syncSearchHistory();
@@ -2989,7 +2989,7 @@ async function handleFaceID() {
 
     try {
         // Verificar si ya hay credencial guardada
-        const credentialId = localStorage.getItem('novia_faceid_credential');
+        const credentialId = localStorage.getItem('abbe_faceid_credential');
 
         if (credentialId) {
             // Autenticar con credencial existente
@@ -3006,7 +3006,7 @@ async function handleFaceID() {
             });
 
             if (credential) {
-                localStorage.setItem('novia_logged_in', 'true');
+                localStorage.setItem('abbe_logged_in', 'true');
                 hideLoginScreen();
             }
         } else {
@@ -3017,11 +3017,11 @@ async function handleFaceID() {
             const credential = await navigator.credentials.create({
                 publicKey: {
                     challenge: new Uint8Array(32),
-                    rp: { name: 'Novia', id: window.location.hostname },
+                    rp: { name: 'Abbe', id: window.location.hostname },
                     user: {
                         id: new Uint8Array(16),
-                        name: 'usuario@novia.app',
-                        displayName: 'Usuario Novia'
+                        name: 'usuario@abbe.app',
+                        displayName: 'Usuario Abbe'
                     },
                     pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
                     timeout: 60000,
@@ -3035,8 +3035,8 @@ async function handleFaceID() {
             if (credential) {
                 // Guardar credential ID para futuras autenticaciones
                 const credId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
-                localStorage.setItem('novia_faceid_credential', credId);
-                localStorage.setItem('novia_logged_in', 'true');
+                localStorage.setItem('abbe_faceid_credential', credId);
+                localStorage.setItem('abbe_logged_in', 'true');
                 hideLoginScreen();
             }
         }
@@ -3053,10 +3053,10 @@ async function handleFaceID() {
 function checkAuthOnLoad() {
     // DEMO MODE: Siempre mostrar login para la demo
     // Comentar estas 2 líneas para producción
-    localStorage.removeItem('novia_logged_in');
-    localStorage.removeItem('novia_user');
+    localStorage.removeItem('abbe_logged_in');
+    localStorage.removeItem('abbe_user');
 
-    const isLoggedIn = localStorage.getItem('novia_logged_in') === 'true';
+    const isLoggedIn = localStorage.getItem('abbe_logged_in') === 'true';
     if (isLoggedIn) {
         elements.loginScreen?.classList.add('hidden');
         elements.welcomeScreen?.classList.remove('hidden');
@@ -3077,7 +3077,7 @@ async function handleDemoOrbClick() {
     // Immediate visual feedback — activate 3D orb animation instantly
     if (window.orbSetListening) window.orbSetListening(true);
 
-    const greetingText = 'Muchas gracias Jorge por la oportunidad de conocernos. Soy Novia, tu asistente de Novacutan. Estaré siempre a tu disposición y será un placer que colaboremos juntos.';
+    const greetingText = 'Muchas gracias Jorge por la oportunidad de conocernos. Soy Abbe, tu asistente de Novacutan. Estaré siempre a tu disposición y será un placer que colaboremos juntos.';
 
     try {
         // Play TTS greeting and wait for it to finish
@@ -3335,7 +3335,7 @@ function init() {
     renderRecentSearches();
 
     // Sincronizar historial con servidor si el usuario está logueado
-    if (localStorage.getItem('novia_logged_in') === 'true') {
+    if (localStorage.getItem('abbe_logged_in') === 'true') {
         syncSearchHistory();
     }
 
@@ -3344,7 +3344,7 @@ function init() {
     document.getElementById('chat-wake-word-btn')?.addEventListener('click', toggleWakeWord);
 
     // Restore wake word preference from localStorage
-    const savedWakeWord = localStorage.getItem('novia_wake_word');
+    const savedWakeWord = localStorage.getItem('abbe_wake_word');
     if (savedWakeWord === 'on') {
         state.wakeWordEnabled = true;
         updateWakeWordToggle(true);
@@ -3355,7 +3355,7 @@ function init() {
     document.getElementById('chat-voice-btn')?.addEventListener('click', toggleTTS);
 
     // Restore TTS preference from localStorage (default: off)
-    const savedTTS = localStorage.getItem('novia_tts');
+    const savedTTS = localStorage.getItem('abbe_tts');
     if (savedTTS === 'on') {
         state.ttsEnabled = true;
         updateVoiceButton(true);
@@ -3373,7 +3373,7 @@ function init() {
         releaseCachedMicStream();
     });
 
-    console.log('Novia inicializada');
+    console.log('Abbe inicializada');
 }
 
 // Iniciar

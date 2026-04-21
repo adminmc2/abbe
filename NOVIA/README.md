@@ -1,6 +1,6 @@
-# NOVIA — Asistente IA de Ventas Farmacéuticas
+# ABBE — Asistente IA de Ventas Farmacéuticas
 
-Asistente de inteligencia artificial diseñado para representantes médicos de **Novacutan** (Above Pharma). NOVIA ayuda con información de productos, manejo de objeciones y argumentos de venta personalizados por especialidad médica.
+Asistente de inteligencia artificial diseñado para representantes médicos de **Novacutan** (Above Pharma). ABBE ayuda con información de productos, manejo de objeciones y argumentos de venta personalizados por especialidad médica.
 
 ## Características
 
@@ -48,8 +48,8 @@ cp .env.example .env
 uvicorn main:app --host 0.0.0.0 --port 7862 --reload
 
 # Docker
-docker build -t novia .
-docker run -p 7862:7862 --env-file .env novia
+docker build -t abbe .
+docker run -p 7862:7862 --env-file .env abbe
 ```
 
 Abrir `http://localhost:7862` en el navegador.
@@ -140,7 +140,7 @@ La base de conocimiento (`knowledge_base.json`) contiene ~170 pares pregunta/res
 El proyecto está configurado para **Hugging Face Spaces**:
 
 ```bash
-docker build -t novia .
+docker build -t abbe .
 # Se ejecuta en puerto 7862 con usuario non-root (requisito HF Spaces)
 ```
 
