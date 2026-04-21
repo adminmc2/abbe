@@ -9,9 +9,9 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 ### Documentación y configuración del proyecto
 
 - **`CLAUDE.md` (raíz)** — Creado archivo de configuración para Claude Code con estructura del proyecto, stack tecnológico, flujo de arquitectura, convenciones de código y notas de desarrollo.
-- **`NOVIA/README.md`** — Creado README técnico completo con: features, requisitos, instalación, variables de entorno, diagrama de arquitectura, estructura de archivos, API endpoints, categorías de knowledge base, stack y deploy.
+- **`ABBE/README.md`** — Creado README técnico completo con: features, requisitos, instalación, variables de entorno, diagrama de arquitectura, estructura de archivos, API endpoints, categorías de knowledge base, stack y deploy.
 - **Seguridad** — Eliminadas credenciales de prueba (usuario/contraseña) y voice IDs de la documentación. Los datos sensibles ahora se referencian a `.env.example` o `app.js` sin exponerlos.
-- **`.gitignore` (raíz)** — Copiado desde `NOVIA/` para cubrir el repositorio completo.
+- **`.gitignore` (raíz)** — Copiado desde `ABBE/` para cubrir el repositorio completo.
 - **`git init`** — Inicializado repositorio git en la raíz del proyecto.
 
 ---

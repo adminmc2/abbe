@@ -25,7 +25,7 @@ Asistente de inteligencia artificial diseñado para representantes médicos de *
 
 ```bash
 # Clonar e instalar dependencias
-cd NOVIA
+cd ABBE
 pip install -r requirements.txt
 
 # Configurar variables de entorno
@@ -85,7 +85,7 @@ Abrir `http://localhost:7862` en el navegador.
 ## Estructura de archivos
 
 ```
-NOVIA/
+ABBE/
 ├── main.py                  # Backend FastAPI, WebSocket, TTS/STT proxy
 ├── agents/
 │   ├── orchestrator.py      # Router de intenciones (LLM + reglas)

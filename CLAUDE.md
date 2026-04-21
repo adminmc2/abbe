@@ -10,7 +10,7 @@ El asistente ayuda a los representantes con información de productos (biomodula
 
 ```
 above pharma/
-├── NOVIA/                          # Aplicación principal
+├── ABBE/                           # Aplicación principal
 │   ├── main.py                     # Backend FastAPI (entry point)
 │   ├── agents/                     # Sistema multi-agente
 │   │   ├── orchestrator.py         # Router de intenciones (clasifica → agente)
@@ -30,7 +30,7 @@ above pharma/
 │   ├── Dockerfile                  # Deploy HF Spaces (puerto 7862)
 │   ├── .env                        # Variables de entorno (NO commitear)
 │   └── CHANGELOG.md                # Historial de desarrollo
-├── NOVIA.md                        # Documentación de producto y pricing
+├── ABBE.md                         # Documentación de producto y pricing
 ├── presentacion-above-pharma.md    # Presentación comercial
 └── presentacion-above-pharma-general.md
 ```
@@ -48,7 +48,7 @@ above pharma/
 ## Cómo correr el proyecto
 
 ```bash
-cd NOVIA
+cd ABBE
 pip install -r requirements.txt
 cp .env.example .env  # Configurar API keys
 uvicorn main:app --host 0.0.0.0 --port 7862 --reload
