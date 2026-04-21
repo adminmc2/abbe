@@ -90,6 +90,14 @@ Usuario → WebSocket /ws/chat
 - ABBE (Novacutan): `7862`
 - Puro Omega (proyecto hermano): `7860`
 
+## Versionado y CHANGELOG
+
+- **Cada cambio funcional debe incrementar la versión** en `ABBE/CHANGELOG.md`
+- Usar versionado semántico: `MAJOR.MINOR.PATCH` (ej: v5.9.0 → v5.9.1 para fix, v5.10.0 para feature)
+- Marcar la versión actual con `(ACTUAL)` y quitar esa etiqueta de la anterior
+- Incluir fecha en formato `YYYY-MM-DD`
+- Describir brevemente qué cambió y por qué
+
 ## Notas importantes
 
 - El proyecto se originó como fork de `puro_omega/` adaptado para Novacutan

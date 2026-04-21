@@ -4,7 +4,17 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v5.8.0 — 2026-04-21 (ACTUAL)
+## v5.9.0 — 2026-04-21 (ACTUAL)
+
+### Rebrand y ajustes de UX
+
+- **Rebrand Novia → Abbe** — Renombrado el asistente en todo el proyecto: UI, backend, prompts, wake words, localStorage keys, PWA manifest, documentación y directorio (`NOVIA/` → `ABBE/`).
+- **Greeting TTS actualizado** — Nuevo mensaje de bienvenida al tocar el orb en login: "Hola, me llamo Abbe y soy tu asistente inteligente que te ayudará en todos los procesos de decisión y venta para los productos de Above Pharma. Será un placer colaborar juntos."
+- **CLAUDE.md** — Agregada convención de versionado y CHANGELOG obligatorio en cada cambio.
+
+---
+
+## v5.8.0 — 2026-04-21
 
 ### Documentación y configuración del proyecto
 

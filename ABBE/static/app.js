@@ -3077,7 +3077,7 @@ async function handleDemoOrbClick() {
     // Immediate visual feedback — activate 3D orb animation instantly
     if (window.orbSetListening) window.orbSetListening(true);
 
-    const greetingText = 'Muchas gracias Jorge por la oportunidad de conocernos. Soy Abbe, tu asistente de Novacutan. Estaré siempre a tu disposición y será un placer que colaboremos juntos.';
+    const greetingText = 'Hola, me llamo Abbe y soy tu asistente inteligente que te ayudará en todos los procesos de decisión y venta para los productos de Above Pharma. Será un placer colaborar juntos.';
 
     try {
         // Play TTS greeting and wait for it to finish
