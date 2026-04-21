@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novacutan - Test Orb Pequeño</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #e0e7ff 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #4c1d95;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 40px;
+        }
+        .proposals {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .proposal {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .proposal h2 {
+            color: #5b21b6;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .proposal p {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .sizes {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .size-group {
+            text-align: center;
+        }
+        .size-label {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 8px;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+        .current {
+            border: 2px solid #a78bfa;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test de Orb Pequeño - Novacutan</h1>
+    <p class="subtitle">Compara las 4 propuestas en tamaños 28px, 40px y 56px</p>
+
+    <div class="proposals">
+        <!-- Propuesta 0: Actual -->
+        <div class="proposal current">
+            <h2>Actual (Referencia)</h2>
+            <p>El shader actual sin modificaciones. Sirve para comparar.</p>
+            <div class="sizes">
+                <div class="size-group">
+                    <canvas id="current-28" width="56" height="56"></canvas>
+                    <div class="size-label">28px</div>
+                </div>
+                <div class="size-group">
+                    <canvas id="current-40" width="80" height="80"></canvas>
+                    <div class="size-label">40px</div>
+                </div>
+                <div class="size-group">
+                    <canvas id="current-56" width="112" height="112"></canvas>
+                    <div class="size-label">56px</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Propuesta 1 -->
+        <div class="proposal">
+            <h2>1. Zoom Reducido + Menos Pétalos</h2>
+            <p>Zoom: 2.0, Pétalos: 4-5. Patrón más grande y visible en pequeño.</p>
+            <div class="sizes">
+                <div class="size-group">
+                    <canvas id="p1-28" width="56" height="56"></canvas>
+                    <div class="size-label">28px</div>
+                </div>
+                <div class="size-group">
+                    <canvas id="p1-40" width="80" height="80"></canvas>
+                    <div class="size-label">40px</div>
+                </div>
+                <div class="size-group">
+                    <canvas id="p1-56" width="112" height="112"></canvas>
+                    <div class="size-label">56px</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Propuesta 2 -->
+        <div class="proposal">
+            <h2>2. Glow Central Dominante</h2>
+            <p>Brillo central intenso (0.4). Orbe brillante con detalles sutiles.</p>
+            <div class="sizes">
+                <div class="size-group">
+                    <canvas id="p2-28" width="56" height="56"></canvas>
+                    <div class="size-label">28px</div>
+                </div>
+                <div class="size-group">
+                    <canvas id="p2-40" width="80" height="80"></canvas>
+                    <div class="size-label">40px</div>
+                </div>
+                <div class="size-group">
+                    <canvas id="p2-56" width="112" height="112"></canvas>
+                    <div class="size-label">56px</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Propuesta 3 -->
+        <div class="proposal">
+            <h2>3. Contraste Aumentado</h2>
+            <p>Colores 1.5x más intensos. Colores más vivos y definidos.</p>
+            <div class="sizes">
+                <div class="size-group">
+                    <canvas id="p3-28" width="56" height="56"></canvas>
+                    <div class="size-label">28px</div>
+                </div>
+                <div class="size-group">
+                    <canvas id="p3-40" width="80" height="80"></canvas>
+                    <div class="size-label">40px</div>
+                </div>
+                <div class="size-group">
+                    <canvas id="p3-56" width="112" height="112"></canvas>
+                    <div class="size-label">56px</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Propuesta 4 -->
+        <div class="proposal">
+            <h2>4. Simplificado + Borde</h2>
+            <p>Una sola capa de pattern + anillo exterior. Forma más clara.</p>
+            <div class="sizes">
+                <div class="size-group">
+                    <canvas id="p4-28" width="56" height="56"></canvas>
+                    <div class="size-label">28px</div>
+                </div>
+                <div class="size-group">
+                    <canvas id="p4-40" width="80" height="80"></canvas>
+                    <div class="size-label">40px</div>
+                </div>
+                <div class="size-group">
+                    <canvas id="p4-56" width="112" height="112"></canvas>
+                    <div class="size-label">56px</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Vertex shader común
+    const vertexShader = `#version 300 es
+    precision highp float;
+    in vec4 position;
+    void main() { gl_Position = position; }`;
+
+    // Shader base (actual)
+    const baseFragment = `#version 300 es
+    precision highp float;
+    out vec4 O;
+    uniform float time;
+    uniform vec2 resolution;
+    uniform float intensity;
+    uniform float mood;
+
+    #define FC gl_FragCoord.xy
+    #define R resolution
+    #define T time
+    #define S smoothstep
+    #define SE(v,a) S(fwidth(a),-7e-3,v-a)
+    #define MN min(R.x,R.y)
+    #define MX max(R.x,R.y)
+    #define reveal(p) SE(MN/MX*length(p),sqrt(S(1.,.0,1./T*1.8)))
+    #define TAU radians(360.)
+    #define PI (TAU/2.)
+
+    vec3 novacutanHue(float a) {
+        vec3 blue = vec3(0.4, 0.494, 0.918);
+        vec3 purple = vec3(0.463, 0.294, 0.635);
+        vec3 pink = vec3(0.941, 0.576, 0.984);
+        vec3 cyan = vec3(0.42, 0.85, 1.0);
+        float t = fract(a);
+        vec3 col;
+        float phase = t * 4.0;
+        if (phase < 1.0) col = mix(blue, purple, smoothstep(0.0, 1.0, phase));
+        else if (phase < 2.0) col = mix(purple, pink, smoothstep(0.0, 1.0, phase - 1.0));
+        else if (phase < 3.0) col = mix(pink, cyan, smoothstep(0.0, 1.0, phase - 2.0));
+        else col = mix(cyan, blue, smoothstep(0.0, 1.0, phase - 3.0));
+        float brightness = 0.08 + intensity * 0.12;
+        col += brightness * sin(PI * a * 0.5 + vec3(0.0, 1.0, 2.0));
+        return clamp(col, 0.0, 1.0);
+    }
+    #define hue(a) novacutanHue(a)
+
+    mat2 rot(float a) { float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
+
+    vec2 pmod(vec2 p, float n) {
+        float a = atan(p.x, p.y);
+        float b = TAU / n;
+        a = floor(0.5 + a / b) * b;
+        return rot(-a) * p;
+    }
+
+    // PARAM: zoom, petals, glowIntensity, colorMult, showRing
+    #define ZOOM_VAL 3.5
+    #define PETALS_VAL 7.0
+    #define GLOW_VAL 0.15
+    #define COLOR_MULT 1.0
+    #define SHOW_RING 0.0
+
+    vec3 pattern(inout vec2 uv) {
+        float petals = PETALS_VAL + mood * 4.0;
+        uv = pmod(uv, petals);
+        uv = uv.yx;
+        vec2 p = uv;
+        float n = 2.8;
+        uv.x -= clamp(round(uv.x * n), 1.0, 4.0) / n;
+        float id = clamp(round(uv.x * n), 1.0, 4.0);
+        float speed = 0.15 + intensity * 0.6 + mood * 0.2;
+        uv.x -= sin(-1.6 + id + T * PI * speed + p.x * id) * 0.0125 + 0.005;
+        float d = SE(length(uv), 0.023 * (6.0 - round(p.x * n)));
+        vec3 col = vec3(0);
+        float colorSpeed = 0.3 + intensity * 1.2;
+        vec3 c = hue(0.2 * (round(p.x * n) - T * colorSpeed) + S(-0.25, 1.0, uv.x) * 0.5);
+        col += tanh(c * c * c) * clamp(d * d * d, 0.0, 1.0);
+        return sqrt(col);
+    }
+
+    void main() {
+        vec2 uv = (FC - 0.5 * R) / MN;
+        vec2 p, st = uv;
+        float zoom = ZOOM_VAL + mood * 1.0;
+        uv *= zoom;
+        float rotSpeed = 0.005 + intensity * 0.015;
+        uv *= rot(rotSpeed * sin(T * (0.3 + intensity * 0.3) - uv.y * 2.0) - 0.0125);
+        p = uv;
+        p *= rot(0.0125);
+        vec3 col;
+        vec3 c = pattern(uv);
+        float pulseSpeed = 0.15 + intensity * 0.25;
+        float k = 0.05 / length(uv) * pow(0.5 + 0.5 * sin(T * PI * pulseSpeed), 3.0);
+        col = mix(k * tanh(c * c * c), pattern(p), 0.985);
+        col *= reveal(st);
+        float glow = exp(-length(st) * (2.8 - intensity * 0.5)) * (GLOW_VAL + intensity * 0.2);
+        vec3 glowColor = mix(vec3(0.4, 0.494, 0.918), vec3(0.463, 0.294, 0.635), 0.5 + 0.5 * sin(T * 0.2));
+        col += glowColor * glow;
+        col *= COLOR_MULT;
+
+        // Anillo exterior (propuesta 4)
+        if (SHOW_RING > 0.5) {
+            float dist = length(st);
+            float ring = smoothstep(0.38, 0.40, dist) - smoothstep(0.42, 0.44, dist);
+            vec3 ringColor = mix(vec3(0.4, 0.494, 0.918), vec3(0.941, 0.576, 0.984), 0.5 + 0.5 * sin(T * 0.3));
+            col += ringColor * ring * 0.8;
+        }
+
+        float dist = length(st);
+        float circleMask = 1.0 - smoothstep(0.35, 0.5, dist);
+        float baseAlpha = clamp(length(col) * 2.0, 0.0, 1.0);
+        float alpha = baseAlpha * circleMask;
+        O = vec4(col * circleMask, alpha);
+    }`;
+
+    // Propuesta 1: Zoom reducido + menos pétalos
+    const p1Fragment = baseFragment
+        .replace('#define ZOOM_VAL 3.5', '#define ZOOM_VAL 2.0')
+        .replace('#define PETALS_VAL 7.0', '#define PETALS_VAL 4.0');
+
+    // Propuesta 2: Glow central dominante
+    const p2Fragment = baseFragment
+        .replace('#define GLOW_VAL 0.15', '#define GLOW_VAL 0.45')
+        .replace('float circleMask = 1.0 - smoothstep(0.35, 0.5, dist);',
+                 'float circleMask = 1.0 - smoothstep(0.42, 0.5, dist);');
+
+    // Propuesta 3: Contraste aumentado
+    const p3Fragment = baseFragment
+        .replace('#define COLOR_MULT 1.0', '#define COLOR_MULT 1.6')
+        .replace('clamp(length(col) * 2.0', 'clamp(length(col) * 3.0');
+
+    // Propuesta 4: Simplificado + borde
+    const p4Fragment = baseFragment
+        .replace('#define ZOOM_VAL 3.5', '#define ZOOM_VAL 2.5')
+        .replace('#define PETALS_VAL 7.0', '#define PETALS_VAL 5.0')
+        .replace('#define GLOW_VAL 0.15', '#define GLOW_VAL 0.3')
+        .replace('#define SHOW_RING 0.0', '#define SHOW_RING 1.0');
+
+    // Crear orb WebGL
+    function createOrb(canvasId, fragmentSource, displaySize) {
+        const canvas = document.getElementById(canvasId);
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = displaySize * dpr;
+        canvas.height = displaySize * dpr;
+        canvas.style.width = displaySize + 'px';
+        canvas.style.height = displaySize + 'px';
+
+        const gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: true });
+        if (!gl) { console.error('WebGL2 not supported'); return null; }
+
+        // Compile shaders
+        const vs = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vs, vertexShader);
+        gl.compileShader(vs);
+
+        const fs = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fs, fragmentSource);
+        gl.compileShader(fs);
+        if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) {
+            console.error('Fragment shader error:', gl.getShaderInfoLog(fs));
+            return null;
+        }
+
+        const program = gl.createProgram();
+        gl.attachShader(program, vs);
+        gl.attachShader(program, fs);
+        gl.linkProgram(program);
+
+        // Geometry
+        const buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+
+        const posLoc = gl.getAttribLocation(program, 'position');
+        gl.enableVertexAttribArray(posLoc);
+        gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+        // Uniforms
+        const uniforms = {
+            time: gl.getUniformLocation(program, 'time'),
+            resolution: gl.getUniformLocation(program, 'resolution'),
+            intensity: gl.getUniformLocation(program, 'intensity'),
+            mood: gl.getUniformLocation(program, 'mood')
+        };
+
+        const startTime = performance.now();
+        let intensity = 0;
+
+        function render() {
+            const now = (performance.now() - startTime) / 1000;
+            intensity += (0.3 - intensity) * 0.02; // Slight activity
+
+            gl.viewport(0, 0, canvas.width, canvas.height);
+            gl.clearColor(0, 0, 0, 0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+            gl.useProgram(program);
+            gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
+            gl.uniform1f(uniforms.time, now);
+            gl.uniform1f(uniforms.intensity, intensity);
+            gl.uniform1f(uniforms.mood, 1.0);
+
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            requestAnimationFrame(render);
+        }
+        render();
+    }
+
+    // Inicializar todos los orbs
+    const sizes = [28, 40, 56];
+    const proposals = [
+        { prefix: 'current', shader: baseFragment },
+        { prefix: 'p1', shader: p1Fragment },
+        { prefix: 'p2', shader: p2Fragment },
+        { prefix: 'p3', shader: p3Fragment },
+        { prefix: 'p4', shader: p4Fragment }
+    ];
+
+    proposals.forEach(p => {
+        sizes.forEach(size => {
+            createOrb(`${p.prefix}-${size}`, p.shader, size);
+        });
+    });
+    </script>
+</body>
+</html>

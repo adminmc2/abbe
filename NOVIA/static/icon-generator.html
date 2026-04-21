@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Íconos PWA - Novacutan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #FBF8FF;
+            color: #333;
+            padding: 40px;
+            min-height: 100vh;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+        .instructions {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .instructions p {
+            margin-bottom: 10px;
+        }
+        .instructions code {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .icon-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.1);
+        }
+        .icon-item h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .icon-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            min-height: 180px;
+            background: #FBF8FF;
+            border-radius: 12px;
+        }
+        .icon-preview canvas {
+            border-radius: 20%;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+        }
+        .icon-item button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .icon-item button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .download-all {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .download-all:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            display: none;
+            color: #667eea;
+        }
+        .status.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generador de Íconos PWA - Novacutan</h1>
+
+    <div class="instructions">
+        <p><strong>Instrucciones:</strong></p>
+        <p>1. Los íconos se generan automáticamente del shader WebGL del orb.</p>
+        <p>2. Haz clic en cada botón para descargar el ícono individual.</p>
+        <p>3. O usa "Descargar Todos" para obtener todos los íconos de una vez.</p>
+        <p>4. Copia los archivos descargados a <code>/static/</code></p>
+    </div>
+
+    <div class="grid" id="icons-grid"></div>
+
+    <button class="download-all" onclick="downloadAll()">Descargar Todos los Íconos</button>
+
+    <div class="status" id="status"></div>
+
+    <script>
+        // Configuración de íconos a generar
+        // TODOS los íconos con fondo lavanda (#FBF8FF) como en Omega
+        const ICONS = [
+            { name: 'favicon-16x16.png', size: 16, desc: 'Favicon 16x16' },
+            { name: 'favicon-32x32.png', size: 32, desc: 'Favicon 32x32' },
+            { name: 'favicon-48x48.png', size: 48, desc: 'Favicon 48x48' },
+            { name: 'apple-touch-icon.png', size: 180, desc: 'Apple Touch Icon' },
+            { name: 'apple-touch-icon-152x152.png', size: 152, desc: 'Apple iPad' },
+            { name: 'apple-touch-icon-167x167.png', size: 167, desc: 'Apple iPad Pro' },
+            { name: 'apple-touch-icon-180x180.png', size: 180, desc: 'Apple iPhone' },
+            { name: 'android-chrome-192x192.png', size: 192, desc: 'Android Chrome 192' },
+            { name: 'android-chrome-512x512.png', size: 512, desc: 'Android Chrome 512' },
+            { name: 'mstile-150x150.png', size: 150, desc: 'Windows Tile' },
+            { name: 'icon-256x256.png', size: 256, desc: 'Mac/Desktop 256' },
+            { name: 'icon-512x512.png', size: 512, desc: 'Mac/Desktop 512' },
+        ];
+
+        // Vertex shader
+        const vertexShaderSource = `#version 300 es
+precision highp float;
+in vec4 position;
+void main() {
+    gl_Position = position;
+}`;
+
+        // Fragment shader - MISMO que orb.js pero con fondo lavanda sólido
+        const fragmentShaderSource = `#version 300 es
+precision highp float;
+
+out vec4 O;
+uniform float time;
+uniform vec2 resolution;
+uniform float intensity;
+uniform float mood;
+uniform float smallMode;
+
+#define FC gl_FragCoord.xy
+#define R resolution
+#define T time
+#define S smoothstep
+#define SE(v,a) S(fwidth(a),-7e-3,v-a)
+#define MN min(R.x,R.y)
+#define MX max(R.x,R.y)
+#define reveal(p) SE(MN/MX*length(p),sqrt(S(1.,.0,1./T*1.8)))
+#define TAU radians(360.)
+#define PI (TAU/2.)
+
+// Paleta Novacutan (igual que orb.js)
+vec3 novacutanHue(float a) {
+    vec3 blue = vec3(0.4, 0.494, 0.918);
+    vec3 purple = vec3(0.463, 0.294, 0.635);
+    vec3 pink = vec3(0.941, 0.576, 0.984);
+    vec3 cyan = vec3(0.42, 0.85, 1.0);
+
+    float t = fract(a);
+    vec3 col;
+    float phase = t * 4.0;
+    if (phase < 1.0) {
+        col = mix(blue, purple, smoothstep(0.0, 1.0, phase));
+    } else if (phase < 2.0) {
+        col = mix(purple, pink, smoothstep(0.0, 1.0, phase - 1.0));
+    } else if (phase < 3.0) {
+        col = mix(pink, cyan, smoothstep(0.0, 1.0, phase - 2.0));
+    } else {
+        col = mix(cyan, blue, smoothstep(0.0, 1.0, phase - 3.0));
+    }
+
+    float brightness = 0.08 + intensity * 0.12;
+    col += brightness * sin(PI * a * 0.5 + vec3(0.0, 1.0, 2.0));
+    return clamp(col, 0.0, 1.0);
+}
+
+#define hue(a) novacutanHue(a)
+
+mat2 rot(float a) {
+    float c = cos(a), s = sin(a);
+    return mat2(c, -s, s, c);
+}
+
+vec2 pmod(vec2 p, float n) {
+    float a = atan(p.x, p.y);
+    float b = TAU / n;
+    a = floor(0.5 + a / b) * b;
+    return rot(-a) * p;
+}
+
+vec3 pattern(inout vec2 uv, vec3 bg) {
+    float petals = mix(7.0 + mood * 4.0, 4.0 + mood * 1.0, smallMode);
+    uv = pmod(uv, petals);
+    uv = uv.yx;
+    vec2 p = uv;
+    float n = 2.8;
+    uv.x -= clamp(round(uv.x * n), 1.0, 4.0) / n;
+    float id = clamp(round(uv.x * n), 1.0, 4.0);
+
+    float speed = 0.15 + intensity * 0.6 + mood * 0.2;
+    uv.x -= sin(-1.6 + id + T * PI * speed + p.x * id) * 0.0125 + 0.005;
+
+    float d = SE(length(uv), 0.023 * (6.0 - round(p.x * n)));
+    float colorSpeed = 0.3 + intensity * 1.2;
+    vec3 c = hue(0.2 * (round(p.x * n) - T * colorSpeed) + S(-0.25, 1.0, uv.x) * 0.5);
+    vec3 petalColor = tanh(c * c * c);
+    float petalMask = clamp(d * d * d, 0.0, 1.0);
+    // Mezclar pétalo con fondo lavanda (no negro)
+    vec3 col = mix(bg, sqrt(petalColor), petalMask);
+    return col;
+}
+
+void main() {
+    vec2 uv = (FC - 0.5 * R) / MN;
+    vec2 p, st = uv;
+
+    // Fondo lavanda (para íconos estáticos)
+    vec3 bgColor = vec3(0.984, 0.973, 1.0);
+
+    float zoom = mix(3.5 + mood * 1.0, 2.0 + mood * 0.5, smallMode);
+    uv *= zoom;
+
+    float rotSpeed = 0.005 + intensity * 0.015;
+    uv *= rot(rotSpeed * sin(T * (0.3 + intensity * 0.3) - uv.y * 2.0) - 0.0125);
+    p = uv;
+    p *= rot(0.0125);
+
+    // Patrón con fondo lavanda (sin negro)
+    vec3 c = pattern(uv, bgColor);
+    vec3 c2 = pattern(p, bgColor);
+
+    float pulseSpeed = 0.15 + intensity * 0.25;
+    float k = 0.05 / length(uv) * pow(0.5 + 0.5 * sin(T * PI * pulseSpeed), 3.0);
+
+    // Mezcla de patrones
+    vec3 col = mix(mix(bgColor, c, k), c2, 0.985);
+
+    // Reveal con fondo lavanda
+    float revealMask = reveal(st);
+    col = mix(bgColor, col, revealMask);
+
+    // Glow central
+    float glowIntensity = mix(0.15 + intensity * 0.2, 0.25 + intensity * 0.3, smallMode);
+    float glow = exp(-length(st) * (2.8 - intensity * 0.5)) * glowIntensity;
+    vec3 glowColor = mix(
+        vec3(0.4, 0.494, 0.918),
+        vec3(0.463, 0.294, 0.635),
+        0.5 + 0.5 * sin(T * 0.2)
+    );
+    col += glowColor * glow;
+
+    // Máscara circular
+    float dist = length(st);
+    float maskOuter = mix(0.5, 0.48, smallMode);
+    float circleMask = 1.0 - smoothstep(0.35, maskOuter, dist);
+
+    // Mezclar con fondo lavanda
+    col = mix(bgColor, col, circleMask);
+
+    O = vec4(col, 1.0);
+}`;
+
+        class IconGenerator {
+            constructor(canvas, size) {
+                this.canvas = canvas;
+                this.size = size;
+
+                const dpr = 1; // No usar dpr para íconos
+                canvas.width = size;
+                canvas.height = size;
+                canvas.style.width = size + 'px';
+                canvas.style.height = size + 'px';
+
+                this.gl = canvas.getContext('webgl2', {
+                    alpha: true,
+                    premultipliedAlpha: false,
+                    antialias: true,
+                    preserveDrawingBuffer: true
+                });
+
+                if (this.gl) {
+                    this.setupShaders();
+                    this.setupGeometry();
+                }
+            }
+
+            setupShaders() {
+                const gl = this.gl;
+
+                const vs = gl.createShader(gl.VERTEX_SHADER);
+                gl.shaderSource(vs, vertexShaderSource);
+                gl.compileShader(vs);
+
+                const fs = gl.createShader(gl.FRAGMENT_SHADER);
+                gl.shaderSource(fs, fragmentShaderSource);
+                gl.compileShader(fs);
+
+                if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) {
+                    console.error('Fragment shader error:', gl.getShaderInfoLog(fs));
+                }
+
+                this.program = gl.createProgram();
+                gl.attachShader(this.program, vs);
+                gl.attachShader(this.program, fs);
+                gl.linkProgram(this.program);
+
+                this.uniforms = {
+                    resolution: gl.getUniformLocation(this.program, 'resolution'),
+                    time: gl.getUniformLocation(this.program, 'time'),
+                    intensity: gl.getUniformLocation(this.program, 'intensity'),
+                    mood: gl.getUniformLocation(this.program, 'mood'),
+                    smallMode: gl.getUniformLocation(this.program, 'smallMode'),
+                };
+            }
+
+            setupGeometry() {
+                const gl = this.gl;
+                const vertices = new Float32Array([-1, 1, -1, -1, 1, 1, 1, -1]);
+                this.buffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+                gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+                const position = gl.getAttribLocation(this.program, 'position');
+                gl.enableVertexAttribArray(position);
+                gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+            }
+
+            render(time = 2.5) {
+                const gl = this.gl;
+
+                gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+                gl.clearColor(0, 0, 0, 0);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+                gl.enable(gl.BLEND);
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+                gl.useProgram(this.program);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+
+                const isSmall = this.size < 80;
+
+                gl.uniform2f(this.uniforms.resolution, this.canvas.width, this.canvas.height);
+                gl.uniform1f(this.uniforms.time, time);
+                gl.uniform1f(this.uniforms.intensity, 0.3); // Intensidad media para mejor visual
+                gl.uniform1f(this.uniforms.mood, 1.0); // Vibrante
+                gl.uniform1f(this.uniforms.smallMode, isSmall ? 1.0 : 0.0);
+
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            }
+
+            toDataURL() {
+                return this.canvas.toDataURL('image/png');
+            }
+        }
+
+        // Generar íconos
+        const grid = document.getElementById('icons-grid');
+        const generators = [];
+
+        ICONS.forEach(icon => {
+            const item = document.createElement('div');
+            item.className = 'icon-item';
+
+            const h3 = document.createElement('h3');
+            h3.textContent = `${icon.desc} (${icon.size}x${icon.size})`;
+
+            const preview = document.createElement('div');
+            preview.className = 'icon-preview';
+
+            const canvas = document.createElement('canvas');
+            canvas.id = `canvas-${icon.name}`;
+            preview.appendChild(canvas);
+
+            const btn = document.createElement('button');
+            btn.textContent = `Descargar ${icon.name}`;
+            btn.onclick = () => downloadIcon(icon.name);
+
+            item.appendChild(h3);
+            item.appendChild(preview);
+            item.appendChild(btn);
+            grid.appendChild(item);
+
+            // Crear generador
+            const gen = new IconGenerator(canvas, icon.size);
+            gen.render(2.5); // Tiempo fijo para captura consistente
+            generators.push({ name: icon.name, gen, canvas });
+        });
+
+        function downloadIcon(name) {
+            const item = generators.find(g => g.name === name);
+            if (!item) return;
+
+            const link = document.createElement('a');
+            link.download = name;
+            link.href = item.canvas.toDataURL('image/png');
+            link.click();
+
+            showStatus(`Descargado: ${name}`);
+        }
+
+        async function downloadAll() {
+            showStatus('Descargando todos los íconos...');
+
+            for (const item of generators) {
+                const link = document.createElement('a');
+                link.download = item.name;
+                link.href = item.canvas.toDataURL('image/png');
+                link.click();
+
+                // Pequeña pausa entre descargas
+                await new Promise(r => setTimeout(r, 200));
+            }
+
+            showStatus('¡Todos los íconos descargados! Cópialos a /static/');
+        }
+
+        function showStatus(msg) {
+            const status = document.getElementById('status');
+            status.textContent = msg;
+            status.classList.add('show');
+            setTimeout(() => status.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>
