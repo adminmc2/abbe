@@ -9,7 +9,10 @@ import re
 from collections import Counter
 from typing import Dict, List, Optional, Set, Tuple
 
-from .catalog import get_catalog, get_product_synonyms, get_product_aliases, get_product_keywords
+from .catalog import (
+    get_catalog, get_product_synonyms, get_product_aliases,
+    get_product_keywords, get_product_alias_to_id_map, get_product_keywords_map,
+)
 
 
 # ============================================
@@ -316,6 +319,38 @@ class RAGEngine:
                         return line['id']
         return None
 
+    def _detect_product(self, query: str) -> Optional[str]:
+        """Detecta a qué product.id se refiere la query.
+
+        Señales usadas (en orden de prioridad):
+          1. product.name o aliases explícitos del catálogo
+          2. keywords del producto (conditions, pretreatment, zones)
+
+        Retorna product.id o None si no se detecta producto específico.
+        No hardcodea nombres — todo viene del catálogo.
+        """
+        query_lower = query.lower()
+
+        # 1. Señal fuerte: nombre o alias del producto
+        alias_to_id = get_product_alias_to_id_map()
+        for alias, pid in alias_to_id.items():
+            if alias in query_lower:
+                return pid
+
+        # 2. Señal secundaria: keywords (conditions, pretreatment, zones)
+        kw_map = get_product_keywords_map()
+        best_pid = None
+        best_count = 0
+        for pid, keywords in kw_map.items():
+            count = sum(1 for kw in keywords if kw in query_lower and len(kw) > 3)
+            if count > best_count:
+                best_count = count
+                best_pid = pid
+        if best_count >= 1:
+            return best_pid
+
+        return None
+
     def search(self, query: str, top_k: int = 5, categories: Optional[List[str]] = None) -> List[Tuple[dict, float]]:
         """
         Búsqueda: BM25 con query expansion + metadata boost.
@@ -342,8 +377,9 @@ class RAGEngine:
         # 3. BM25 scoring
         raw_scores = self.bm25.score(query_tokens)
 
-        # 4. Detectar product line para metadata boost
+        # 4. Detectar product_line y product.id para metadata boost
         detected_line = self._detect_product_line(query)
+        detected_product = self._detect_product(query)
 
         # 5. Aplicar filtros, metadata boost y normalizar
         scored: List[Tuple[int, float]] = []
@@ -360,6 +396,11 @@ class RAGEngine:
             # Metadata boost: +30% si coincide product_line
             if detected_line and qa.get('product_line') == detected_line:
                 score *= 1.3
+
+            # Metadata boost: +25% si coincide product.id
+            # product=null queda neutral (no se penaliza ni se boostea)
+            if detected_product and qa.get('product') == detected_product:
+                score *= 1.25
 
             # Boost por coincidencia directa en pregunta
             query_norm = self._normalize(query)

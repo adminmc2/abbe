@@ -4,7 +4,26 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.3.0 — 2026-04-22 (ACTUAL)
+## v4.4.0 — 2026-04-22 (ACTUAL)
+
+### Bloque 2.1: discriminación por product.id en ranking
+
+**Detección de producto en query (`rag_engine.py`):**
+- Nuevo método `_detect_product()` — resuelve `product.id` desde la query usando:
+  - Señal fuerte: `product.name` y `aliases` del catálogo
+  - Señal secundaria: `keywords` (conditions, pretreatment, zones)
+- Data-driven: no hardcodea nombres, todo viene del catálogo
+- Retorna `None` si no detecta producto específico (queries ambiguas mantienen comportamiento anterior)
+
+**Metadata boost por product.id (+25%):**
+- Se aplica en `search()` después del boost por `product_line` (+30%)
+- Solo se aplica si `_detect_product()` detecta un producto y el Q&A tiene el mismo `product.id`
+- `product=null` queda neutral (no se penaliza ni se boostea)
+- Resultado: confusiones en top-3 pasan de 2/24 a 1/24 (el caso residual tiene score 0.072, filtrado por `min_score=0.1`)
+
+---
+
+## v4.3.0 — 2026-04-22
 
 ### Bloque 1.5: política comparativa explícita con enforcement runtime
 
