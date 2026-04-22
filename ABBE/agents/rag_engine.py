@@ -412,11 +412,10 @@ class RAGEngine:
 
             scored.append((i, score))
 
-        # 6. Normalizar scores a [0, 1]
-        if scored:
-            max_score = max(s for _, s in scored)
-            if max_score > 0:
-                scored = [(i, s / max_score) for i, s in scored]
+        # 6. Raw scores — NO normalizar a [0,1]
+        # Los scores BM25 con boosts se devuelven sin reescalar.
+        # Esto permite que main.py use el score real para decidir cobertura.
+        # El ranking no cambia: ordenar por raw es equivalente a ordenar por normalizado.
 
         # 7. Ordenar y devolver top_k
         scored.sort(key=lambda x: x[1], reverse=True)

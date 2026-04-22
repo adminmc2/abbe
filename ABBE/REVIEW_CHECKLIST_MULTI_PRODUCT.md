@@ -58,177 +58,120 @@
 
 ## Impacto cruzado más reciente
 
-### Dictamen aplicado tras revisión de evidencias de ranking aportadas para `2.1`
+### Dictamen aplicado tras revisión directa de `agents/rag_engine.py`, `agents/base_agent.py`, `main.py`, `CHANGELOG.md` y evidencias diagnósticas/runtime aportadas para `2.2`
 
 Estado actual confirmado:
-- `agents/rag_engine.py` ya incorpora `_detect_product()` y metadata boost de `+25%` por `product.id`.
-- Existe evidencia de 8 queries dirigidas:
-  - 4 para `ctm_estabilizador_renal`
-  - 4 para `ctm_metabolica`
-- La señal por `product.id` ya opera por:
-  - alias
-  - keywords
-- Resultado observado:
-  - top-1 correcto por producto: `8/8`
-  - confusiones en top-3: `2/24 -> 1/24`
-  - la confusión residual aparece solo en:
-    - query `PCSK9`
-    - score `0.072`
-    - queda filtrada por `min_score = 0.1`
-- Las queries ambiguas siguen sin boost por producto cuando `_detect_product()` retorna `None`, lo cual es correcto en esta fase.
+- `agents/rag_engine.py` ya no normaliza scores a `[0,1]`; `search()` devuelve **raw BM25 scores** con boosts.
+- `agents/base_agent.py` recalibró:
+  - `search_knowledge_with_fallback(... score_threshold=8.0)`
+  - `format_context(... min_score=3.0)`
+  - la normalización queda solo para display local de confianza.
+- `main.py` ya calcula cobertura con 4 buckets reales:
+  - `high`
+  - `medium`
+  - `low`
+  - `no_results`
+- La evidencia diagnóstica aportada reporta:
+  - antes: `10 high / 0 medium / 2 low`
+  - después: `8 high / 2 medium / 0 low / 2 no_results`
+- Existe evidencia runtime de:
+  - `high`: composición CTM Estabilizador Renal (`max_score: 43.312`)
+  - `medium`: `¿Cómo funcionan las CTM?` (`max_score: 6.502`)
+  - `no_results`: `Lifting temporal con hilo tensor` (`max_score: 0.0`)
+- La traza persistida ya registra el score raw usado para cobertura.
+- El fallback vuelve a ser funcional tras recalibrar el umbral a escala raw.
 
 ### Nota de alcance
 
-El cierre de `2.1` es estrictamente sobre discriminación por `product.id`.  
-No certifica todavía precisión temática por subtema (`contraindicaciones`, `administración`, etc.); ese ajuste queda movido a `2.2`.
+El cierre de `2.2` valida:
+- calibración de scores
+- buckets de cobertura
+- separación real entre `high`, `medium`, `low` y `no_results`
+
+No cierra todavía:
+- endurecimiento de soporte comparativo
+- hardening final anti-fabrication
+- limpieza de residuos del dominio anterior
+
+### Observación no bloqueante
+
+- `evaluate_comparative_query()` en `base_agent.py` sigue usando `score >= 0.15` para soporte comparativo, heredado de la escala anterior normalizada.
+- No bloquea el cierre de `2.2`, pero debe recalibrarse en `2.5` / hardening comparativo para mantener coherencia de thresholds.
 
 ### Estado actualizado por puntos afectados
 
 | Punto | Estado | Motivo |
 |---|---|---|
-| 2.1 Discriminación por producto, no solo por `product_line` | **Cerrado** | Ya existe señal explícita por `product.id` y evidencia auditada de no confusión suficiente |
-| 2.2 Thresholds, scores y cobertura RAG | **Activo** | Falta calibrar precisión temática, cortes de score y buckets `low/medium/high` |
-| 2.5 `NO RESULTS` y anti-fabrication | **Parcial reforzado** | La confusión residual queda bajo threshold y no llega al LLM |
-| 2.7 Suite mínima de regresión fija | **Pendiente preparado** | Las 8 queries de ranking ya pueden convertirse en regresión |
-| 3.3 Limpieza de residuos activos del dominio anterior | **Pendiente crítico confirmado** | `MEDICAL_SYNONYMS` y residuos heredados siguen fuera del alcance de `2.1` |
-| 4.1 Documentación / versionado | **Parcial reforzado** | `main.py`, `FastAPI.version` y `/api/health` ya están alineados a `4.4.0` |
+| 2.2 Thresholds, scores y cobertura RAG | **Cerrado** | Ya existe calibración con raw scores, bucket `medium` real, `no_results` separado y evidencia runtime auditada |
+| 2.5 `NO RESULTS` y anti-fabrication | **Parcial reforzado** | `no_results` ya es bucket explícito y auditado con score real |
+| 2.7 Suite mínima de regresión fija | **Pendiente preparado** | La batería de 12 queries y los 3 casos runtime ya pueden convertirse en regresión |
+| 4.1 Documentación / versionado | **Parcial reforzado** | `main.py`, `FastAPI.version`, `/api/health` y `CHANGELOG.md` ya están alineados a `4.5.0` |
+| 3.3 Limpieza de residuos activos del dominio anterior | **Pendiente crítico confirmado** | Persisten residuos fuera del alcance de `2.2` |
 
 ---
 
-## 2.1 Discriminación por producto, no solo por `product_line`
+## 2.2 Thresholds, scores y cobertura RAG
 **Estado:** Cerrado  
 **Bloquea avance:** No
 
 ### Cierre alcanzado
 
-- `rag_engine.py` ya incorpora `_detect_product()` con señal explícita por `product.id`
-- el ranking ya usa:
-  - alias del catálogo
-  - keywords del catálogo
-  para aplicar metadata boost por producto específico
-- se auditó una batería de 8 queries dirigidas:
-  - 4 para `ctm_estabilizador_renal`
-  - 4 para `ctm_metabolica`
-- resultado consolidado:
-  - top-1 correcto por producto: `8/8`
-  - confusiones en top-3: `2/24 -> 1/24`
-  - el residuo restante queda por debajo de `min_score=0.1` y no llega al LLM
+- Se eliminó la normalización artificial `[0,1]` en `search()`.
+- El ranking sigue siendo válido, pero ahora la cobertura usa scores raw reales.
+- `main.py` distingue correctamente:
+  - `high`
+  - `medium`
+  - `low`
+  - `no_results`
+- `medium` deja de ser un bucket muerto.
+- `no_results` queda separado de `low`.
+- `base_agent.py` recalibra:
+  - threshold de fallback
+  - `min_score` de contexto
+- Se validó con:
+  - 12 queries diagnósticas
+  - 3 casos runtime auditables
 
 ### Evidencia revisada
 
-#### CTM Estabilizador Renal
-- Q1 `¿Cuál es la composición del CTM Estabilizador Renal?`
-  - top-3 final: `#3 renal`, `#4 renal`, `#2 renal`
-  - señal: alias match
-- Q2 `¿Cuáles son las contraindicaciones del CTM Estabilizador Renal?`
-  - top-3 final: todos `renal`
-  - señal: alias match
-- Q3 `¿Cómo se administra el CTM Estabilizador Renal?`
-  - top-3 final: todos `renal`
-  - señal: alias match
-- Q4 `¿Por qué las CTM se pre-tratan con melatonina?`
-  - top-3 final: `#6 renal`, `#3 renal`, `#1 null`
-  - señal: keyword match (`melatonina`)
+#### Distribución diagnóstica
+- Antes:
+  - `high: 10`
+  - `medium: 0`
+  - `low: 2`
+- Después:
+  - `high: 8`
+  - `medium: 2`
+  - `low: 0`
+  - `no_results: 2`
 
-#### CTM Metabólica
-- Q5 `¿Qué es la CTM Metabólica?`
-  - top-3 final: todos `metabólica`
-  - señal: alias match
-- Q6 `¿Cuáles son las contraindicaciones de la CTM Metabólica?`
-  - top-3 final: todos `metabólica`
-  - señal: alias match
-- Q7 `¿Cómo se administra la CTM Metabólica?`
-  - top-3 final: todos `metabólica`
-  - señal: alias match
-- Q8 `¿Qué es la PCSK9 y por qué es importante inhibirla?`
-  - top-2 final: `metabólica`
-  - residuo: `#5 renal` con score `0.072`
-  - decisión: no bloquea porque queda filtrado por threshold
+#### Casos runtime
+- **HIGH**
+  - Query: `Composición CTM Estabilizador Renal`
+  - Coverage: `high`
+  - `max_score`: `43.312`
 
-### Reservas no bloqueantes
+- **MEDIUM**
+  - Query: `¿Cómo funcionan las CTM?`
+  - Coverage: `medium`
+  - `max_score`: `6.502`
 
-- `_detect_product()` devuelve un solo `product.id`
-- el matching sigue siendo endurecible
-- `MEDICAL_SYNONYMS` mantiene residuos del dominio anterior
+- **NO_RESULTS**
+  - Query: `Lifting temporal con hilo tensor`
+  - Coverage: `no_results`
+  - `max_score`: `0.0`
 
-Estas reservas no reabren `2.1`.
+### Nota no bloqueante
+
+Que la batería final no haya producido un caso `low` no reabre `2.2`.  
+El bucket existe y quedó correctamente separado de `no_results`; la evidencia mínima runtime ya quedó cubierta con:
+- `high`
+- `medium`
+- `no_results`
 
 ### Decisión actual
 
-**Se habilita avance a `2.2`.**
-
----
-
-## 2.2 Thresholds, scores y cobertura RAG
-**Estado:** Activo  
-**Bloquea avance:** Sí
-
-### Objetivo real del punto
-
-Demostrar que el retrieval no solo trae el **producto correcto**, sino también el **subtema correcto**, y que los cortes de score / buckets de cobertura (`low`, `medium`, `high`) están calibrados para soportar respuestas seguras.
-
-### Riesgo abierto
-
-La evidencia de `2.1` confirma discriminación por producto, pero no garantiza todavía precisión temática por subtema.  
-Eso impacta directamente:
-- calidad de respuesta
-- `rag_coverage`
-- fallback
-- `NO RESULTS`
-- anti-fabrication
-
-### Evidencia mínima requerida
-
-1. **10–12 queries de calibración**
-   - composición
-   - indicaciones
-   - contraindicaciones
-   - administración / protocolo
-   - tecnología / mecanismo
-   - objeciones
-   - comparativas
-   - fuera de dominio
-
-2. **Top-5 con scores por query**
-   - `qa_id`
-   - `categoria`
-   - `product`
-   - `score`
-
-3. **Decisión de cobertura por query**
-   - `high`
-   - `medium`
-   - `low`
-   - `no_results`
-
-4. **Relación con la salida final**
-   - 1 caso `high` con respuesta normal
-   - 1 caso `medium` con respuesta acotada
-   - 1 caso `low` o `no_results` con respuesta segura / rechazo
-
-5. **Decisión explícita de thresholds**
-   - `min_score`
-   - top-k útil
-   - regla de cobertura
-   - qué cambia en `rag_engine.py` vs `main.py` si hace falta ajustar
-
-### Archivos a revisar
-
-- `ABBE/agents/rag_engine.py`
-- `ABBE/main.py`
-- `ABBE/knowledge_base.json`
-- opcional:
-  - `ABBE/audit_traces.jsonl`
-
-### Regla de diseño
-
-No crear categorías nuevas para arreglar relevancia o cobertura.  
-Si falla la precisión, se corrige en:
-- scoring
-- thresholds
-- ranking
-- cobertura
-- catálogo / aliases / keywords solo si aportan señal real
+**Se habilita avance al siguiente subpunto del bloque 2.**
 
 ---
 

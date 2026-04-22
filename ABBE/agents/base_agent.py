@@ -66,7 +66,7 @@ class BaseAgent(ABC):
         return self.rag.search(query, top_k=top_k, categories=self.categories if self.categories else None)
 
     def search_knowledge_with_fallback(self, query: str, top_k: int = 5,
-                                       score_threshold: float = 0.25) -> List[Tuple[dict, float]]:
+                                       score_threshold: float = 8.0) -> List[Tuple[dict, float]]:
         """Búsqueda dual: primero filtrada por categorías, si no hay buenos resultados busca sin filtro"""
 
         # 1. Búsqueda filtrada por categorías del agente
@@ -107,17 +107,22 @@ class BaseAgent(ABC):
         Override en subclases para aportar inteligencia específica."""
         return ""
 
-    def format_context(self, results: List[Tuple[dict, float]], min_score: float = 0.1) -> str:
-        """Formatea los resultados de búsqueda como HECHOS VERIFICADOS numerados para el LLM"""
+    def format_context(self, results: List[Tuple[dict, float]], min_score: float = 3.0) -> str:
+        """Formatea los resultados de búsqueda como HECHOS VERIFICADOS numerados para el LLM.
+        Scores son raw BM25 — se normalizan localmente solo para display."""
         empresa = get_empresa()
         context_parts = []
         fact_num = 1
 
+        # Normalizar a [0,1] solo para display (confianza relativa al top result)
+        max_raw = max((s for _, s in results), default=0.0)
+
         for qa, score in results:
             if score >= min_score:
+                display_score = score / max_raw if max_raw > 0 else 0.0
                 source = qa.get('source_doc', 'fuente no especificada')
                 context_parts.append(
-                    f"HECHO VERIFICADO #{fact_num} (confianza: {score:.0%}):\n"
+                    f"HECHO VERIFICADO #{fact_num} (confianza: {display_score:.0%}):\n"
                     f"  Producto/Tema: {qa['pregunta']}\n"
                     f"  Datos confirmados: {qa['respuesta']}\n"
                     f"  Fuente: {source}"

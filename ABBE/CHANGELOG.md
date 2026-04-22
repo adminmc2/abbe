@@ -4,7 +4,37 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.4.0 — 2026-04-22 (ACTUAL)
+## v4.5.0 — 2026-04-22 (ACTUAL)
+
+### Bloque 2.2: thresholds, scores y cobertura RAG real
+
+**Problema resuelto:** `rag_engine.py` normalizaba scores a `[0,1]` dividiendo por el máximo, lo que hacía que el top result **siempre** tuviera score 1.0. Combinado con `max_score >= 0.5` en main.py, toda query con resultados era clasificada como `high`. El bucket `medium` nunca aparecía.
+
+**Corrección en `rag_engine.py`:**
+- Eliminada la normalización a `[0,1]` — ahora `search()` devuelve raw BM25 scores
+- El ranking no cambia (ordenar por raw es equivalente a ordenar por normalizado)
+
+**Corrección en `base_agent.py`:**
+- `format_context()`: normaliza scores localmente solo para display (confianza relativa al top result)
+- `min_score` ajustado: 0.1 (normalizado) → 3.0 (raw BM25)
+- `search_knowledge_with_fallback()`: threshold ajustado: 0.25 (normalizado, nunca activaba fallback) → 8.0 (raw, ahora funciona)
+
+**Nueva lógica de cobertura en `main.py` (raw scores calibrados):**
+- `high`: max_raw ≥ 10.0 y ≥2 strong docs → queries específicas con match claro
+- `medium`: max_raw ≥ 5.0 → queries amplias o match parcial
+- `low`: max_raw > 0 pero < 5.0 → match muy débil
+- `no_results`: sin resultados → bucket separado con instrucciones propias
+
+**Calibración con 12 queries diagnósticas:**
+- Antes: 10 high, 0 medium, 2 low
+- Después: 8 high, 2 medium, 0 low, 2 no_results
+- `medium` ahora captura correctamente queries genéricas (ej: "¿Cómo funcionan las CTM?" max_raw=5.9)
+
+**Trazabilidad:** `audit_traces.jsonl` ahora registra el raw score real usado para cobertura, no un score normalizado que siempre valía 1.0.
+
+---
+
+## v4.4.0 — 2026-04-22
 
 ### Bloque 2.1: discriminación por product.id en ranking
 

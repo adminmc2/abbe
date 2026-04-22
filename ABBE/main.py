@@ -1,5 +1,5 @@
 """
-Abbe - Asistente de Ventas Above Pharma RAG v4.4
+Abbe - Asistente de Ventas Above Pharma RAG v4.5
 Backend FastAPI con WebSocket para streaming
 """
 
@@ -113,7 +113,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Abbe - Asistente de Ventas Above Pharma",
-    version="4.4.0",
+    version="4.5.0",
     lifespan=lifespan
 )
 
@@ -132,7 +132,7 @@ async def health_check():
     """Verificar estado del sistema"""
     return {
         "status": "ok",
-        "version": "4.4.0",
+        "version": "4.5.0",
         "agents": ["productos", "objeciones", "argumentos"],
         "knowledge_base_size": len(orchestrator.agents['productos'].rag.qa_pairs) if orchestrator else 0
     }
@@ -674,7 +674,7 @@ async def websocket_chat(websocket: WebSocket):
 
                 # Buscar contexto relevante en RAG (con fallback si score bajo)
                 results = agent.search_knowledge_with_fallback(user_message, top_k=5)
-                context = agent.format_context(results, min_score=0.1)
+                context = agent.format_context(results, min_score=3.0)
                 print(f"[DEBUG] RAG: {len(results)} resultados, contexto: {len(context)} chars")
 
                 # Enriquecer contexto con inteligencia del agente
@@ -682,11 +682,23 @@ async def websocket_chat(websocket: WebSocket):
                 if enrichment:
                     context += f"\n\n═══ CONTEXTO ADICIONAL DEL AGENTE ═══\n{enrichment}"
 
-                # Evaluar cobertura RAG
-                relevant_docs = [r for r in results if r[1] >= 0.1]
-                strong_docs = [r for r in results if r[1] >= 0.35]
+                # Evaluar cobertura RAG (basada en raw BM25 scores, no normalizados)
+                # Thresholds calibrados con batería de 12 queries diagnósticas:
+                #   high:  raw >= 10.0 y ≥2 strong docs (queries específicas con match claro)
+                #   medium: raw >= 5.0 (queries amplias o con match parcial)
+                #   low:    raw > 0 pero < 5.0 (match muy débil)
+                #   no_results: sin resultados
                 max_score = max((r[1] for r in results), default=0.0)
-                rag_coverage = "high" if (len(strong_docs) >= 2 or max_score >= 0.5 or (len(strong_docs) >= 1 and len(relevant_docs) >= 3)) else ("medium" if len(relevant_docs) >= 1 else "low")
+                relevant_docs = [r for r in results if r[1] >= 3.0]
+                strong_docs = [r for r in results if r[1] >= 10.0]
+                if not results or max_score == 0:
+                    rag_coverage = "no_results"
+                elif max_score >= 10.0 and len(strong_docs) >= 2:
+                    rag_coverage = "high"
+                elif max_score >= 5.0:
+                    rag_coverage = "medium"
+                else:
+                    rag_coverage = "low"
 
                 # Evaluar política comparativa (runtime enforcement, no solo prompt)
                 comp_policy = agent.evaluate_comparative_query(user_message, results)
@@ -705,8 +717,24 @@ async def websocket_chat(websocket: WebSocket):
                 print(f"[DEBUG] agent_info enviado al frontend")
 
                 # Instrucciones dinámicas según cobertura RAG
-                if rag_coverage == "low":
-                    rag_instruction = """⚠️ COBERTURA RAG: BAJA — No hay información suficiente para responder con datos verificados.
+                if rag_coverage == "no_results":
+                    rag_instruction = """🚫 COBERTURA RAG: SIN RESULTADOS — No se encontró ningún dato relevante en la base de conocimiento.
+
+REGLAS ESTRICTAS:
+1. Respuesta CORTA (máximo 60 palabras).
+2. NO inventes NINGÚN dato. No hay contexto verificado para esta consulta.
+3. Indica claramente que no tienes información sobre ese tema.
+4. Redirige al usuario hacia temas del portafolio.
+
+FORMATO:
+No tengo información sobre [tema]. Mi especialidad es el portafolio de Above Pharma.
+
+**Te puedo ayudar con:**
+- [Pregunta sugerida 1]
+- [Pregunta sugerida 2]
+- [Pregunta sugerida 3]"""
+                elif rag_coverage == "low":
+                    rag_instruction = """⚠️ COBERTURA RAG: BAJA — Los datos encontrados son muy débiles o tangenciales.
 
 REGLAS ESTRICTAS:
 1. Respuesta CORTA (máximo 100 palabras). No generes un argumentario completo.
@@ -743,8 +771,8 @@ Presenta TODA la información disponible de forma persuasiva, completa y útil p
 PROHIBIDO EXTRAPOLAR INDICACIONES: Recomienda cada producto SOLO para las indicaciones que aparecen EXPLÍCITAMENTE en los datos verificados. No atribuyas indicaciones nuevas a un producto existente."""
 
                 # Instrucción de longitud según modo de respuesta
-                # Si cobertura baja, el formato ya está definido en rag_instruction — no aplicar templates de agente
-                if rag_coverage == "low":
+                # Si cobertura baja o sin resultados, el formato ya está definido en rag_instruction
+                if rag_coverage in ("low", "no_results"):
                     length_instruction = ""  # El formato de respuesta corta ya está en rag_instruction
                 elif response_mode == "short":
                     # Formato resumido adaptado a cada agente — preserva los elementos de diseño clave
@@ -903,8 +931,10 @@ REGLAS DE MODO RESUMIDO:
 
 {length_instruction}"""
 
-                # Tokens según modo (low coverage siempre corto)
-                if rag_coverage == "low":
+                # Tokens según modo (low/no_results siempre corto)
+                if rag_coverage == "no_results":
+                    max_tokens = 250
+                elif rag_coverage == "low":
                     max_tokens = 400
                 elif response_mode == "short":
                     max_tokens = 500
@@ -979,7 +1009,7 @@ REGLAS DE MODO RESUMIDO:
                 # Traza de auditoría persistente
                 retrieved = []
                 for qa, score in results:
-                    if score >= 0.1:
+                    if score >= 3.0:
                         retrieved.append({
                             "qa_id": qa.get('id'),
                             "categoria": qa.get('categoria'),
@@ -988,8 +1018,8 @@ REGLAS DE MODO RESUMIDO:
                             "normalized_sources": qa.get('normalized_sources', []),
                             "score": round(score, 3),
                         })
-                no_results = len(retrieved) == 0
-                fallback_used = rag_coverage == "low" and len(results) > 0
+                no_results = rag_coverage == "no_results"
+                fallback_used = rag_coverage in ("low", "no_results") and len(results) > 0
                 write_audit_trace({
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                     "session_id": session_id,
