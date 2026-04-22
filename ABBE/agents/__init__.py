@@ -1,4 +1,4 @@
-# Sistema de Agentes Novacutan
+# Sistema de Agentes Above Pharma
 
 from .rag_engine import RAGEngine, get_rag_engine
 from .base_agent import BaseAgent

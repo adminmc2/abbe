@@ -1,14 +1,15 @@
 """
-Motor RAG Mejorado - Base de conocimiento compartida por todos los agentes
-v2.0 - Con stemming español, sinónimos y búsqueda híbrida
+Motor RAG v4.0 — BM25 + sinónimos dinámicos + metadata boost + contrato de datos
+Base de conocimiento compartida por todos los agentes de Above Pharma.
 """
 import json
-import numpy as np
-from collections import Counter
-from typing import List, Tuple, Optional, Set, Dict
 import math
 import os
 import re
+from collections import Counter
+from typing import Dict, List, Optional, Set, Tuple
+
+from .catalog import get_catalog, get_product_synonyms, get_product_aliases, get_product_keywords
 
 
 # ============================================
@@ -18,7 +19,6 @@ class SpanishStemmer:
     """Stemmer ligero para español basado en sufijos comunes"""
 
     SUFFIXES = [
-        # Verbales (ordenados de mayor a menor longitud)
         'ándose', 'iéndose', 'amente', 'mente',
         'ación', 'ición', 'ando', 'iendo', 'ador', 'edor', 'idor',
         'ante', 'ente', 'anza', 'encia', 'ible', 'able',
@@ -26,11 +26,9 @@ class SpanishStemmer:
         'ar', 'er', 'ir', 'do', 'da', 'os', 'as', 'es',
     ]
 
-    # Palabras que no deben ser stemmed
+    # Palabras que no deben ser stemmed (términos médicos y técnicos)
     EXCEPTIONS = {
-        'novacutan', 'biopro', 'fbio', 'dvs', '3dvs', 'bdde',
-        'light', 'medium', 'volume', 'hialuronidasa',
-        'embarazo', 'profhilo', 'juvederm', 'lifting',
+        'hialuronidasa', 'embarazo', 'lifting', 'light', 'medium', 'volume',
     }
 
     @classmethod
@@ -39,7 +37,6 @@ class SpanishStemmer:
         word = word.lower()
         if word in cls.EXCEPTIONS or len(word) < 4:
             return word
-
         for suffix in cls.SUFFIXES:
             if word.endswith(suffix) and len(word) - len(suffix) >= 3:
                 return word[:-len(suffix)]
@@ -47,38 +44,23 @@ class SpanishStemmer:
 
 
 # ============================================
-# DICCIONARIO DE SINÓNIMOS Y EXPANSIÓN
+# SINÓNIMOS MÉDICOS ESTÁTICOS (genéricos para medicina estética)
 # ============================================
-SYNONYMS: Dict[str, List[str]] = {
-    # Productos Novacutan
-    'biopro': ['biomodulador', 'bio pro', 'bio-pro', 'bioproducto', 'novacutan biopro'],
-    'biomodulador': ['biopro', 'bioestimulador', 'regenerador'],
-    'fbio': ['f bio', 'f-bio', 'relleno', 'filler', 'fbio dvs'],
-    'relleno': ['filler', 'fbio', 'ácido hialurónico', 'dermal filler'],
-    'filler': ['relleno', 'fbio', 'ácido hialurónico'],
-    'light': ['ligero', 'suave', 'sutil', 'fbio light', 'fbio dvs light'],
-    'medium': ['medio', 'moderado', 'fbio medium', 'fbio dvs medium'],
-    'volume': ['volumen', 'volumizador', 'fbio volume', 'fbio dvs volume'],
-
-    # Tecnología
-    'dvs': ['divinilsulfona', '3dvs', 'reticulante', 'reticulación'],
-    '3dvs': ['dvs', 'microesferas', 'tecnología', 'tridimensional'],
-    'bdde': ['competencia', 'reticulante competencia', 'juvederm'],
-    'microesferas': ['3dvs', 'estructura', 'porosa', 'tridimensional'],
-    'reticulante': ['dvs', 'divinilsulfona', 'bdde', 'reticulación'],
-
+MEDICAL_SYNONYMS: Dict[str, List[str]] = {
     # Ácido hialurónico
     'hialurónico': ['ácido hialurónico', 'ah', 'hialuronato'],
     'hialuronico': ['ácido hialurónico', 'ah', 'hialuronato'],
-    'hialuronidasa': ['disolver', 'reversible', 'hyalase', 'emergencia'],
+    'hialuronidasa': ['disolver', 'reversible', 'emergencia'],
+    'biomodulador': ['bioestimulador', 'regenerador'],
+    'relleno': ['filler', 'ácido hialurónico', 'dermal filler'],
+    'filler': ['relleno', 'ácido hialurónico'],
 
     # Técnicas y protocolos
-    'vlift': ['v-lift', 'v lift', 'lifting', 'cánula'],
-    'dlift': ['d-lift', 'd lift', 'aguja', 'bolus'],
-    'lifting': ['vlift', 'levantamiento', 'tensado', 'reafirmante'],
+    'lifting': ['levantamiento', 'tensado', 'reafirmante'],
     'cánula': ['canula', 'instrumento', 'inyección'],
     'aguja': ['needle', 'instrumento', 'inyección'],
     'protocolo': ['técnica', 'procedimiento', 'tratamiento', 'aplicación'],
+    'reticulante': ['reticulación', 'crosslinker'],
 
     # Zonas anatómicas
     'ojera': ['surco lagrimal', 'periorbital', 'tear trough'],
@@ -94,257 +76,240 @@ SYNONYMS: Dict[str, List[str]] = {
     'arruga': ['línea', 'surco', 'pliegue', 'rítide'],
     'volumen': ['proyección', 'relleno', 'aumento', 'definición'],
     'rejuvenecimiento': ['anti-aging', 'regeneración', 'juventud'],
+    'edema': ['hinchazón', 'inflamación', 'hinchado'],
 
-    # Comparativas
+    # Comparativas y objeciones
     'mejor': ['superior', 'óptimo', 'ideal', 'recomendado', 'preferible'],
     'diferencia': ['comparar', 'comparativa', 'versus', 'contra', 'diferente'],
     'precio': ['costo', 'coste', 'valor', 'económico', 'caro', 'barato'],
-    'profhilo': ['competencia', 'bioestimulador', 'sin reticular'],
-    'juvederm': ['competencia', 'bdde', 'relleno competencia'],
 
     # Seguridad
     'contraindicación': ['contraindicacion', 'riesgo', 'prohibido', 'no tratar'],
     'complicación': ['complicacion', 'problema', 'emergencia', 'adverso'],
     'embarazo': ['embarazada', 'gestación', 'lactancia'],
-    'edema': ['hinchazón', 'inflamación', 'hinchado'],
-}
-
-# Keywords que indican intención específica
-INTENT_KEYWORDS: Dict[str, List[str]] = {
-    'comparacion': ['comparar', 'diferencia', 'versus', 'mejor', 'cuál', 'cual', 'elegir', 'entre', 'profhilo', 'juvederm'],
-    'protocolo': ['protocolo', 'técnica', 'aplicar', 'inyectar', 'sesiones', 'cánula', 'aguja', 'vlift', 'dlift'],
-    'precio': ['precio', 'costo', 'coste', 'caro', 'barato', 'económico', 'vale', 'cuesta', 'descuento'],
-    'indicacion': ['indicado', 'indicación', 'sirve', 'usar', 'recomendar', 'paciente', 'zona'],
-    'seguridad': ['contraindicación', 'contraindicacion', 'seguro', 'riesgo', 'embarazo', 'herpes', 'anticoagulante'],
-    'complicaciones': ['complicación', 'edema', 'nódulo', 'vascular', 'hialuronidasa', 'disolver', 'emergencia'],
-    'productos': ['biopro', 'fbio', 'light', 'medium', 'volume', 'dvs', 'biomodulador', 'relleno'],
-}
-
-# Frases de consulta comunes que mapean a preguntas específicas de la KB
-QUERY_PATTERNS: Dict[str, List[str]] = {
-    'protocolo': ['cómo se aplica', 'como se aplica', 'protocolo v-lift', 'protocolo d-lift',
-                  'cuántas sesiones', 'qué aguja', 'técnica de inyección'],
-    'productos': ['qué es biopro', 'que es biopro', 'diferencia light medium volume',
-                  'qué producto uso', 'que producto uso'],
 }
 
 
+# ============================================
+# BM25 INDEX
+# ============================================
+class BM25Index:
+    """Índice BM25 (Okapi) para búsqueda léxica sin dependencias externas."""
+
+    def __init__(self, tokenized_docs: List[List[str]], k1: float = 1.5, b: float = 0.75):
+        self.k1 = k1
+        self.b = b
+        self.n_docs = len(tokenized_docs)
+        self.doc_lengths = [len(doc) for doc in tokenized_docs]
+        self.avgdl = sum(self.doc_lengths) / self.n_docs if self.n_docs else 1
+
+        # Document frequencies
+        self.df: Dict[str, int] = Counter()
+        for doc in tokenized_docs:
+            for token in set(doc):
+                self.df[token] += 1
+
+        # Precompute IDF
+        self.idf: Dict[str, float] = {}
+        for token, freq in self.df.items():
+            self.idf[token] = math.log((self.n_docs - freq + 0.5) / (freq + 0.5) + 1)
+
+        # Term frequencies per document
+        self.doc_tf: List[Counter] = [Counter(doc) for doc in tokenized_docs]
+
+    def score(self, query_tokens: List[str]) -> List[float]:
+        """Score all documents against query tokens."""
+        scores = []
+        for i in range(self.n_docs):
+            s = 0.0
+            dl = self.doc_lengths[i]
+            for token in query_tokens:
+                if token not in self.idf:
+                    continue
+                tf = self.doc_tf[i].get(token, 0)
+                idf = self.idf[token]
+                num = tf * (self.k1 + 1)
+                den = tf + self.k1 * (1 - self.b + self.b * dl / self.avgdl)
+                s += idf * num / den
+            scores.append(s)
+        return scores
+
+
+# ============================================
+# RAG ENGINE
+# ============================================
 class RAGEngine:
-    """Motor de búsqueda RAG mejorado con stemming, sinónimos y búsqueda híbrida"""
+    """Motor de búsqueda RAG con BM25, expansión de sinónimos y metadata boost."""
 
-    def __init__(self, knowledge_base_path: str):
-        self.qa_pairs = []
-        self.embeddings = []
-        self.vocab = []
-        self.word_to_idx = {}
-        self.idf = {}
-        self.stemmer = SpanishStemmer()
-
-        # Índice invertido para búsqueda por keywords
-        self.keyword_index: Dict[str, Set[int]] = {}
-
-        self.load_knowledge_base(knowledge_base_path)
-        self.compute_embeddings()
-        self.build_keyword_index()
-
-    def load_knowledge_base(self, path: str):
-        """Carga la base de conocimiento desde JSON"""
-        with open(path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        self.qa_pairs = data['qa_pairs']
-        print(f"[RAG] Cargadas {len(self.qa_pairs)} preguntas")
-
-    # Nombres de producto con guion → forma canónica (sin guion)
-    PRODUCT_ALIASES = {
-        'bio-pro': 'biopro',
-        'bio pro': 'biopro',
-        'f-bio': 'fbio',
-        'f bio': 'fbio',
-        'v-lift': 'vlift',
-        'v lift': 'vlift',
-        'd-lift': 'dlift',
-        'd lift': 'dlift',
-        '3-dvs': '3dvs',
-        '3 dvs': '3dvs',
-        'fbio-dvs': 'fbio dvs',
-        'f-bio-dvs': 'fbio dvs',
-        'f-bio dvs': 'fbio dvs',
+    STOPWORDS = {
+        'el', 'la', 'los', 'las', 'de', 'del', 'en', 'un', 'una',
+        'y', 'a', 'que', 'es', 'por', 'para', 'con', 'se', 'su',
+        'al', 'lo', 'como', 'mas', 'pero', 'sus', 'le', 'ya', 'o',
+        'cual', 'cuales', 'donde', 'cuando', 'si',
+        'no', 'muy', 'sin', 'sobre', 'este', 'esta', 'esto', 'eso',
+        'mi', 'tu', 'me', 'te', 'nos', 'les', 'tiene', 'hay',
     }
 
+    def __init__(self, knowledge_base_path: str):
+        self.qa_pairs: List[dict] = []
+        self.stemmer = SpanishStemmer()
+        self.bm25: Optional[BM25Index] = None
+
+        # Merge synonyms: medical (static) + product (from catalog)
+        self.synonyms: Dict[str, List[str]] = dict(MEDICAL_SYNONYMS)
+        self.synonyms.update(get_product_synonyms())
+
+        # Product aliases for normalization
+        self.product_aliases: Dict[str, str] = get_product_aliases()
+
+        # Product keywords for intent detection
+        self.product_keywords: List[str] = get_product_keywords()
+
+        # Load and index
+        self.load_knowledge_base(knowledge_base_path)
+        self._build_bm25_index()
+
+    # Campos obligatorios por Q&A (contrato de datos)
+    REQUIRED_FIELDS = {'id', 'categoria', 'pregunta', 'respuesta', 'source_doc', 'product_line', 'product'}
+    NON_EMPTY_FIELDS = {'pregunta', 'respuesta', 'source_doc', 'categoria'}
+
+    # Lista cerrada de categorías válidas (fuente única de verdad)
+    VALID_CATEGORIES = {
+        'empresa', 'productos', 'tecnologia', 'protocolos', 'seguridad',
+        'objeciones_precio', 'objeciones_eficacia', 'objeciones_seguridad',
+        'argumentos_venta', 'perfil_paciente',
+    }
+
+    def load_knowledge_base(self, path: str):
+        """Carga la base de conocimiento desde JSON y valida contrato de datos."""
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        self.qa_pairs = data.get('qa_pairs', [])
+        self._validate_kb()
+        print(f"[RAG] Cargadas {len(self.qa_pairs)} preguntas")
+
+    def _validate_kb(self):
+        """Valida contrato de datos: campos obligatorios, IDs únicos, categorías, referencias válidas.
+
+        Modo controlado por KB_VALIDATION_MODE:
+          - 'warn' (default): reporta errores sin detener el arranque
+          - 'strict': lanza ValueError si hay errores (recomendado en local/predeploy)
+        """
+        errors = []
+        ids_seen = set()
+        catalog = get_catalog()
+        valid_lines = {line['id'] for line in catalog.get('product_lines', [])}
+        valid_products = {}
+        for line in catalog.get('product_lines', []):
+            for prod in line.get('products', []):
+                valid_products[prod['id']] = line['id']
+
+        for qa in self.qa_pairs:
+            qid = qa.get('id', '?')
+
+            # Campos obligatorios presentes
+            missing = self.REQUIRED_FIELDS - set(qa.keys())
+            if missing:
+                errors.append(f"Q&A #{qid}: missing fields {missing}")
+
+            # Campos no vacíos
+            for field in self.NON_EMPTY_FIELDS:
+                if field in qa and not qa[field]:
+                    errors.append(f"Q&A #{qid}: empty '{field}'")
+
+            # Categoría debe pertenecer a la allowlist
+            cat = qa.get('categoria')
+            if cat and cat not in self.VALID_CATEGORIES:
+                errors.append(f"Q&A #{qid}: categoria '{cat}' not in VALID_CATEGORIES")
+
+            # ID único
+            if qid in ids_seen:
+                errors.append(f"Q&A #{qid}: duplicate ID")
+            ids_seen.add(qid)
+
+            # product_line debe existir en catalog
+            pl = qa.get('product_line')
+            if pl and pl not in valid_lines:
+                errors.append(f"Q&A #{qid}: product_line '{pl}' not in catalog")
+
+            # product debe existir en su product_line
+            prod = qa.get('product')
+            if prod and prod not in valid_products:
+                errors.append(f"Q&A #{qid}: product '{prod}' not in catalog")
+            elif prod and valid_products.get(prod) != pl:
+                errors.append(f"Q&A #{qid}: product '{prod}' not in line '{pl}'")
+
+        if errors:
+            mode = os.environ.get('KB_VALIDATION_MODE', 'warn')
+            print(f"[RAG] ⚠ KB validation: {len(errors)} errors:")
+            for e in errors:
+                print(f"  {e}")
+            if mode == 'strict':
+                raise ValueError(f"KB validation failed ({len(errors)} errors). Fix data or set KB_VALIDATION_MODE=warn")
+        else:
+            print(f"[RAG] ✓ KB validation passed ({len(self.qa_pairs)} Q&As, contract OK)")
+
+    def _build_bm25_index(self):
+        """Construye el índice BM25 sobre pregunta + respuesta."""
+        if not self.qa_pairs:
+            self.bm25 = BM25Index([])
+            print("[RAG] KB vacía — índice BM25 vacío")
+            return
+
+        documents = [qa['pregunta'] + ' ' + qa['respuesta'] for qa in self.qa_pairs]
+        tokenized = [self._tokenize(doc) for doc in documents]
+        self.bm25 = BM25Index(tokenized)
+        vocab_size = len(self.bm25.df)
+        print(f"[RAG] Índice BM25 construido: {vocab_size} términos, {len(self.qa_pairs)} documentos")
+
     def _normalize(self, text: str) -> str:
-        """Normaliza texto: minúsculas, sin acentos, unifica nombres de producto"""
+        """Normaliza texto: minúsculas, sin acentos, unifica aliases de producto."""
         text = text.lower()
-        # Unificar nombres de producto con/sin guion ANTES de quitar acentos
-        for alias, canonical in self.PRODUCT_ALIASES.items():
+        # Unificar aliases de producto
+        for alias, canonical in self.product_aliases.items():
             text = text.replace(alias, canonical)
         # Quitar acentos para búsqueda
-        replacements = {
-            'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u',
-            'ü': 'u', 'ñ': 'n'
-        }
-        for acc, plain in replacements.items():
+        for acc, plain in {'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u', 'ñ': 'n'}.items():
             text = text.replace(acc, plain)
         return text
 
     def _tokenize(self, text: str, apply_stemming: bool = True) -> List[str]:
-        """Tokeniza texto con normalización y stemming opcional"""
+        """Tokeniza texto con normalización y stemming opcional."""
         text = self._normalize(text)
         text = re.sub(r'[^\w\s]', ' ', text)
         words = text.split()
-
-        stopwords = {
-            'el', 'la', 'los', 'las', 'de', 'del', 'en', 'un', 'una',
-            'y', 'a', 'que', 'es', 'por', 'para', 'con', 'se', 'su',
-            'al', 'lo', 'como', 'mas', 'pero', 'sus', 'le', 'ya', 'o',
-            'que', 'como', 'cual', 'cuales', 'donde', 'cuando', 'si',
-            'no', 'muy', 'sin', 'sobre', 'este', 'esta', 'esto', 'eso',
-            'mi', 'tu', 'me', 'te', 'nos', 'les', 'tiene', 'hay'
-        }
-
-        tokens = [w for w in words if w not in stopwords and len(w) > 2]
-
+        tokens = [w for w in words if w not in self.STOPWORDS and len(w) > 2]
         if apply_stemming:
             tokens = [self.stemmer.stem(w) for w in tokens]
-
         return tokens
 
     def _expand_query(self, query: str) -> str:
-        """Expande la query con sinónimos"""
+        """Expande la query con sinónimos (query expansion, no tercer ranker)."""
         words = self._tokenize(query, apply_stemming=False)
         expanded = list(words)
-
         for word in words:
-            word_lower = word.lower()
-            if word_lower in SYNONYMS:
-                expanded.extend(SYNONYMS[word_lower][:3])  # Max 3 sinónimos por palabra
-
+            if word in self.synonyms:
+                expanded.extend(self.synonyms[word][:3])
         return ' '.join(expanded)
 
-    def build_keyword_index(self):
-        """Construye índice invertido para búsqueda por keywords"""
-        for i, qa in enumerate(self.qa_pairs):
-            text = qa['pregunta'] + ' ' + qa['respuesta']
-            tokens = set(self._tokenize(text, apply_stemming=False))
-            tokens_stemmed = set(self._tokenize(text, apply_stemming=True))
-            all_tokens = tokens | tokens_stemmed
-
-            for token in all_tokens:
-                if token not in self.keyword_index:
-                    self.keyword_index[token] = set()
-                self.keyword_index[token].add(i)
-
-        print(f"[RAG] Índice de keywords: {len(self.keyword_index)} términos únicos")
-
-    def compute_embeddings(self):
-        """Calcula embeddings TF-IDF para todas las Q&A"""
-        documents = [qa['pregunta'] + ' ' + qa['respuesta'] for qa in self.qa_pairs]
-
-        # Construir vocabulario con stemming
-        all_words = []
-        for doc in documents:
-            all_words.extend(self._tokenize(doc))
-
-        self.vocab = list(set(all_words))
-        self.word_to_idx = {word: idx for idx, word in enumerate(self.vocab)}
-
-        # Calcular IDF
-        doc_freq = Counter()
-        for doc in documents:
-            unique_words = set(self._tokenize(doc))
-            for word in unique_words:
-                doc_freq[word] += 1
-
-        n_docs = len(documents)
-        self.idf = {word: math.log(n_docs / (freq + 1)) for word, freq in doc_freq.items()}
-
-        # Calcular embeddings
-        self.embeddings = []
-        for doc in documents:
-            vec = self._get_vector(doc)
-            self.embeddings.append(vec)
-
-        print(f"[RAG] Embeddings calculados: {len(self.vocab)} palabras en vocabulario")
-
-    def _get_vector(self, text: str) -> np.ndarray:
-        """Obtiene vector TF-IDF de un texto"""
-        words = self._tokenize(text)
-        tf = Counter(words)
-        vec = np.zeros(len(self.vocab))
-        for word, count in tf.items():
-            if word in self.word_to_idx:
-                vec[self.word_to_idx[word]] = count * self.idf.get(word, 0)
-        norm = np.linalg.norm(vec)
-        if norm > 0:
-            vec = vec / norm
-        return vec
-
-    def _keyword_search(self, query: str, top_k: int = 10) -> List[Tuple[int, float]]:
-        """Búsqueda por keywords con boost por coincidencias múltiples"""
-        tokens = set(self._tokenize(query, apply_stemming=False))
-        tokens_stemmed = set(self._tokenize(query, apply_stemming=True))
-        all_tokens = tokens | tokens_stemmed
-
-        # Palabras clave de alta importancia (boost extra)
-        high_value_terms = {'biopro', 'fbio', 'dvs', '3dvs', 'biomodulador',
-                           'lifting', 'relleno', 'protocolo', 'precio'}
-
-        # Expandir con sinónimos
-        expanded_tokens = set(all_tokens)
-        for token in list(all_tokens):
-            if token in SYNONYMS:
-                expanded_tokens.update(SYNONYMS[token][:3])  # más sinónimos
-
-        # Contar matches por documento
-        doc_scores: Dict[int, float] = {}
-        for token in expanded_tokens:
-            if token in self.keyword_index:
-                for doc_idx in self.keyword_index[token]:
-                    if doc_idx not in doc_scores:
-                        doc_scores[doc_idx] = 0
-                    # Boost para tokens originales vs sinónimos
-                    boost = 2.0 if token in all_tokens else 1.0
-                    # Boost extra para términos de alta importancia
-                    if token in high_value_terms:
-                        boost *= 1.5
-                    doc_scores[doc_idx] += boost
-
-        # Boost adicional por coincidencia directa en pregunta
-        query_normalized = self._normalize(query)
-        for i, qa in enumerate(self.qa_pairs):
-            pregunta_norm = self._normalize(qa['pregunta'])
-            # Si palabras clave de la query aparecen en la pregunta
-            matches = sum(1 for t in all_tokens if t in pregunta_norm and len(t) > 3)
-            if matches > 0 and i in doc_scores:
-                doc_scores[i] *= (1 + matches * 0.3)
-
-        # Normalizar scores
-        if doc_scores:
-            max_score = max(doc_scores.values())
-            doc_scores = {k: v / max_score for k, v in doc_scores.items()}
-
-        # Ordenar por score
-        sorted_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
-        return sorted_docs[:top_k]
-
-    def _detect_intent(self, query: str) -> Optional[str]:
-        """Detecta la intención de la query basado en keywords"""
-        query_lower = self._normalize(query)
-
-        # Primero verificar patrones de query completos
-        for intent, patterns in QUERY_PATTERNS.items():
-            for pattern in patterns:
-                if self._normalize(pattern) in query_lower:
-                    return intent
-
-        for intent, keywords in INTENT_KEYWORDS.items():
-            for kw in keywords:
-                if kw in query_lower:
-                    return intent
+    def _detect_product_line(self, query: str) -> Optional[str]:
+        """Detecta a qué línea de producto se refiere la query."""
+        query_lower = query.lower()
+        catalog = get_catalog()
+        for line in catalog.get('product_lines', []):
+            if line['name'].lower() in query_lower:
+                return line['id']
+            for product in line.get('products', []):
+                if product['name'].lower() in query_lower:
+                    return line['id']
+                for alias in product.get('aliases', []):
+                    if alias.lower() in query_lower:
+                        return line['id']
         return None
 
     def search(self, query: str, top_k: int = 5, categories: Optional[List[str]] = None) -> List[Tuple[dict, float]]:
         """
-        Búsqueda híbrida: TF-IDF + keywords + expansión de sinónimos.
+        Búsqueda: BM25 con query expansion + metadata boost.
 
         Args:
             query: Texto de búsqueda
@@ -354,77 +319,70 @@ class RAGEngine:
         Returns:
             Lista de (qa_pair, score)
         """
+        if not self.qa_pairs or self.bm25 is None:
+            return []
+
         # 1. Expandir query con sinónimos
         expanded_query = self._expand_query(query)
 
-        # 2. Búsqueda TF-IDF con query expandida
-        query_vec = self._get_vector(expanded_query)
+        # 2. Tokenizar query expandida (con stemming)
+        query_tokens = self._tokenize(expanded_query)
+        if not query_tokens:
+            return []
 
-        tfidf_results = []
-        for i, (qa, emb) in enumerate(zip(self.qa_pairs, self.embeddings)):
-            if categories and qa['categoria'] not in categories:
-                continue
-            score = float(np.dot(query_vec, emb))
-            tfidf_results.append((i, score))
+        # 3. BM25 scoring
+        raw_scores = self.bm25.score(query_tokens)
 
-        # 3. Búsqueda por keywords
-        keyword_results = self._keyword_search(query, top_k=top_k * 2)
-        keyword_dict = dict(keyword_results)
+        # 4. Detectar product line para metadata boost
+        detected_line = self._detect_product_line(query)
 
-        # 4. Combinar scores (híbrido)
-        # TF-IDF tiene más peso pero keywords ayuda cuando TF-IDF falla
-        combined_scores: Dict[int, float] = {}
-
-        # Detectar intent una vez
-        intent = self._detect_intent(query)
-
-        for i, tfidf_score in tfidf_results:
-            keyword_score = keyword_dict.get(i, 0)
-            # Ponderación: 60% TF-IDF, 40% keywords
-            combined = (tfidf_score * 0.6) + (keyword_score * 0.4)
-
+        # 5. Aplicar filtros, metadata boost y normalizar
+        scored: List[Tuple[int, float]] = []
+        for i, score in enumerate(raw_scores):
             qa = self.qa_pairs[i]
 
-            # Boost adicional si coincide con categoría de intent detectado
-            if intent:
-                category = qa.get('categoria', '')
-                if intent in category or any(kw in category for kw in INTENT_KEYWORDS.get(intent, [])):
-                    combined *= 1.2
-
-            # Boost especial para intent de concentración: buscar en pregunta/respuesta
-            if intent == 'concentracion':
-                pregunta_norm = self._normalize(qa['pregunta'])
-                respuesta_norm = self._normalize(qa['respuesta'])
-                if 'concentracion' in pregunta_norm:
-                    combined = max(combined * 4.0, 0.5)  # boost muy significativo
-                elif 'concentrado' in pregunta_norm or 'potente' in pregunta_norm:
-                    combined = max(combined * 3.0, 0.4)
-                elif 'concentracion' in respuesta_norm or 'concentrado' in respuesta_norm:
-                    combined *= 2.0
-
-            combined_scores[i] = combined
-
-        # 5. Ordenar y devolver top_k
-        sorted_results = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
-
-        results = []
-        for i, score in sorted_results[:top_k]:
-            if categories and self.qa_pairs[i]['categoria'] not in categories:
+            # Filtro por categorías
+            if categories and qa.get('categoria', '') not in categories:
                 continue
-            results.append((self.qa_pairs[i], score))
 
-        return results[:top_k]
+            if score <= 0:
+                continue
+
+            # Metadata boost: +30% si coincide product_line
+            if detected_line and qa.get('product_line') == detected_line:
+                score *= 1.3
+
+            # Boost por coincidencia directa en pregunta
+            query_norm = self._normalize(query)
+            pregunta_norm = self._normalize(qa['pregunta'])
+            query_words = set(self._tokenize(query, apply_stemming=False))
+            direct_matches = sum(1 for w in query_words if w in pregunta_norm and len(w) > 3)
+            if direct_matches > 0:
+                score *= (1 + direct_matches * 0.2)
+
+            scored.append((i, score))
+
+        # 6. Normalizar scores a [0, 1]
+        if scored:
+            max_score = max(s for _, s in scored)
+            if max_score > 0:
+                scored = [(i, s / max_score) for i, s in scored]
+
+        # 7. Ordenar y devolver top_k
+        scored.sort(key=lambda x: x[1], reverse=True)
+        return [(self.qa_pairs[i], score) for i, score in scored[:top_k]]
 
     def get_categories(self) -> List[str]:
-        """Retorna todas las categorías disponibles"""
-        return list(set(qa['categoria'] for qa in self.qa_pairs))
+        """Retorna todas las categorías disponibles."""
+        return list(set(qa.get('categoria', '') for qa in self.qa_pairs))
 
 
 # Singleton del motor RAG
 _rag_instance = None
 
+
 def get_rag_engine() -> RAGEngine:
-    """Obtiene la instancia singleton del RAG"""
+    """Obtiene la instancia singleton del RAG."""
     global _rag_instance
     if _rag_instance is None:
         base_path = os.path.dirname(os.path.dirname(__file__))

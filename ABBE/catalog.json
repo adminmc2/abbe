@@ -1,0 +1,54 @@
+{
+  "metadata": {
+    "empresa": "Above Pharma",
+    "version": "2.0",
+    "updated": "2026-04-21",
+    "description": "Catálogo multi-producto de Above Pharma. Cada product_line agrupa productos relacionados."
+  },
+  "product_lines": [
+    {
+      "id": "gencell",
+      "name": "Gencell Biotechnology",
+      "manufacturer": "Gencell®",
+      "description": "Células troncales mesenquimales para medicina regenerativa",
+      "category": "medicina_regenerativa",
+      "technologies": ["CTM", "Pretratamiento específico por indicación", "Medicina regenerativa"],
+      "products": [
+        {
+          "id": "ctm_estabilizador_renal",
+          "name": "CTM Estabilizador Renal",
+          "type": "terapia_celular",
+          "pretreatment": "melatonina",
+          "pretreatment_mechanism": "Vías MT1/MT2",
+          "aliases": ["estabilizador renal", "ctm renal", "células mesenquimales renal"],
+          "conditions": ["lesión renal", "post-covid", "esteatosis hepática", "asma", "lyme", "infecciones crónicas"],
+          "zones": ["renal", "hepático", "pulmonar", "sistémico"]
+        },
+        {
+          "id": "ctm_metabolica",
+          "name": "CTM Metabólica",
+          "type": "terapia_celular",
+          "pretreatment": "evolocumab",
+          "pretreatment_mechanism": "Inhibición de PCSK9, preservación del receptor LDL",
+          "aliases": ["ctm metabólica", "metabólica", "metabolica", "ctm metabolica", "ctm colesterol"],
+          "conditions": ["hipercolesterolemia familiar", "dislipidemia mixta", "daño endotelial", "riesgo cardiovascular"],
+          "zones": ["cardiovascular", "endotelial", "metabólico", "sistémico"]
+        }
+      ],
+      "competitors": [],
+      "synonyms": {
+        "ctm": ["células troncales mesenquimales", "stem cells", "células madre", "mesenquimatosas"],
+        "mesenquimales": ["mesenquimatosas", "msc", "stem cells"],
+        "gencell": ["gen cell", "gen-cell"],
+        "estabilizador renal": ["ctm renal", "estabilizador riñón"],
+        "metabólica": ["metabolica", "ctm metabolica", "ctm colesterol"],
+        "evolocumab": ["inhibidor pcsk9", "anti pcsk9"],
+        "pcsk9": ["proteína convertasa subtilisina kexina tipo 9", "pcsk-9"],
+        "hipercolesterolemia": ["colesterol alto", "hipercolesterolemia familiar", "colesterol elevado"],
+        "dislipidemia": ["dislipidemia mixta", "desorden lipídico", "perfil lipídico alterado"],
+        "colesterol": ["colesterol ldl", "ldl", "lipoproteínas de baja densidad"],
+        "endotelial": ["endotelio", "daño endotelial", "vascular"]
+      }
+    }
+  ]
+}

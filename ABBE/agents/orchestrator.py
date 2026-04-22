@@ -42,15 +42,15 @@ class Orchestrator:
         "argumentos": AgenteArgumentos
     }
 
-    CLASSIFICATION_PROMPT = """Eres un clasificador de intenciones para un asistente de ventas de Novacutan (biomoduladores y rellenos dérmicos con tecnología DVS).
+    CLASSIFICATION_PROMPT = """Eres un clasificador de intenciones para un asistente de ventas farmacéutico de Above Pharma.
 
 Analiza el mensaje del usuario y clasifícalo en UNA de estas categorías:
 
 1. **productos** - Preguntas sobre:
-   - Información técnica de productos (BioPRO, FBio DVS Light/Medium/Volume)
+   - Información técnica de productos (composición, presentación, tecnología)
    - Indicaciones y zonas de tratamiento
-   - Protocolos de aplicación (V-Lift, D-Lift)
-   - Tecnología DVS/3DVS, certificaciones
+   - Protocolos de aplicación
+   - Certificaciones, tecnología diferenciada
    - Qué producto recomendar para X zona o condición
    - Diferencias entre productos de la marca
    - Seguridad, contraindicaciones, complicaciones, cuidados post
@@ -59,7 +59,7 @@ Analiza el mensaje del usuario y clasifícalo en UNA de estas categorías:
    - Objeciones de PRECIO ("es caro", "muy costoso")
    - Objeciones de EFICACIA ("no funciona", "no hay resultados", "no dura")
    - Objeciones de MARCA ("no conozco", "ya uso otra marca", "por qué cambiar")
-   - Comparativas negativas ("prefiero Profhilo", "Juvederm es mejor")
+   - Comparativas negativas ("prefiero otra marca", "X es mejor")
    - Cualquier duda o rechazo que necesite ser rebatido
 
 3. **argumentos** - Preguntas sobre:
@@ -142,7 +142,7 @@ Responde SOLO con una palabra: productos, objeciones o argumentos"""
         # Especialidades con o sin contexto de venta
         r'\bdermat[oó]logo\b', r'\bcirujano\b', r'\bpl[aá]stico\b',
         r'\best[eé]tico\b', r'\best[eé]tica\b',
-        r'\bginec[oó]logo\b', r'\binternista\b',
+        r'\bginec[oó]logo\b', r'\binternista\b', r'\bnefr[oó]logo\b', r'\bneum[oó]logo\b',
         r'\bespecialista\b', r'\bespecialidad\b',
     ]
 

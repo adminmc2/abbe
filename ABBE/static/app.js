@@ -1,5 +1,5 @@
 /**
- * Abbe - App Principal Novacutan
+ * Abbe - App Principal Above Pharma
  * Chat con voz y transiciones
  */
 
@@ -350,12 +350,12 @@ function saveMoodToStorage() {
         date: getLocalDateStr(),
         timestamp: state.mood.timestamp
     };
-    localStorage.setItem('novacutan_mood', JSON.stringify(data));
+    localStorage.setItem('abbe_mood', JSON.stringify(data));
 }
 
 function loadMoodFromStorage() {
     try {
-        const raw = localStorage.getItem('novacutan_mood');
+        const raw = localStorage.getItem('abbe_mood');
         if (!raw) return;
 
         const data = JSON.parse(raw);
@@ -365,7 +365,7 @@ function loadMoodFromStorage() {
         if (data.date !== today) {
             const utcToday = new Date().toISOString().slice(0, 10);
             if (data.date !== utcToday) {
-                localStorage.removeItem('novacutan_mood');
+                localStorage.removeItem('abbe_mood');
                 return;
             }
         }
@@ -386,7 +386,7 @@ function loadMoodFromStorage() {
 // ============================================
 // Búsquedas Recientes
 // ============================================
-const RECENT_SEARCHES_KEY = 'novacutan_recent_searches';
+const RECENT_SEARCHES_KEY = 'abbe_recent_searches';
 const MAX_RECENT_SEARCHES = 10;
 
 // Iconos según tipo de búsqueda
@@ -400,8 +400,8 @@ const SEARCH_ICONS = {
 
 function classifySearchIcon(query) {
     const q = query.toLowerCase();
-    if (/producto|novacutan|biopro|fbio|dvs|hialuronic|relleno/i.test(q)) return 'product';
-    if (/objeción|objecion|caro|no funciona|otra marca|profhilo/i.test(q)) return 'objection';
+    if (/producto|above pharma|gencell|ctm|mesenquimal|hialuronic|relleno|regenerativ/i.test(q)) return 'product';
+    if (/objeción|objecion|caro|no funciona|otra marca|competencia/i.test(q)) return 'objection';
     if (/argumento|venta|presentar|dermatólogo|cirujano|perfil|ventaja/i.test(q)) return 'argument';
     return 'default';
 }
@@ -409,7 +409,7 @@ function classifySearchIcon(query) {
 function getSearchDescription(query) {
     const type = classifySearchIcon(query);
     switch (type) {
-        case 'product':   return 'Consulta sobre productos Novacutan';
+        case 'product':   return 'Consulta sobre productos Above Pharma';
         case 'objection': return 'Manejo de objeciones médicas';
         case 'argument':  return 'Estrategia de argumentación comercial';
         default:          return 'Conversación con el asistente';
@@ -595,24 +595,24 @@ function escapeHtml(str) {
 const PLAN_TASKS = [
     // --- En proceso (fecha de hoy) ---
     { id: 1, title: 'Visita Dra. García — Dermatología', date: '2026-01-27', project: 'visitas', status: 'in_progress', tasks: 2, subtasks: 1 },
-    { id: 2, title: 'Estudiar ficha BioPRO', date: '2026-01-27', project: 'formacion', status: 'in_progress', tasks: 1, subtasks: 0 },
+    { id: 2, title: 'Estudiar ficha CTM Estabilizador Renal', date: '2026-01-27', project: 'formacion', status: 'in_progress', tasks: 1, subtasks: 0 },
     { id: 3, title: 'Preparar argumentario Cirugía Plástica', date: '2026-01-27', project: 'visitas', status: 'in_progress', tasks: 3, subtasks: 2 },
     // --- Por hacer (futuro cercano) ---
     { id: 4, title: 'Visita Dra. López — Pediatría', date: '2026-01-28', project: 'visitas', status: 'todo', tasks: 2, subtasks: 0 },
     { id: 5, title: 'Informe semanal de ventas', date: '2026-01-29', project: 'admin', status: 'todo', tasks: 1, subtasks: 0 },
     { id: 6, title: 'Llamada farmacia central', date: '2026-01-30', project: 'visitas', status: 'todo', tasks: 1, subtasks: 1 },
-    { id: 7, title: 'Revisar catálogo FBio DVS', date: '2026-01-31', project: 'formacion', status: 'todo', tasks: 2, subtasks: 0 },
+    { id: 7, title: 'Revisar catálogo Gencell', date: '2026-01-31', project: 'formacion', status: 'todo', tasks: 2, subtasks: 0 },
     { id: 8, title: 'Reunión equipo zona norte', date: '2026-02-02', project: 'admin', status: 'todo', tasks: 1, subtasks: 0 },
     { id: 9, title: 'Visita Dr. Fernández — Dermatología', date: '2026-02-03', project: 'visitas', status: 'todo', tasks: 2, subtasks: 1 },
     { id: 10, title: 'Actualizar CRM contactos', date: '2026-02-05', project: 'admin', status: 'todo', tasks: 1, subtasks: 0 },
-    { id: 11, title: 'Preparar presentación BioPRO', date: '2026-02-07', project: 'formacion', status: 'todo', tasks: 3, subtasks: 2 },
+    { id: 11, title: 'Preparar presentación CTM Gencell', date: '2026-02-07', project: 'formacion', status: 'todo', tasks: 3, subtasks: 2 },
     // --- Retrasadas (antes de hoy) ---
     { id: 12, title: 'Seguimiento Dr. Martínez', date: '2026-01-26', project: 'visitas', status: 'overdue', tasks: 1, subtasks: 1 },
-    { id: 13, title: 'Completar módulo tecnología DVS', date: '2026-01-25', project: 'formacion', status: 'overdue', tasks: 2, subtasks: 0 },
+    { id: 13, title: 'Completar módulo medicina regenerativa', date: '2026-01-25', project: 'formacion', status: 'overdue', tasks: 2, subtasks: 0 },
     { id: 14, title: 'Enviar muestras Hospital Clínic', date: '2026-01-24', project: 'visitas', status: 'overdue', tasks: 1, subtasks: 0 },
     // --- Completadas ---
     { id: 15, title: 'Visita Dra. Ruiz — Cirugía Plástica', date: '2026-01-23', project: 'visitas', status: 'done', tasks: 2, subtasks: 1 },
-    { id: 16, title: 'Curso online DVS vs BDDE', date: '2026-01-22', project: 'formacion', status: 'done', tasks: 1, subtasks: 0 },
+    { id: 16, title: 'Curso online células mesenquimales', date: '2026-01-22', project: 'formacion', status: 'done', tasks: 1, subtasks: 0 },
 ];
 
 // Proyectos con sus colores
@@ -933,11 +933,11 @@ const ICON_MAP_HEADERS = {
     // Product-related
     'producto':     'package',
     'productos':    'package',
-    'novacutan':    'drop',
-    'biopro':       'drop',
-    'bio pro':      'drop',
-    'fbio':         'syringe',
-    'dvs':          'drop',
+    'above pharma': 'drop',
+    'gencell':      'drop',
+    'ctm':          'drop',
+    'mesenquimal':  'syringe',
+    'regenerativ':  'drop',
     'hialuronico':  'drop',
     'composición':  'flask',
     'composicion':  'flask',
@@ -1312,7 +1312,7 @@ function insertRagCoverageWarning(coverage, maxScore) {
             </div>
             <div class="rag-coverage-warning__content">
                 <strong>Fuentes externas</strong>
-                <span>Esta consulta no está cubierta en la base de conocimiento de Novacutan. La respuesta usa información externa general.</span>
+                <span>Esta consulta no está cubierta en la base de conocimiento. La respuesta usa información externa general.</span>
             </div>
         `;
     } else {
@@ -1821,7 +1821,7 @@ async function transcribeAudio(audioBlob, extension = 'webm') {
             } else {
                 // Show capabilities message when transcription fails (only for normal queries)
                 if (!elements.chatScreen.classList.contains('hidden')) {
-                    addMessage('No pude entender lo que dijiste. Puedes preguntarme sobre:\n\n- **Productos**: "¿Qué es BioPRO?"\n- **Objeciones**: "Un médico dice que es caro"\n- **Argumentos**: "¿Cómo presento Novacutan a un dermatólogo?"', 'assistant');
+                    addMessage('No pude entender lo que dijiste. Puedes preguntarme sobre:\n\n- **Productos**: "¿Qué es el CTM Estabilizador Renal?"\n- **Objeciones**: "Un médico dice que es caro"\n- **Argumentos**: "¿Cómo presento Gencell a un nefrólogo?"', 'assistant');
                 }
             }
         }
@@ -1889,7 +1889,7 @@ function warmupIOSAudio() {
 // ============================================
 /**
  * Determina si un mensaje contiene una consulta real sobre
- * productos, objeciones o argumentos de Novacutan.
+ * productos, objeciones o argumentos de Above Pharma.
  * Solo muestra el selector de formato cuando hay contenido estética relevante.
  * Cualquier otra cosa (saludos, frases vagas, charla) se envía directo.
  */
@@ -1899,17 +1899,18 @@ function isActionableQuery(text) {
 
     // Palabras clave que indican consulta real sobre el dominio estética/ventas
     const pharmaKeywords = [
-        // Productos y sustancias Novacutan
-        /novacutan/i, /biopro/i, /bio\s*pro/i, /fbio/i, /f\s*bio/i,
-        /dvs/i, /3dvs/i, /biomodulador/i, /relleno/i, /filler/i,
-        /hialuronico/i, /acido hialuronico/i, /reticulante/i,
-        /divinilsulfona/i, /microesfera/i, /bdde/i,
+        // Productos y sustancias Above Pharma
+        /above pharma/i, /gencell/i, /ctm/i, /mesenquimal/i, /mesenquimatosa/i,
+        /celula.? madre/i, /celula.? troncal/i, /stem cell/i,
+        /regenerativ/i, /exosoma/i, /inmunomodul/i,
+        /biomodulador/i, /relleno/i, /filler/i,
+        /hialuronico/i, /acido hialuronico/i,
         // Médico / clínico
         /medico/i, /doctor/i, /paciente/i, /dosis/i,
         /indicaci/i, /tratamiento/i, /clinico/i, /sesion/i,
         /dermato/i, /cirujano/i, /plastico/i, /estetico/i, /estetica/i,
         // Técnicas y protocolos
-        /v.?lift/i, /d.?lift/i, /lifting/i, /canula/i, /aguja/i,
+        /intravenosa/i, /lifting/i, /canula/i, /aguja/i,
         /protocolo/i, /tecnica/i, /inyecci/i, /bolus/i, /fanning/i,
         /retrotrazante/i, /subdermic/i, /supraperiostic/i,
         // Zonas anatómicas
@@ -1925,13 +1926,13 @@ function isActionableQuery(text) {
         /no funciona/i, /no sirve/i, /no conoce/i,
         /efecto.? secundario/i, /contraindicac/i,
         /otra marca/i, /competencia/i, /objecion/i,
-        /profhilo/i, /juvederm/i,
+        /competencia/i,
         // Ventas y argumentos
         /argumento/i, /vender/i, /venta/i, /presentar/i, /visita/i,
         /represent/i, /estrategi/i, /perfil/i, /diferenci/i,
         /ventaja/i, /evidencia/i, /estudio/i, /pitch/i,
         // Marca y certificaciones
-        /novacutan/i, /fijie/i, /marcado ce/i, /certificac/i,
+        /above pharma/i, /marcado ce/i, /certificac/i,
         // Producto genérico
         /producto/i, /composici/i, /concentraci/i, /cohesividad/i,
         /calidad/i, /pureza/i, /purificacion/i,
@@ -2305,7 +2306,7 @@ function downloadInfographicAsPNG(cardElement) {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'infografia-novacutan.png';
+            a.download = 'infografia-above-pharma.png';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -3311,18 +3312,18 @@ function init() {
     // Si no hay búsquedas, o si las existentes no tienen 'answer' (versión vieja), reemplazar
     const SEED_DATA = [
         {
-            query: '¿Cuál es la diferencia entre BioPRO y FBio DVS?',
+            query: '¿Qué es el CTM Estabilizador Renal de Gencell?',
             icon: 'product',
-            desc: 'Consulta sobre productos Novacutan',
+            desc: 'Consulta sobre productos Above Pharma',
             timestamp: Date.now() - 3600000,
-            answer: 'BioPRO es un biomodulador de matriz celular (2ml) con triple acción celular (extracelular, intracelular y subcelular), indicado para lifting y rejuvenecimiento global con protocolos V-Lift y D-Lift. FBio DVS son rellenos dérmicos (1ml) en tres versiones: Light (zonas delicadas como ojeras), Medium (surcos nasogenianos, pómulos) y Volume (mentón, mandíbula). Todos usan la misma tecnología DVS con 20mg/ml de ácido hialurónico.'
+            answer: 'El CTM Estabilizador Renal es una terapia de células troncales mesenquimales de Gencell® Biotechnology. Las CTM son pretratadas con melatonina (vías MT1/MT2) para potenciar su capacidad regenerativa. Está indicado para lesión renal, esteatosis hepática, condiciones pulmonares (asma), e infecciones crónicas (post-COVID, Lyme). Se administra por vía intravenosa.'
         },
         {
             query: '¿Cómo manejar la objeción de que el precio es alto?',
             icon: 'objection',
             desc: 'Manejo de objeciones médicas',
             timestamp: Date.now() - 7200000,
-            answer: 'Cuando un médico menciona el precio, es clave reencuadrar el valor:\n\n1) El efecto dura 12+ meses vs 6 meses de otros productos — menos sesiones de mantenimiento.\n2) Menor edema post-tratamiento gracias al DVS — menos quejas y menos retoques gratuitos.\n3) Triple acción celular única en el mercado — diferenciación como clínica premium.\n4) Propuesta de cierre: "¿Qué le parece si empezamos con un pack de prueba para que vea los resultados en sus propios pacientes?"'
+            answer: 'Cuando un médico menciona el precio, es clave reencuadrar el valor:\n\n1) La terapia con CTM aborda la causa raíz, no solo los síntomas — menos tratamientos paliativos a largo plazo.\n2) Pretratamiento con melatonina potencia la capacidad regenerativa — mejores resultados por sesión.\n3) Mecanismo de acción multimodal único — diferenciación como centro de medicina avanzada.\n4) Propuesta de cierre: "¿Qué le parece si empezamos con un paciente candidato para que vea los resultados de primera mano?"'
         },
     ];
     const existing = loadRecentSearches();

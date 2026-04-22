@@ -1,4 +1,4 @@
-# Novacutan - Asistente de Ventas RAG v1.0
+# Above Pharma (Abbe) - Asistente de Ventas RAG v4.0
 # Dependencias principales
 
 # Backend API

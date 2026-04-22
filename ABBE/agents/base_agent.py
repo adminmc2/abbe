@@ -4,6 +4,7 @@ Clase base para todos los agentes
 from typing import List, Tuple, Optional
 from abc import ABC, abstractmethod
 from .rag_engine import get_rag_engine
+from .catalog import get_empresa
 
 
 class BaseAgent(ABC):
@@ -69,6 +70,7 @@ class BaseAgent(ABC):
 
     def format_context(self, results: List[Tuple[dict, float]], min_score: float = 0.1) -> str:
         """Formatea los resultados de búsqueda como HECHOS VERIFICADOS numerados para el LLM"""
+        empresa = get_empresa()
         context_parts = []
         fact_num = 1
 
@@ -85,7 +87,7 @@ class BaseAgent(ABC):
             return "NO HAY DATOS VERIFICADOS para esta consulta. NO inventes ningún dato."
 
         header = (
-            "═══ DATOS VERIFICADOS DE NOVACUTAN ═══\n"
+            f"═══ DATOS VERIFICADOS DE {empresa.upper()} ═══\n"
             "IMPORTANTE: Solo los datos listados abajo son REALES y VERIFICADOS.\n"
             "Cualquier dato que NO esté aquí abajo es INVENTADO y está PROHIBIDO usarlo.\n\n"
         )

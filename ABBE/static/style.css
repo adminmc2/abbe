@@ -1649,7 +1649,7 @@ body[data-mood-active] .message.assistant {
 
 /* Tooltip on hover */
 .source-badge-general::after {
-    content: 'Fuente externa no empresarial. Este dato NO proviene de la base de conocimiento de Novacutan. Usar con precaución.';
+    content: 'Fuente externa no empresarial. Este dato NO proviene de la base de conocimiento de Above Pharma. Usar con precaución.';
     position: absolute;
     bottom: calc(100% + 8px);
     left: 0;

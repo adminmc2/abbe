@@ -1,10 +1,10 @@
-# CLAUDE.md — ABBE (Above Pharma / Novacutan)
+# CLAUDE.md — ABBE (Above Pharma)
 
 ## Qué es este proyecto
 
-ABBE es un asistente de ventas IA para representantes médicos de Novacutan (marca de Above Pharma). Es una aplicación web con backend FastAPI y frontend vanilla JS, desplegada en Hugging Face Spaces via Docker.
+ABBE es un asistente de ventas IA multi-producto para representantes médicos de Above Pharma. Es una aplicación web con backend FastAPI y frontend vanilla JS, desplegada en Hugging Face Spaces via Docker.
 
-El asistente ayuda a los representantes con información de productos (biomoduladores y rellenos dérmicos), manejo de objeciones y argumentos de venta por especialidad médica.
+El asistente ayuda a los representantes con información de productos (terapias celulares y medicina regenerativa), manejo de objeciones y argumentos de venta por especialidad médica. Actualmente opera con la línea Gencell Biotechnology (CTM Estabilizador Renal y CTM Metabólica).
 
 ## Estructura del proyecto
 
@@ -15,7 +15,8 @@ above pharma/
 │   ├── agents/                     # Sistema multi-agente
 │   │   ├── orchestrator.py         # Router de intenciones (clasifica → agente)
 │   │   ├── base_agent.py           # Clase base con métodos RAG
-│   │   ├── rag_engine.py           # Motor de búsqueda híbrido (TF-IDF + keywords)
+│   │   ├── rag_engine.py           # Motor BM25 + sinónimos + metadata boost
+│   │   ├── catalog.py              # Gestión de catálogo (sinónimos, aliases, keywords)
 │   │   ├── agent_productos.py      # Agente Científico (FAB methodology)
 │   │   ├── agent_objeciones.py     # Agente Diplomático (Feel-Felt-Found)
 │   │   └── agent_argumentos.py     # Agente Estratega (SPIN/Challenger Sale)
@@ -24,7 +25,8 @@ above pharma/
 │   │   ├── app.js                  # Lógica cliente (~3100 líneas)
 │   │   ├── style.css               # Estilos (~2500 líneas)
 │   │   └── manifest.json           # PWA config
-│   ├── knowledge_base.json         # Base de conocimiento RAG (~170 Q&As)
+│   ├── catalog.json                # Catálogo de productos (líneas, aliases, sinónimos)
+│   ├── knowledge_base.json         # Base de conocimiento RAG (50 Q&As, 2 productos)
 │   ├── user_data.json              # Historial de usuarios
 │   ├── requirements.txt            # Dependencias Python
 │   ├── Dockerfile                  # Deploy HF Spaces (puerto 7862)
@@ -38,11 +40,12 @@ above pharma/
 ## Stack tecnológico
 
 - **Backend:** Python 3.11+, FastAPI, Uvicorn, AsyncOpenAI
-- **LLM:** Groq API → Llama 3.3-70b-versatile (fallback: Kimi K2)
+- **LLM:** Groq API → Llama 3.3-70b-versatile
 - **STT:** Groq Whisper v3 (español)
 - **TTS:** ElevenLabs v2 (voz Camila MX)
 - **Frontend:** Vanilla JS, streaming-markdown, marked.js (fallback), Phosphor Icons
-- **RAG:** Motor custom con stemming español, sinónimos, TF-IDF + keywords
+- **RAG:** Motor custom BM25 (Okapi) + stemming español + sinónimos dinámicos + metadata boost
+- **Catálogo:** `catalog.json` con líneas de producto, aliases, sinónimos y keywords
 - **Deploy:** Docker → Hugging Face Spaces (puerto 7862)
 
 ## Cómo correr el proyecto
@@ -60,6 +63,7 @@ uvicorn main:app --host 0.0.0.0 --port 7862 --reload
 GROQ_API_KEY=           # LLM (Llama 3.3) + Whisper STT
 ELEVENLABS_API_KEY=     # Text-to-speech
 ELEVENLABS_VOICE_ID=    # ID de voz mexicana (ver .env.example)
+KB_VALIDATION_MODE=     # 'warn' (default) o 'strict' (bloquea startup si KB inválida)
 ```
 
 ## Arquitectura: Flujo de una consulta
@@ -77,9 +81,9 @@ Usuario → WebSocket /ws/chat
 
 - **Idioma del código:** Nombres de variables y funciones en inglés, comentarios y prompts en español
 - **Agentes:** Cada agente tiene un system prompt extenso con metodología de ventas específica
-- **Knowledge base:** JSON plano con pares pregunta/respuesta categorizados
+- **Knowledge base:** JSON con pares pregunta/respuesta, contrato de datos obligatorio (id, categoria, pregunta, respuesta, source_doc, product_line, product). Validado al arrancar.
 - **Frontend:** SPA sin framework, estado global en objeto `state`, comunicación via WebSocket
-- **Streaming:** Usar `streaming-markdown` para renderizado incremental (NO `marked.parse()` en cada token — causa O(n²), ver CHANGELOG v5.7.0)
+- **Streaming:** Usar `streaming-markdown` para renderizado incremental (NO `marked.parse()` en cada token — causa O(n²), ver CHANGELOG v3.8.2)
 
 ## Credenciales de prueba
 
@@ -87,7 +91,7 @@ Usuario → WebSocket /ws/chat
 
 ## Puertos
 
-- ABBE (Novacutan): `7862`
+- ABBE (Above Pharma): `7862`
 - Puro Omega (proyecto hermano): `7860`
 
 ## Versionado y CHANGELOG
@@ -101,7 +105,8 @@ Usuario → WebSocket /ws/chat
 
 ## Notas importantes
 
-- El proyecto se originó como fork de `puro_omega/` adaptado para Novacutan
-- La knowledge base se extrajo de `GUIA_OPERATIVA_CHATBOT_NOVACUTAN.md`
+- El proyecto se originó como fork de `puro_omega/`, adaptado primero para Novacutan y luego transformado en plataforma multi-producto Above Pharma (v4.0+)
+- La knowledge base actual se extrajo de las fichas técnicas PDF de cada producto
+- El validador de KB se ejecuta al arrancar y verifica contrato de datos, categorías y referencias cruzadas con `catalog.json`
 - No hay tests automatizados; verificación manual via `/api/health` y DevTools
 - El modelo LLM es configurable en `main.py` variable `LLM_MODEL`

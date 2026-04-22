@@ -1,5 +1,5 @@
 """
-Abbe - Asistente de Ventas Novacutan RAG v3.0
+Abbe - Asistente de Ventas Above Pharma RAG v4.0
 Backend FastAPI con WebSocket para streaming
 """
 
@@ -109,8 +109,8 @@ async def lifespan(app: FastAPI):
     print("Cerrando aplicación...")
 
 app = FastAPI(
-    title="Abbe - Asistente de Ventas Novacutan",
-    version="3.8.4",
+    title="Abbe - Asistente de Ventas Above Pharma",
+    version="4.0.3",
     lifespan=lifespan
 )
 
@@ -129,7 +129,7 @@ async def health_check():
     """Verificar estado del sistema"""
     return {
         "status": "ok",
-        "version": "3.8.4",
+        "version": "4.0.3",
         "agents": ["productos", "objeciones", "argumentos"],
         "knowledge_base_size": len(orchestrator.agents['productos'].rag.qa_pairs) if orchestrator else 0
     }
@@ -141,7 +141,7 @@ async def test_infographic():
     if not llm_client:
         return {"success": False, "error": "LLM client no configurado (falta GROQ_API_KEY)"}
 
-    test_text = "NOVACUTAN BioPRO contiene 20mg/ml de ácido hialurónico con tecnología 3DVS. Indicado para lifting de tejidos blandos y rejuvenecimiento facial. Triple acción celular: extracelular, intracelular y subcelular."
+    test_text = "Producto de medicina estética con ácido hialurónico de alta concentración. Indicado para rejuvenecimiento facial y bioestimulación de tejidos. Tecnología avanzada de reticulación para mayor duración y naturalidad."
 
     try:
         data = await asyncio.to_thread(_generate_infographic_sync, test_text)
@@ -227,11 +227,11 @@ async def transcribe_voice(audio: UploadFile = File(...)):
 
 
 # Prompt para generar resumen conversacional para TTS
-TTS_SUMMARY_PROMPT = """Eres Abbe, una asistente de ventas de Novacutan. Convierte la siguiente respuesta escrita en un RESUMEN HABLADO conversacional y natural.
+TTS_SUMMARY_PROMPT = """Eres Abbe, una asistente de ventas de Above Pharma. Convierte la siguiente respuesta escrita en un RESUMEN HABLADO conversacional y natural.
 
 REGLAS:
 1. Habla como si estuvieras conversando con el representante de ventas, en tono cercano y profesional.
-2. NUNCA leas tablas, filas, columnas, pipes (|), separadores (---) ni datos tabulares. Extrae solo los 2-3 datos más relevantes de la tabla y menciónalos de forma conversacional. Ejemplo: "El BioPRO tiene 20 miligramos por mililitro de ácido hialurónico con tecnología 3DVS."
+2. NUNCA leas tablas, filas, columnas, pipes (|), separadores (---) ni datos tabulares. Extrae solo los 2-3 datos más relevantes de la tabla y menciónalos de forma conversacional.
 3. Máximo 3-4 oraciones (50-80 palabras). Sé concisa pero informativa.
 4. Menciona solo el dato más importante (nombre de producto, técnica clave, o argumento principal).
 5. Si hay un guion sugerido para el médico, menciónalo brevemente: "podrías decirle al doctor..."
@@ -502,17 +502,23 @@ def is_greeting_or_vague(message: str) -> bool:
 
     # Palabras clave que indican consulta real sobre el dominio estética/ventas
     pharma_patterns = [
-        # Productos y sustancias Novacutan
-        r'novacutan', r'biopro', r'bio\s*pro', r'fbio', r'f\s*bio',
-        r'dvs', r'3dvs', r'biomodulador', r'relleno', r'filler',
+        # Sustancias y tecnología
+        r'biomodulador', r'relleno', r'filler',
         r'acido hialuronico', r'hialuronico', r'\bah\b', r'reticulante',
-        r'divinilsulfona', r'microesfera', r'bdde',
+        r'microesfera',
+        # Medicina regenerativa / CTM
+        r'celula.? madre', r'celula.? troncal', r'mesenquimal', r'\bctm\b',
+        r'stem cell', r'regenerativ', r'gencell', r'melatonina',
+        r'estabilizador', r'inmunomodul', r'exosoma',
+        r'renal', r'ri[ñn]on', r'hepatic', r'pulmonar',
+        r'post.?covid', r'lyme', r'esteatosis',
+        r'tasa de filtracion', r'\btfg\b', r'intravenosa',
         # Médico / clínico
         r'medico', r'doctor', r'paciente', r'prescri', r'dosis',
         r'indicaci', r'tratamiento', r'clinico', r'sesion',
         r'dermato', r'cirujano', r'plastico', r'estetico', r'estetica',
         # Técnicas y protocolos
-        r'v.?lift', r'd.?lift', r'lifting', r'canula', r'aguja',
+        r'lifting', r'canula', r'aguja',
         r'protocolo', r'tecnica', r'inyecci', r'bolus', r'fanning',
         r'retrotrazante', r'subdermic', r'supraperiostic',
         # Zonas anatómicas
@@ -528,13 +534,12 @@ def is_greeting_or_vague(message: str) -> bool:
         r'no funciona', r'no sirve', r'no conoce',
         r'efecto.? secundario', r'contraindicac',
         r'otra marca', r'competencia', r'objecion',
-        r'profhilo', r'juvederm',
         # Ventas y argumentos
         r'argumento', r'vender', r'\bventa\b', r'presentar', r'visita',
         r'represent', r'estrategi', r'perfil', r'diferenci',
         r'ventaja', r'evidencia', r'estudio', r'pitch',
         # Marca y certificaciones
-        r'novacutan', r'fijie', r'marcado ce', r'certificac',
+        r'above pharma', r'marcado ce', r'certificac',
         r'dispositivo medico', r'clase iii',
         # Producto genérico
         r'producto', r'composici', r'concentraci', r'cohesividad',
@@ -551,11 +556,11 @@ def is_greeting_or_vague(message: str) -> bool:
     return not any(re.search(p, t) for p in pharma_patterns)
 
 
-GREETING_RESPONSE = """Soy **Abbe**, tu asistente de ventas de Novacutan. Para poder ayudarte, cuéntame qué necesitas. Por ejemplo:
+GREETING_RESPONSE = """Soy **Abbe**, tu asistente de ventas de Above Pharma. Para poder ayudarte, cuéntame qué necesitas. Por ejemplo:
 
-- **Producto**: *"¿Qué es BioPRO y para qué sirve?"*
+- **Producto**: *"¿Qué productos tienen para rejuvenecimiento facial?"*
 - **Objeción**: *"Un médico dice que es caro, ¿cómo respondo?"*
-- **Argumento**: *"¿Cómo presento Novacutan a un dermatólogo?"*
+- **Argumento**: *"¿Cómo presento nuestros productos a un dermatólogo?"*
 
 > Puedes usar las **preguntas sugeridas** en la pantalla de inicio o escribir tu consulta directamente."""
 
@@ -680,8 +685,8 @@ async def websocket_chat(websocket: WebSocket):
 REGLAS:
 1. Respuesta CORTA (máximo 150 palabras). No generes un argumentario completo.
 2. NO inventes cifras, porcentajes ni datos específicos.
-3. SÍ puedes mencionar consenso médico general sin cifras exactas (ej: "El ácido hialurónico reticulado con DVS ofrece mayor estabilidad y menor edema").
-4. Si HAY algún dato relevante en el contexto RAG de arriba (aunque sea tangencial), úsalo — son datos verificados de Novacutan.
+3. SÍ puedes mencionar consenso médico general sin cifras exactas (ej: "El ácido hialurónico reticulado ofrece mayor estabilidad y menor edema").
+4. Si HAY algún dato relevante en el contexto RAG de arriba (aunque sea tangencial), úsalo — son datos verificados.
 5. Redirige al usuario hacia temas que SÍ puedes cubrir con preguntas sugeridas.
 6. NO muestres secciones vacías ni uses placeholders.
 
@@ -693,7 +698,7 @@ FORMATO para cobertura baja:
 [1-2 frases de consenso médico general SIN cifras inventadas si aplica]
 
 **Te puedo ayudar con:**
-- [Pregunta sugerida 1 sobre productos/protocolos de Novacutan]
+- [Pregunta sugerida 1 sobre productos/protocolos del portafolio]
 - [Pregunta sugerida 2]
 - [Pregunta sugerida 3]"""
                 elif rag_coverage == "medium":
@@ -795,7 +800,7 @@ REGLAS DE MODO RESUMIDO:
                     "══════════════════════════════════════════\n"
                     "REGLA #1 — LA MÁS IMPORTANTE DE TODAS:\n"
                     "══════════════════════════════════════════\n"
-                    "USA SOLO datos de la sección 'DATOS VERIFICADOS DE NOVACUTAN' de abajo.\n"
+                    "USA SOLO datos de la sección 'DATOS VERIFICADOS' de abajo.\n"
                     "- NO inventes cifras (mg, %, ratios) ni estudios que no estén en los datos verificados.\n"
                     "- NO menciones productos que no aparezcan en los datos verificados.\n"
                     "- Si una sección de tu formato NO tiene datos verificados disponibles → OMITE esa sección ENTERA. No la incluyas.\n"

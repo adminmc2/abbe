@@ -1,6 +1,6 @@
 # ABBE — Asistente IA de Ventas Farmacéuticas
 
-Asistente de inteligencia artificial diseñado para representantes médicos de **Novacutan** (Above Pharma). ABBE ayuda con información de productos, manejo de objeciones y argumentos de venta personalizados por especialidad médica.
+Asistente de inteligencia artificial multi-producto para representantes médicos de **Above Pharma**. ABBE ayuda con información de productos (terapias celulares y medicina regenerativa), manejo de objeciones y argumentos de venta personalizados por especialidad médica.
 
 ## Características
 
@@ -8,7 +8,7 @@ Asistente de inteligencia artificial diseñado para representantes médicos de *
   - **Productos** — Información técnica, indicaciones, protocolos (metodología FAB)
   - **Objeciones** — Manejo de objeciones de precio, eficacia, seguridad (Feel-Felt-Found)
   - **Argumentos** — Estrategias de venta por especialidad (SPIN Selling, Challenger Sale)
-- **RAG híbrido** con stemming español, sinónimos y búsqueda TF-IDF + keywords
+- **RAG con BM25** (Okapi), stemming español, sinónimos dinámicos y metadata boost por producto
 - **Streaming en tiempo real** via WebSocket con renderizado incremental
 - **Voz bidireccional** — STT (Whisper) + TTS (ElevenLabs, voz mexicana)
 - **PWA** — Instalable como app móvil
@@ -37,9 +37,10 @@ cp .env.example .env
 
 | Variable | Requerida | Descripción |
 |----------|-----------|-------------|
-| `GROQ_API_KEY` | Si | API key de Groq (LLM Llama 3.3 + Whisper STT) |
-| `ELEVENLABS_API_KEY` | Si | API key de ElevenLabs (TTS) |
+| `GROQ_API_KEY` | Sí | API key de Groq (LLM Llama 3.3 + Whisper STT) |
+| `ELEVENLABS_API_KEY` | Sí | API key de ElevenLabs (TTS) |
 | `ELEVENLABS_VOICE_ID` | No | ID de voz ElevenLabs (ver `.env.example`) |
+| `KB_VALIDATION_MODE` | No | `warn` (default) o `strict` (bloquea startup si KB inválida) |
 
 ## Uso
 
@@ -90,8 +91,9 @@ ABBE/
 ├── agents/
 │   ├── orchestrator.py      # Router de intenciones (LLM + reglas)
 │   ├── base_agent.py        # Clase base con métodos RAG compartidos
-│   ├── rag_engine.py        # Motor de búsqueda (TF-IDF + keywords + sinónimos)
-│   ├── agent_productos.py   # Info técnica de productos Novacutan
+│   ├── rag_engine.py        # Motor BM25 + sinónimos + metadata boost + validador
+│   ├── catalog.py           # Gestión de catálogo (sinónimos, aliases, keywords)
+│   ├── agent_productos.py   # Info técnica de productos Above Pharma
 │   ├── agent_objeciones.py  # Manejo de objeciones comerciales
 │   └── agent_argumentos.py  # Argumentos de venta por especialidad
 ├── static/
@@ -99,7 +101,8 @@ ABBE/
 │   ├── app.js               # Cliente: WebSocket, voz, estado, UI
 │   ├── style.css            # Design system con mood-theming
 │   └── manifest.json        # Configuración PWA
-├── knowledge_base.json      # ~170 pares Q&A categorizados
+├── catalog.json             # Catálogo de productos (líneas, aliases, sinónimos)
+├── knowledge_base.json      # 50 pares Q&A con contrato de datos validado
 ├── user_data.json           # Persistencia de historial por usuario
 ├── requirements.txt         # Dependencias Python
 ├── Dockerfile               # Deploy para Hugging Face Spaces
@@ -120,20 +123,24 @@ ABBE/
 
 ## Knowledge Base
 
-La base de conocimiento (`knowledge_base.json`) contiene ~170 pares pregunta/respuesta organizados en categorías:
+La base de conocimiento (`knowledge_base.json`) contiene 50 pares pregunta/respuesta con contrato de datos validado al arrancar. Cada Q&A incluye campos obligatorios: `id`, `categoria`, `pregunta`, `respuesta`, `source_doc`, `product_line`, `product`.
 
-- `empresa_marca` — Información de Novacutan y Above Pharma
-- `tecnologia_dvs` — Tecnología DVS (Dynamic Volumetric Stabilization)
-- `productos_biopro` — BioPRO (biomodulador)
-- `productos_fbio_dvs` — FBio DVS Light/Medium/Volume (fillers)
-- `protocolos_aplicacion` — Técnicas de aplicación y protocolos
-- `comparativas_competencia` — Comparativas con Juvederm, Restylane, etc.
-- `objeciones` — Objeciones frecuentes y respuestas
+### Categorías (lista cerrada, 10):
+
+- `empresa` — Información corporativa de la línea
+- `productos` — Información técnica de cada producto
+- `tecnologia` — Mecanismos de acción y tecnología diferenciada
+- `protocolos` — Protocolos de aplicación y administración
+- `seguridad` — Contraindicaciones y seguridad
+- `objeciones_precio` — Objeciones de precio
+- `objeciones_eficacia` — Objeciones de eficacia
+- `objeciones_seguridad` — Objeciones de seguridad
 - `argumentos_venta` — Argumentos por especialidad médica
-- `seguridad_contraindicaciones` — Seguridad y contraindicaciones
-- `complicaciones` — Manejo de complicaciones
-- `cuidados_post` — Cuidados post-procedimiento
-- `zonas_tecnicas` — Zonas anatómicas de aplicación
+- `perfil_paciente` — Perfiles de paciente candidato
+
+### Productos actuales:
+- **Gencell CTM Estabilizador Renal** — CTM pre-tratadas con melatonina (25 Q&As)
+- **Gencell CTM Metabólica** — CTM pre-tratadas con evolocumab (25 Q&As)
 
 ## Deploy
 
@@ -153,7 +160,7 @@ docker build -t abbe .
 | STT | Groq Whisper v3 (español) |
 | TTS | ElevenLabs v2 (voz Camila MX) |
 | Frontend | Vanilla JS + streaming-markdown |
-| RAG | Custom (TF-IDF + keywords + stemming español) |
+| RAG | Custom BM25 (Okapi) + stemming español + sinónimos dinámicos |
 | Containerización | Docker (python:3.11-slim) |
 
 ---

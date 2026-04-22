@@ -3,6 +3,7 @@ Agente de Objeciones - Especializado en manejar objeciones del médico
 """
 from typing import List, Tuple
 from .base_agent import BaseAgent
+from .catalog import get_empresa
 
 
 class AgenteObjeciones(BaseAgent):
@@ -16,12 +17,12 @@ class AgenteObjeciones(BaseAgent):
     - Comparativas con competencia
     """
 
-    # Clasificador de tipo de objeción
+    # Clasificador de tipo de objeción (genérico, no depende de producto)
     OBJECTION_TYPES = {
         'precio': ['caro', 'costoso', 'precio', 'barato', 'económico', 'economico', 'cuesta', 'costo', 'coste'],
         'eficacia': ['no funciona', 'no sirve', 'resultado', 'evidencia', 'eficacia', 'eficaz', 'tarda', 'no dura'],
         'seguridad': ['seguro', 'seguridad', 'efecto secundario', 'contraindicación', 'complicación', 'riesgo'],
-        'competencia': ['otra marca', 'ya uso', 'cambiar', 'profhilo', 'juvederm', 'competencia', 'no conoce'],
+        'competencia': ['otra marca', 'ya uso', 'cambiar', 'competencia', 'no conoce'],
     }
 
     def __init__(self):
@@ -32,9 +33,10 @@ class AgenteObjeciones(BaseAgent):
             "objeciones_precio",
             "objeciones_eficacia",
             "objeciones_seguridad",
-            "comparativas_competencia",
-            "tecnologia_calidad",
-            "certificaciones"
+            "seguridad",
+            "tecnologia",
+            "productos",
+            "empresa",
         ]
 
     def enrich_context(self, query: str, results: List[Tuple[dict, float]]) -> str:
@@ -50,10 +52,12 @@ class AgenteObjeciones(BaseAgent):
 
     @property
     def system_prompt(self) -> str:
-        return """# ROL: EL DIPLOMÁTICO — Agente de Objeciones Novacutan
+        empresa = get_empresa()
+
+        return f"""# ROL: EL DIPLOMÁTICO — Agente de Objeciones {empresa}
 
 # CONTEXTO
-Eres el diplomático del equipo de Novacutan. Tu función es desactivar resistencias sin confrontar, transformando cada objeción en una oportunidad de profundizar la conversación. No peleas — empatizas, reencuadras y rediriges. La objeción es información, no un ataque. Cada objeción es una necesidad no cubierta.
+Eres el diplomático del equipo de {empresa}. Tu función es desactivar resistencias sin confrontar, transformando cada objeción en una oportunidad de profundizar la conversación. No peleas — empatizas, reencuadras y rediriges. La objeción es información, no un ataque. Cada objeción es una necesidad no cubierta.
 
 # OBJETIVO
 Proporcionar una respuesta que el representante pueda memorizar, usando técnicas de persuasión diferenciadas según el tipo de objeción. Cada respuesta debe desarmar la duda y abrir la puerta a la prescripción.
@@ -126,7 +130,7 @@ Giro persuasivo: convierte la objeción en argumento a favor, o cambia el marco 
 5. SIEMPRE incluye un reencuadre con Boomerang o aversión a la pérdida.
 6. NUNCA critiques directamente a la competencia por nombre.
 7. NUNCA contradigas al médico frontalmente. Valida primero, redirige después.
-8. Usa EXCLUSIVAMENTE los datos de la sección 'DATOS VERIFICADOS DE NOVACUTAN'. Esos son los ÚNICOS datos reales.
+8. Usa EXCLUSIVAMENTE los datos de la sección 'DATOS VERIFICADOS'. Esos son los ÚNICOS datos reales.
 9. PROHIBIDO añadir información externa: NO inventes cifras, estudios, porcentajes ni nombres de productos que no estén en los datos verificados.
 10. Si una sección del formato no tiene datos verificados disponibles, OMITE esa sección entera. Es mejor una respuesta corta y precisa que una larga con datos inventados.
 11. NUNCA cites estudios, journals ni meta-análisis que no aparezcan en los datos verificados."""

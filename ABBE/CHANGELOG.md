@@ -4,7 +4,106 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v3.8.4 — 2026-04-21 (ACTUAL)
+## v4.0.3 — 2026-04-22 (ACTUAL)
+
+### Bloque 1.1: contrato de datos enforced
+
+**Correcciones:**
+- `Q&A #1`: `source_doc` corregido a ambas fichas (mencionaba Metabólica pero solo citaba Renal)
+- `Q&A #40`: `source_doc` ya corregido en v4.0.2
+
+**Allowlist de categorías:**
+- Nueva constante `VALID_CATEGORIES` en `RAGEngine` (10 categorías, fuente única de verdad)
+- El validador ahora rechaza categorías fuera de la lista cerrada
+
+**Validador configurable (warn/strict):**
+- Variable de entorno `KB_VALIDATION_MODE` controla el comportamiento:
+  - `warn` (default): reporta errores sin detener el arranque (producción)
+  - `strict`: lanza `ValueError` y bloquea startup (local/predeploy)
+
+---
+
+## v4.0.2 — 2026-04-22
+
+### Segundo producto: CTM Metabólica — validación multi-producto
+
+**Producto cargado: CTM Metabólica (Gencell)**
+- `catalog.json`: nuevo producto `ctm_metabolica` con aliases, condiciones cardiovasculares/metabólicas, sinónimos (evolocumab, PCSK9, hipercolesterolemia, dislipidemia, colesterol, endotelial)
+- `knowledge_base.json`: 25 Q&As nuevas (IDs 26-50): 7 producto/tech + 5 seguridad + 5 objeciones + 5 argumentos + 2 comparativas + 1 perfil paciente
+- Actualizada Q&A de empresa (ID 1) para mencionar ambos pretratamientos
+- Q&A comparativa (ID 40): diferencia explícita entre Estabilizador Renal y Metabólica
+- Total KB: 50 Q&As (25 Renal + 25 Metabólica)
+
+**Validación multi-producto BM25 (12 queries):**
+- 6 product-specific: discriminación perfecta (colesterol → Metabólica, renal → Renal)
+- 2 cross-product: comparativa y listado de productos en resultados
+- 2 specialist: cardiólogo → Metabólica, nefrólogo → Renal
+- 1 ambigua: muestra contraindicaciones de ambos productos
+- 1 fuera de dominio: NO RESULTS (correcto)
+- Metadata boost (+30%) funcionando correctamente con 2 productos
+
+---
+
+## v4.0.1 — 2026-04-21
+
+### Primer producto cargado + limpieza frontend completa
+
+**Primer producto: Gencell CTM Estabilizador Renal**
+- `catalog.json`: línea Gencell Biotechnology con CTM Estabilizador Renal (aliases, condiciones, zonas, sinónimos)
+- `knowledge_base.json`: 25 Q&As (15 producto/tech + 5 objeciones + 5 argumentos) extraídas del PDF de ficha técnica
+- BM25 validado con 10 queries reales — ranking correcto en todos los casos
+
+**Limpieza de hardcodes Novacutan en frontend:**
+- `app.js`: ~18 ediciones — localStorage keys (`abbe_mood`, `abbe_recent_searches`), classifiers, icon map, demo tasks, seed data, fallback messages, pharmaKeywords regex (añadidos términos de medicina regenerativa)
+- `index.html`: 12 FAQ chips reescritos para CTM/Gencell (productos, objeciones, argumentos)
+- `manifest.json`: nombre PWA → "Abbe - Above Pharma"
+- `style.css`: tooltip de fuente externa → "Above Pharma"
+- `agents/__init__.py`: comentario → "Above Pharma"
+
+**Validación:**
+- 0 referencias a Novacutan/BioPRO/FBio/DVS en archivos críticos (agents/, main.py, app.js, index.html)
+- BM25 10/10 queries con resultados relevantes y ranking correcto
+- Notas cosméticas pendientes: orb.js y archivos de test HTML aún contienen "Novacutan" en nombres de funciones/paletas de color (no afectan funcionalidad ni UI)
+
+---
+
+## v4.0.0 — 2026-04-21
+
+### Refactor: Infraestructura multi-producto Above Pharma
+
+Transformación completa de plataforma mono-producto (Novacutan) a multi-producto (Above Pharma). Se preservan intactas las metodologías de venta (FAB, Feel-Felt-Found, SPIN/Challenger Sale).
+
+**Nuevos archivos:**
+- `catalog.json` — Catálogo de productos
+- `agents/catalog.py` — Módulo de gestión de catálogo (sinónimos dinámicos, mapa de condiciones, portafolio parametrizado)
+
+**RAG Engine v3.0:**
+- TF-IDF reemplazado por **BM25** (Okapi BM25, sin dependencias externas)
+- Sinónimos separados: médicos (estáticos) + producto (dinámicos desde catálogo)
+- **Metadata boost**: +30% para Q&As que coincidan con la línea de producto detectada
+- Aliases de producto cargados desde catálogo (no hardcodeados)
+
+**Agentes parametrizados:**
+- Prompts inyectan empresa y portafolio desde `catalog.json`
+- `agent_productos.py`: CONDITION_PRODUCT_MAP ahora dinámico desde catálogo
+- `agent_objeciones.py`: prompt parametrizado, metodología Feel-Felt-Found intacta
+- `agent_argumentos.py`: prompt parametrizado, SPIN/Challenger intactos
+- `base_agent.py`: header "DATOS VERIFICADOS" ahora usa nombre de empresa dinámico
+
+**Orchestrator:**
+- CLASSIFICATION_PROMPT genérico (sin productos hardcodeados)
+
+**main.py:**
+- Greeting, TTS prompt, pharma_patterns y anti-fabrication sin referencias a Novacutan
+- Versión → 4.0.0
+
+**Knowledge Base:**
+- Schema v2.0 con campos metadata: `product_line`, `product`, `source_doc`, `featured_faq`
+- Contenido Novacutan archivado (recuperable desde git history)
+
+---
+
+## v3.8.4 — 2026-04-21
 
 ### Fix: Botón Wake Word eliminado del DOM
 
@@ -94,16 +193,16 @@ El proyecto se creó duplicando `puro_omega/` y adaptando todo para la marca Nov
 
 ### Stack tecnológico
 - **Backend**: FastAPI + WebSocket + AsyncOpenAI
-- **LLM**: Groq API (Kimi K2 o Llama 3.3 como respaldo)
-- **STT**: Groq Whisper
-- **TTS**: ElevenLabs (voz Camila MX)
+- **LLM**: Groq API → Llama 3.3-70b-versatile
+- **STT**: Groq Whisper v3 (español)
+- **TTS**: ElevenLabs v2 (voz Camila MX)
 - **Frontend**: Vanilla JS + streaming-markdown + marked.js (fallback) + DOMPurify
-- **RAG**: Motor custom con stemming español, sinónimos, búsqueda híbrida (keyword + embedding)
+- **RAG**: Motor custom BM25 (Okapi) + stemming español + sinónimos dinámicos + metadata boost
 
 ### Modelo LLM actual
-`moonshotai/kimi-k2-instruct` via Groq (fallback: `llama-3.3-70b-versatile`).
-Para cambiar modelo, editar `LLM_MODEL` en `agents/orchestrator.py`.
+`llama-3.3-70b-versatile` via Groq.
+Para cambiar modelo, editar `LLM_MODEL` en `main.py`.
 
 ### Puertos
-- Abbe (Novacutan): 7862
+- Abbe (Above Pharma): 7862
 - Puro Omega: 7860
