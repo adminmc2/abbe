@@ -49,7 +49,7 @@
 
 | Bloque | Estado | Nota |
 |---|---|---|
-| 1. Datos, gobernanza y cumplimiento | **En progreso** | `1.1`, `1.2` y `1.3` cerrados; `1.4` activo |
+| 1. Datos, gobernanza y cumplimiento | **En progreso** | `1.1`, `1.2`, `1.3` y `1.4` cerrados; `1.5` activo |
 | 2. Retrieval, routing y seguridad | **Pendiente crítico** | Persisten temas de discriminación por producto, thresholds y léxico heredado |
 | 3. Frontend y desacople real | **Pendiente** | Falta auditar frontend/data-driven y limpiar residuos |
 | 4. Documentación, configuración e higiene | **En progreso** | Validación y trazabilidad mejoraron; siguen abiertos docs, privacidad y despliegue |
@@ -265,34 +265,108 @@ Las trazas persistidas deberán convertirse después en:
 
 ## 1.4 — Cobertura por agente y por producto
 
-**No avanzar a `1.5` hasta cerrar `1.4`.**
+**Estado:** Cerrado
+**Cerrado tras aprobación del revisor.**
 
-### Evidencia mínima a pedir ahora
+### Evidencia 1: Qué cambió
 
-1. tabla de cobertura por producto y por agente
-2. para cada producto, confirmar cobertura mínima en:
-   - **Productos**:
-     - composición
-     - tecnología
-     - indicaciones
-     - protocolos
-     - seguridad
-   - **Objeciones**:
-     - precio
-     - eficacia
-     - seguridad
-     - comparativa
-   - **Argumentos**:
-     - perfil de paciente
-     - especialidad
-     - pitch
-     - diferenciadores
-3. huecos detectados por producto
-4. decisión explícita sobre qué falta cargar en KB y qué no aplica
+Auditoría completa de cobertura de `knowledge_base.json` por producto y por agente, con cruce directo de Q&A IDs.
+
+### Evidencia 2: Dónde
+
+Este documento. Sin cambios de código — `1.4` es auditoría de contenido.
+
+### Evidencia 3: Cómo se validó
+
+Cruce directo de cada Q&A ID contra `knowledge_base.json` (50 entries, campos `id`, `categoria`, `product`, `product_line`).
+
+### Evidencia 4: Matriz de cobertura
+
+#### Agente Productos (categorías: `productos`, `tecnologia`, `protocolos`, `seguridad`)
+
+| Subtema | CTM Estabilizador Renal | CTM Metabólica |
+|---|---|---|
+| Definición del producto | #2 | #26 |
+| Composición | #3, #4 | #27, #28 |
+| Tecnología / Mecanismo | #5, #6, #14, #15 | #30, #31, #32, #33 |
+| Indicaciones | #7 | #29 |
+| Protocolos | #8 | #34 |
+| Contraindicaciones | #9 | #35 |
+| Efectos adversos | #10 | #36 |
+| Interacciones | #11 | #37 |
+| Embarazo/pediátrico | #13 | #38 |
+| Almacenamiento | #12 | #39 |
+| Empresa (cross-product) ¹ | #1 | #1 |
+| Comparativa terapéutica ¹ | #19 (vs convencional) | #42 (vs estatinas/PCSK9i) |
+| Comparativa cross-product ¹ | #40 (Renal vs Metabólica) | #40 (Renal vs Metabólica) |
+| Comparativa competidor de marca ¹ | N/A | N/A |
+
+> ¹ **Cobertura transversal**: estas filas no pertenecen estrictamente a las categorías del Agente Productos, pero se listan aquí porque el contenido de la KB es accesible por cualquier agente vía RAG. El mínimo exigido para Productos (composición, tecnología, indicaciones, protocolos, seguridad) ya está cubierto sin estas filas.
+
+#### Agente Objeciones (categorías: `objeciones_precio`, `objeciones_eficacia`, `objeciones_seguridad`)
+
+| Subtema | CTM Estabilizador Renal | CTM Metabólica |
+|---|---|---|
+| Precio | #16 | #41 |
+| Eficacia | #17 | #43 |
+| Seguridad | #18, #20 | #44, #45 |
+| Comparativa terapéutica | #19 (vs tratamiento convencional) | #42 (vs estatinas/alternativas) |
+| Comparativa competidor de marca | N/A — sin competidor directo en CTM pre-tratadas | N/A |
+
+#### Agente Argumentos (categorías: `argumentos_venta`, `perfil_paciente`)
+
+| Subtema | CTM Estabilizador Renal | CTM Metabólica |
+|---|---|---|
+| Especialidad | Nefrólogo (#21), Internista (#22), Médico general (#25) | Cardiólogo (#46), Endocrinólogo (#47), Internista (#48) |
+| Pitch | #21, #22, #25 | #46, #47, #48 |
+| Diferenciadores | #24 (vs otras terapias celulares) | #50 (vs otros tratamientos dislipidemia) |
+| Perfil de paciente | #23 | #49 |
+
+### Huecos detectados
+
+| Hueco | Decisión |
+|---|---|
+| Comparativa con competidor de marca | **N/A** — no hay competidor directo identificado/cargado en el catálogo y la KB actuales |
+| Más especialidades | No bloqueante — se amplía cargando nuevas Q&As por producto |
+
+### Nota de alcance: cobertura y especialidades
+
+- **Solo cuenta como cobertura lo respaldado por Q&As en `knowledge_base.json`.** Las especialidades o indicaciones mencionadas en los system prompts de los agentes **no constituyen cobertura** — son instrucciones de formato/estilo, no datos verificables.
+- Las especialidades cubiertas son las que tienen Q&A dedicado: nefrólogo, internista, médico general (Renal); cardiólogo, endocrinólogo, internista (Metabólica).
+- Cualquier residuo de especialidades antiguas (ej: dermatólogo, cirujano plástico de versiones anteriores) queda pendiente en **bloque 3.3** (limpieza de prompts), no es alcance de 1.4.
+- "Comparativa con competidor de marca" es N/A porque no hay competidor directo identificado/cargado en el catálogo y la KB actuales.
+
+### Nota sobre referencias
+
+Los Q&A IDs listados son **referencias de cobertura**, no conteo único. Un mismo Q&A puede aparecer en más de un subtema cuando su contenido es relevante para ambos (ej: #19 aparece en Productos/Comparativa y en Objeciones/Comparativa). El total real de Q&As únicos en la KB es **50**.
 
 ### Regla
 
 La cobertura debe validarse por **producto real**, no solo por conteo global de Q&As.
+
+---
+
+## Impacto cruzado tras cierre de 1.4
+
+| Punto | Estado | Motivo |
+|---|---|---|
+| 1.4 Cobertura por agente y producto | **Cerrado** | Matriz completa con 4 evidencias, cobertura verificada por producto real |
+| 1.5 Política de comparativas y competencia | **Parcial reforzado** | 1.4 ubicó las comparativas existentes (#19, #42, #40) y confirmó que competidor de marca es N/A |
+| 2.1 Discriminación por producto | **Pendiente** | 1.4 no demuestra discriminación en ranking, solo cobertura de contenido |
+| 2.7 Suite mínima de regresión | **Pendiente preparado** | La matriz de cobertura puede alimentar casos de prueba por producto/agente |
+| 3.3 Limpieza de prompts | **Pendiente** | Residuos de especialidades antiguas en prompts quedan aquí, no en 1.4 |
+
+**Sin impacto en categorías.**
+
+---
+
+# Siguiente punto activo
+
+## 1.5 — Política de comparativas y competencia
+
+**No avanzar a `2.x` hasta cerrar `1.5`.**
+
+### Pendiente de requisitos del revisor
 
 ---
 
@@ -316,3 +390,7 @@ La cobertura debe validarse por **producto real**, no solo por conteo global de 
   - `no_results`
   - `fallback_used`
 - "Aprender de errores" significa revisar trazas y convertirlas en mejoras de KB, reglas y regresión; no entrenamiento automático
+- La cobertura se valida por producto real, no por conteo global de Q&As
+- Solo cuenta como cobertura lo respaldado por KB, no lo mencionado en prompts
+- Comparativa con competidor de marca es N/A (no cargado en catálogo/KB)
+- Residuos de especialidades antiguas en prompts → bloque 3.3
