@@ -1,5 +1,5 @@
 """
-Abbe - Asistente de Ventas Above Pharma RAG v4.6
+Abbe - Asistente de Ventas Above Pharma RAG v4.7
 Backend FastAPI con WebSocket para streaming
 """
 
@@ -113,7 +113,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Abbe - Asistente de Ventas Above Pharma",
-    version="4.6.0",
+    version="4.7.0",
     lifespan=lifespan
 )
 
@@ -132,7 +132,7 @@ async def health_check():
     """Verificar estado del sistema"""
     return {
         "status": "ok",
-        "version": "4.6.0",
+        "version": "4.7.0",
         "agents": ["productos", "objeciones", "argumentos"],
         "knowledge_base_size": len(orchestrator.agents['productos'].rag.qa_pairs) if orchestrator else 0
     }
@@ -1019,7 +1019,8 @@ REGLAS DE MODO RESUMIDO:
                             "score": round(score, 3),
                         })
                 no_results = rag_coverage == "no_results"
-                fallback_used = rag_coverage in ("low", "no_results") and len(results) > 0
+                # Señal real de fallback desde base_agent (no heurística)
+                search_meta = agent.last_search_meta
                 write_audit_trace({
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                     "session_id": session_id,
@@ -1029,7 +1030,9 @@ REGLAS DE MODO RESUMIDO:
                     "rag_coverage": rag_coverage,
                     "max_score": round(max_score, 3),
                     "no_results": no_results,
-                    "fallback_used": fallback_used,
+                    "fallback_activated": search_meta["fallback_activated"],
+                    "score_before_fallback": search_meta["score_before_fallback"],
+                    "score_after_fallback": search_meta["score_after_fallback"],
                     "comparative": comp_policy if comp_policy["is_comparative"] else None,
                     "retrieved_results": retrieved,
                     "response_text": full_response,

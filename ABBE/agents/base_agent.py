@@ -54,6 +54,12 @@ class BaseAgent(ABC):
         self.name = "BaseAgent"
         self.description = ""
         self.categories = []  # Categorías del RAG que este agente maneja
+        # Estado del último search — para trazabilidad en audit_traces
+        self.last_search_meta = {
+            "fallback_activated": False,
+            "score_before_fallback": 0.0,
+            "score_after_fallback": 0.0,
+        }
 
     @property
     @abstractmethod
@@ -67,7 +73,8 @@ class BaseAgent(ABC):
 
     def search_knowledge_with_fallback(self, query: str, top_k: int = 5,
                                        score_threshold: float = 8.0) -> List[Tuple[dict, float]]:
-        """Búsqueda dual: primero filtrada por categorías, si no hay buenos resultados busca sin filtro"""
+        """Búsqueda dual: primero filtrada por categorías, si no hay buenos resultados busca sin filtro.
+        Persiste estado real del fallback en self.last_search_meta para trazabilidad."""
 
         # 1. Búsqueda filtrada por categorías del agente
         filtered_results = self.rag.search(
@@ -79,7 +86,13 @@ class BaseAgent(ABC):
         best_score = max((score for _, score in filtered_results), default=0.0)
 
         if best_score >= score_threshold:
-            return filtered_results  # Buenos resultados, usar filtrados
+            # Buenos resultados — sin fallback
+            self.last_search_meta = {
+                "fallback_activated": False,
+                "score_before_fallback": round(best_score, 3),
+                "score_after_fallback": round(best_score, 3),
+            }
+            return filtered_results
 
         # 3. Fallback activado — log para métricas
         print(f"[FALLBACK] Query: '{query[:50]}' | Score: {best_score:.2f} | Agent: {self.name}")
@@ -100,7 +113,15 @@ class BaseAgent(ABC):
                 combined[key] = (qa, score)
 
         results = sorted(combined.values(), key=lambda x: x[1], reverse=True)
-        return results[:top_k]
+        final = results[:top_k]
+
+        best_final = max((s for _, s in final), default=0.0)
+        self.last_search_meta = {
+            "fallback_activated": True,
+            "score_before_fallback": round(best_score, 3),
+            "score_after_fallback": round(best_final, 3),
+        }
+        return final
 
     def enrich_context(self, query: str, results: List[Tuple[dict, float]]) -> str:
         """Enriquece el contexto RAG con conocimiento estructurado del agente.

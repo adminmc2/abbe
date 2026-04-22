@@ -4,7 +4,31 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.6.0 — 2026-04-22 (ACTUAL)
+## v4.7.0 — 2026-04-22 (ACTUAL)
+
+### Bloque 2.4: coherencia agente↔retrieval y fallback auditable
+
+**Problema resuelto:** `fallback_used` en `audit_traces.jsonl` se calculaba con una heurística en `main.py` (`rag_coverage in ("low", "no_results")`) que no correspondía al trigger real del fallback en `search_knowledge_with_fallback()` (score < 8.0). Un fallback activado con score entre 5.0 y 8.0 quedaba invisible en la auditoría.
+
+**Corrección en `base_agent.py`:**
+- Nuevo atributo `last_search_meta` en BaseAgent con estado real del fallback
+- `search_knowledge_with_fallback()` persiste: `fallback_activated`, `score_before_fallback`, `score_after_fallback`
+- La señal es la verdad del sistema — no hay duplicación de thresholds
+
+**Corrección en `main.py`:**
+- `fallback_used` reemplazado por `fallback_activated` + scores antes/después del fallback
+- Campos nuevos en traza: `fallback_activated`, `score_before_fallback`, `score_after_fallback`
+- Eliminada heurística duplicada
+
+**Diagnóstico previo (12 queries):**
+- productos: 4/4 coherentes (0 nativos en top-3 es esperado — categoría nativa `protocolos` tiene solo 2 entries)
+- objeciones: 4/4 coherentes (3+ nativos en top-3 siempre)
+- argumentos: 3/4 coherentes (Q12 "pitch internista" sin contenido nativo = gap de contenido, no de retrieval)
+- Fallbacks activados: 1/12 (Q8, mejora score de 7.99 a 8.79)
+
+---
+
+## v4.6.0 — 2026-04-22
 
 ### Bloque 2.3: routing por intención basado en frame comercial
 
