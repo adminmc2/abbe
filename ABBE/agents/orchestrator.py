@@ -119,22 +119,44 @@ Responde SOLO con una palabra: productos, objeciones o argumentos"""
             print(f"Error en clasificación: {e}")
             return self.default_agent
 
-    # Patrones ESTRICTOS de objeción: solo rechazo/resistencia explícita del médico
-    OBJECTION_PATTERNS = [
+    # ── Patrones de objeción DIRECTA ──
+    # Rechazo/resistencia explícita sin ambigüedad — siempre objeciones
+    OBJECTION_DIRECT = [
+        # Rechazo de eficacia
         r'\bno funciona\b', r'\bno sirve\b', r'\bno veo resultado',
-        r'\bes caro\b', r'\bmuy caro\b', r'\bcostoso\b',
-        r'\bprecio\b.*\b(?:alto|elevado|caro)\b',
-        r'\bmetales pesados\b', r'\befecto.? secundario',
-        r'\binteracci[oó]n', r'\bcontraindicac',
+        # Precio (con género: caro/cara, costoso/costosa)
+        r'\bes car[oa]\b', r'\bmuy car[oa]\b', r'\bcostos[oa]\b',
+        r'\bprecio\b.*\b(?:alto|elevado|car[oa])\b',
+        # Marca / competencia
         r'\bya uso otra\b', r'\bpor qu[eé] cambiar\b',
-        r'\bobje[cs]i[oó]n', r'\bel m[eé]dico dice\b',
-        r'\bel doctor dice\b', r'\bno (?:le |me )?convence\b',
         r'\bcompetencia\b', r'\botra marca\b',
+        r'\bprefiere? (?:otra|otro|gen[eé]rico)',
+        # Resistencia explícita
+        r'\bobje[cs]i[oó]n',
+        r'\bno (?:le |me )?convence\b',
         r'\bno (?:le |me )?(?:gusta|interesa|convence)',
-        r'\bprefiere? (?:otra|otro|genérico|gen[eé]rico)',
     ]
 
-    # Patrones de argumentos: contexto de venta, visita o especialidad
+    # ── Frame comercial ──
+    # Señales de que el rep maneja una situación de resistencia/duda con el médico.
+    # Solo verbos que implican resistencia real, NO verbos neutros (pregunta, dice).
+    # "El médico pregunta la composición" es consulta técnica → productos.
+    # "El médico duda de la eficacia" es resistencia → objeciones.
+    COMMERCIAL_FRAME = [
+        # Doctor + verbo de resistencia (NO pregunta/dice — son neutros)
+        r'\bel (?:m[eé]dico|doctor) (?:me |le )?(?:duda|cuestiona|objeta|preocupa|no cree)',
+        # Doctor + dice/dijo solo cuando va seguido de resistencia explícita
+        r'\bel (?:m[eé]dico|doctor) (?:me |le )?(?:dice|dijo) que (?:no |es (?:muy )?car|le preocupa|duda|no (?:le |me )?convence)',
+        # Solicitud de respuesta/manejo (frame inequívoco de objeción)
+        r'\bc[oó]mo (?:le )?respondo\b',
+        r'\bqu[eé] le digo\b',
+        r'\bc[oó]mo (?:le )?(?:manejo|contesto|rebato)\b',
+        # Situación hipotética de venta
+        r'\bsi (?:me |el (?:m[eé]dico|doctor) )?dice que\b',
+    ]
+
+    # ── Patrones de argumentos ──
+    # Contexto de venta, visita o especialidad
     ARGUMENT_PATTERNS = [
         r'\bc[oó]mo vend', r'\bc[oó]mo present', r'\bargumento',
         r'\bestrategi.* vent', r'\bperfil.* paciente',
@@ -143,30 +165,41 @@ Responde SOLO con una palabra: productos, objeciones o argumentos"""
         r'\bdermat[oó]logo\b', r'\bcirujano\b', r'\bpl[aá]stico\b',
         r'\best[eé]tico\b', r'\best[eé]tica\b',
         r'\bginec[oó]logo\b', r'\binternista\b', r'\bnefr[oó]logo\b', r'\bneum[oó]logo\b',
+        r'\bcardi[oó]logo\b', r'\bendocrin[oó]logo\b',
         r'\bespecialista\b', r'\bespecialidad\b',
     ]
 
     def classify_intent_rules(self, message: str) -> str:
         """
-        Clasificación contextual en 2 fases.
+        Clasificación contextual por frame, no por vocabulario.
 
-        Fase 1: Detecta estructura de OBJECIÓN (rechazo/resistencia explícita).
-        Fase 2: Detecta estructura de ARGUMENTO (venta/especialidad).
-        Default: PRODUCTOS (temas médicos, info técnica, dudas generales).
+        Jerarquía:
+          1. Objeción directa: rechazo/resistencia explícita → objeciones
+          2. Frame comercial: doctor + duda/preocupación, solicitud de respuesta → objeciones
+          3. Contexto de venta/especialidad → argumentos
+          4. Default → productos (ficha técnica, info clínica, dudas generales)
+
+        Términos como contraindicaciones, efectos secundarios, interacciones
+        van a productos (consulta técnica) a menos que tengan frame comercial.
         """
         message_lower = message.lower()
 
-        # Fase 1: ¿Hay rechazo/resistencia explícita?
-        for pattern in self.OBJECTION_PATTERNS:
+        # Fase 1: ¿Hay rechazo/resistencia directa e inequívoca?
+        for pattern in self.OBJECTION_DIRECT:
             if re.search(pattern, message_lower):
                 return "objeciones"
 
-        # Fase 2: ¿Hay contexto de venta/especialidad?
+        # Fase 2: ¿Hay frame comercial (manejo de situación con médico)?
+        for pattern in self.COMMERCIAL_FRAME:
+            if re.search(pattern, message_lower):
+                return "objeciones"
+
+        # Fase 3: ¿Hay contexto de venta/especialidad?
         for pattern in self.ARGUMENT_PATTERNS:
             if re.search(pattern, message_lower):
                 return "argumentos"
 
-        # Default: productos (incluye temas médicos, dudas, info técnica)
+        # Default: productos (incluye seguridad técnica neutra, ficha, protocolos)
         return "productos"
 
     def get_agent(self, agent_name: str) -> BaseAgent:

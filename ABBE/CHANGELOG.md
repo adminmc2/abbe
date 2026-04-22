@@ -4,7 +4,33 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.5.0 — 2026-04-22 (ACTUAL)
+## v4.6.0 — 2026-04-22 (ACTUAL)
+
+### Bloque 2.3: routing por intención basado en frame comercial
+
+**Problema resuelto:** `classify_intent_rules()` usaba patrones de vocabulario planos que confundían seguridad técnica con objeciones (ej: "contraindicaciones" siempre iba a `objeciones`) y no detectaba objeciones con variantes naturales ("el médico duda", "muy cara", "el médico me dice").
+
+**Corrección en `orchestrator.py`:**
+- Separación de patrones en 3 capas: `OBJECTION_DIRECT` (resistencia inequívoca), `COMMERCIAL_FRAME` (doctor + duda/preocupación, solicitud de respuesta), `ARGUMENT_PATTERNS`
+- Términos técnicos (contraindicaciones, efectos secundarios, interacciones) ya no disparan objeciones por sí solos — necesitan frame comercial
+- Corregido género en patrones de precio: `caro/cara`, `costoso/costosa`
+- Frame del médico: solo verbos de resistencia real (`duda`, `cuestiona`, `objeta`, `preocupa`, `no cree`). Verbos neutros (`pregunta`, `dice`) NO disparan objeciones por sí solos — `dice/dijo` solo con resistencia posterior ("dice que no", "dice que es caro", "dice que le preocupa")
+- Añadido `cardiólogo` y `endocrinólogo` a ARGUMENT_PATTERNS
+- Añadido frame hipotético: `si me dice que`
+
+**Validación adversarial:** "El médico pregunta la composición / contraindicaciones / administración / melatonina" → 4/4 correctamente a `productos` (no sobrerutean a objeciones)
+
+**Diagnóstico pre-fix:** 10/13 single-turn, 3/6 multi-turn (6 misroutes)
+**Diagnóstico post-fix:** 13/13 single-turn, 6/6 multi-turn, 4/4 adversariales = **23/23** (0 misroutes)
+
+**Tipos de error corregidos:**
+- Seguridad técnica mal enviada a objeciones (Q4, Flow A-T2)
+- Objeciones no detectadas por falta de variantes verbales (Q6, Q8, Flow C-T1)
+- Objeciones no detectadas por género masculino en regex (Flow B-T2)
+
+---
+
+## v4.5.0 — 2026-04-22
 
 ### Bloque 2.2: thresholds, scores y cobertura RAG real
 
