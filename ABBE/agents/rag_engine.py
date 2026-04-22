@@ -181,10 +181,19 @@ class RAGEngine:
     }
 
     def load_knowledge_base(self, path: str):
-        """Carga la base de conocimiento desde JSON y valida contrato de datos."""
+        """Carga la base de conocimiento desde JSON, normaliza fuentes y valida contrato de datos."""
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         self.qa_pairs = data.get('qa_pairs', [])
+
+        # Normalizar source_doc → normalized_sources (lista interna canónica)
+        for qa in self.qa_pairs:
+            raw = qa.get('source_doc', '')
+            if '+' in raw:
+                qa['normalized_sources'] = [s.strip() for s in raw.split('+') if s.strip()]
+            else:
+                qa['normalized_sources'] = [raw] if raw else []
+
         self._validate_kb()
         print(f"[RAG] Cargadas {len(self.qa_pairs)} preguntas")
 

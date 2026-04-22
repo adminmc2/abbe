@@ -4,7 +4,34 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.1.0 — 2026-04-22 (ACTUAL)
+## v4.2.0 — 2026-04-22 (ACTUAL)
+
+### Bloque 1.3: trazabilidad end-to-end
+
+**Normalización de fuentes:**
+- `source_doc` se parsea a `normalized_sources: List[str]` al cargar la KB
+- Convención: `"A.pdf + B.pdf"` → `["A.pdf", "B.pdf"]`
+- El JSON no cambia; la normalización es interna en runtime
+
+**Trazas de auditoría persistentes (`audit_traces.jsonl`):**
+- Archivo append-only con una traza JSONL por interacción
+- Cada traza incluye: `timestamp`, `session_id`, `query`, `intent`, `agent`, `rag_coverage`, `max_score`, `no_results`, `fallback_used`, `retrieved_results` (con `qa_id`, `categoria`, `product`, `product_line`, `normalized_sources`, `score`), `response_text`
+- `session_id` generado por conexión WebSocket (sin datos sensibles)
+- Archivo excluido de git (`.gitignore`)
+- Mejora futura: migrar a Postgres/Neon cuando el volumen lo requiera
+
+**Trazabilidad en contexto LLM:**
+- `format_context()` ahora incluye `Fuente: {source_doc}` en cada hecho verificado
+- El LLM puede citar la fuente documental en sus respuestas
+
+**Anti-fabrication reforzado:**
+- Cobertura RAG baja: eliminada referencia a ácido hialurónico (residuo dominio anterior)
+- Reglas más estrictas: no sintetizar comparativas sin datos, indicar explícitamente falta de información
+- Límite reducido a 100 palabras en cobertura baja
+
+---
+
+## v4.1.0 — 2026-04-22
 
 ### Bloque 1.2: contrato de datos del catálogo + canonicalización
 

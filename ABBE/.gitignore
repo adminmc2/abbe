@@ -22,6 +22,10 @@ Thumbs.db
 *.swp
 *.swo
 
+# Datos de runtime (no commitear)
+user_data.json
+audit_traces.jsonl
+
 # Docs (Word/PDF files - keep in separate docs repo)
 *.docx
 *.pdf

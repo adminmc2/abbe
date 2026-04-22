@@ -49,416 +49,250 @@
 
 | Bloque | Estado | Nota |
 |---|---|---|
-| 1. Datos, gobernanza y cumplimiento | **En progreso** | `1.1` y `1.2` cerrados; `1.3` activo |
-| 2. Retrieval, routing y seguridad | **Pendiente crítico** | Persisten temas de producto, thresholds y léxico heredado |
+| 1. Datos, gobernanza y cumplimiento | **En progreso** | `1.1`, `1.2` y `1.3` cerrados; `1.4` activo |
+| 2. Retrieval, routing y seguridad | **Pendiente crítico** | Persisten temas de discriminación por producto, thresholds y léxico heredado |
 | 3. Frontend y desacople real | **Pendiente** | Falta auditar frontend/data-driven y limpiar residuos |
-| 4. Documentación, configuración e higiene | **En progreso** | Validación mejoró; documentación y despliegue siguen abiertos |
+| 4. Documentación, configuración e higiene | **En progreso** | Validación y trazabilidad mejoraron; siguen abiertos docs, privacidad y despliegue |
 
 ---
 
 ## Impacto cruzado más reciente
 
-### Dictamen aplicado tras cierre de `1.2`
+### Dictamen aplicado tras revisión directa de `main.py` y evidencias reales de runtime para `1.3`
 
-Cambios absorbidos:
-- Ya existe contrato de datos del catálogo
-- Ya existe validación del catálogo con política `warn/strict`
-- Ya existe canónico interno por `product.id`
-- Ya existen helpers explícitos para:
-  - `product.id -> producto`
-  - `product.id -> name`
-  - `alias -> product.id`
-  - `product.id -> keywords`
-- `get_condition_product_map()` ya devuelve `product.id`
-- `agent_productos.py` ya resuelve `id -> name` para uso de prompt
+Estado actual confirmado:
+- El sistema **no usa base de datos**.
+- La persistencia sigue basada en archivos JSON locales.
+- `user_data.json` sigue siendo historial de búsquedas del frontend.
+- La app **sí persiste trazas reales** en:
+  - `audit_traces.jsonl`
+- Cada traza persistida incluye ahora:
+  - `timestamp`
+  - `session_id`
+  - `query`
+  - `intent`
+  - `agent`
+  - `rag_coverage`
+  - `max_score`
+  - `no_results`
+  - `fallback_used`
+  - `retrieved_results`
+  - `response_text`
+
+Cambios confirmados:
+- `source_doc` ya se normaliza internamente a:
+  - `normalized_sources: List[str]`
+- `search()` sigue propagando el `qa_pair` completo
+- `format_context()` incluye `Fuente: ...` en cada hecho verificado
+- `main.py` escribe trazas append-only en `audit_traces.jsonl`
+- la respuesta final del LLM ya se guarda en la traza persistida
+- existe evidencia real de:
+  - una consulta multi-fuente
+  - un rechazo seguro con `no_results: true`
 
 ### Impacto en categorías
 
 **Sin cambios.**  
-La taxonomía de la KB se mantiene igual.
+La trazabilidad se resuelve en runtime y persistencia, no creando categorías nuevas.
 
-Regla de mantenimiento vigente:
-- si se añade una categoría nueva en la KB, deben actualizarse:
-  1. la allowlist de categorías del validador
-  2. el mapping agente → categorías
+### Nota operativa
+
+El campo `fallback_used` ya existe en la traza.  
+Su semántica actual queda aceptada para esta fase, pero si luego se quiere distinguir fallback real vs cobertura baja con precisión, ese endurecimiento pertenece a `2.5` / `2.2`, no bloquea `1.3`.
 
 ### Estado actualizado por puntos afectados
 
 | Punto | Estado | Motivo |
 |---|---|---|
-| 1.1 Contrato de datos por Q&A | **Cerrado** | Contrato mínimo, allowlist de categorías y validación configurable ya existen |
-| 1.2 Contrato de datos por producto | **Cerrado** | Validador de catálogo + canónico por `product.id` + helpers explícitos |
-| 1.3 Trazabilidad de fuentes | **Parcial** | Hay `source_doc`, pero falta cerrar trazabilidad end-to-end y convención multi-fuente |
-| 1.4 Cobertura por agente y por producto | **Pendiente** | Aún no hay matriz de cobertura formal |
-| 2.1 Discriminación por producto | **Parcial** | La infraestructura por `product.id` ya existe, pero falta aplicarla en ranking/RAG |
-| 4.3 Validación automática al arrancar | **Parcial sólido** | KB y catálogo ya validan con `warn/strict`; falta política final por entorno |
-| 4.1 Documentación / versionado | **Parcial** | Hay progreso reportado, pero falta auditoría completa de docs y versiones |
-
----
-
-# BLOQUE 1 — Datos, gobernanza y cumplimiento
-
-## 1.1 Contrato de datos por Q&A
-**Estado:** Cerrado  
-**Bloquea avance:** No
-
-### Cierre alcanzado
-
-- Contrato mínimo visible aplicado en la KB
-- `source_doc` obligatorio
-- `product = null` permitido para:
-  - contenido de empresa
-  - contenido de línea
-  - comparativas cross-product
-- `categoria` validada contra allowlist explícita
-- Validación configurable `warn|strict`
-
-### Regla fijada
-
-Si se añade una categoría nueva:
-1. actualizar allowlist del validador
-2. actualizar mapping agente → categorías
-
----
-
-## 1.2 Contrato de datos por producto en `catalog.json`
-**Estado:** Cerrado  
-**Bloquea avance:** No
-
-### Cierre alcanzado
-
-- Validador del catálogo con:
-  - campos obligatorios por línea y por producto
-  - IDs únicos
-  - tipos correctos
-  - detección de aliases duplicados
-  - política `warn|strict`
-- `get_catalog()` ya no depende de fallback silencioso puro
-- Canónico interno fijado en `product.id`
-- Nombre visible separado en `product.name`
-- Helpers canónicos disponibles para futura evolución del retrieval
-
-### Decisión de diseño fijada
-
-- **Interno:** `product.id`
-- **Visible:** `product.name`
-
-### Impacto confirmado
-
-Esto prepara, pero **no cierra**, el punto `2.1` de discriminación por producto.
+| 1.3 Trazabilidad de fuentes | **Cerrado** | Ya existe normalización de fuentes, persistencia estructurada, `response_text`, `no_results`, `fallback_used` y evidencia real de runtime |
+| 1.5 Política de comparativas y competencia | **Parcial reforzado** | La trazabilidad persistente ya permite auditar comparativas y rechazos |
+| 2.5 `NO RESULTS` y anti-fabrication | **Parcial reforzado** | Ya hay evidencia persistida de rechazo seguro y del contexto entregado al LLM |
+| 2.7 Suite mínima de regresión fija | **Pendiente preparado** | Las trazas ya pueden alimentar casos reales de regresión |
+| 4.1 Documentación / versionado | **Parcial** | `main.py` refleja `4.2.0`, pero falta auditoría completa del repositorio |
+| 4.5 Higiene de datos | **Pendiente reforzado** | Ya existe persistencia de respuestas y contexto; falta política explícita de privacidad, retención y rotación |
 
 ---
 
 ## 1.3 Trazabilidad de fuentes
-**Estado:** Parcial  
-**Bloquea avance:** Sí
+**Estado:** Cerrado  
+**Bloquea avance:** No
 
-### Objetivo real del punto
+### Cierre alcanzado
 
-No basta con que la KB tenga `source_doc`.  
-Hay que asegurar trazabilidad **end-to-end** para respuestas recuperadas o sintetizadas.
+- `source_doc` se mantiene compatible en `knowledge_base.json`
+- el runtime normaliza a:
+  - `normalized_sources: List[str]`
+- la trazabilidad ya no depende solo de `stdout`
+- existe persistencia append-only en:
+  - `audit_traces.jsonl`
+- se guarda la respuesta final del LLM en cada interacción
+- se guardan los resultados recuperados con:
+  - `qa_id`
+  - `categoria`
+  - `product`
+  - `product_line`
+  - `normalized_sources`
+  - `score`
+- la traza incluye:
+  - `no_results`
+  - `fallback_used`
+- existe evidencia real de:
+  - caso multi-fuente
+  - rechazo seguro por falta de soporte documental
 
-### Lo ya resuelto
+### Decisión de diseño fijada
 
-- `source_doc` es obligatorio en la KB
-- Los casos revisados ya tienen fuente coherente
-- La trazabilidad mínima documental existe
+- **No** se introduce base de datos en esta fase
+- `audit_traces.jsonl` se considera suficiente para trazabilidad operativa actual
+- Neon/Postgres queda como mejora futura no bloqueante
 
-### Lo que falta para cerrarlo
+### Evidencia revisada
 
-1. **Definir convención multi-fuente**
-   - decidir si se mantiene:
-     - `source_doc` como string documentado
-   - o si se migra a:
-     - `source_docs` como lista
-2. **Preservar trazabilidad en runtime**
-   - el sistema debe conservar al menos:
-     - `qa_id`
-     - fuente(s) usadas
-   - aunque sea en logs internos o estructura de contexto
-3. **Cerrar criterio para respuestas sintetizadas**
-   - si una respuesta mezcla varias entradas, debe seguir siendo auditable
-4. **Definir política cuando no hay fuente suficiente**
-   - no inventar claims
-   - no mezclar fuentes ambiguas como si fueran una sola
+- `main.py`
+- evidencia real de `audit_traces.jsonl` con:
+  - consulta multi-fuente (`Q&A #40`)
+  - rechazo seguro (`no_results: true`)
 
-### No obligatorio en esta fase
+### Nota no bloqueante
 
-- `source_section`
-- `source_page`
-- `source_ref`
-
-Pueden añadirse después, pero no son requisito para cerrar `1.3`.
-
-### Evidencia requerida para cierre
-
-1. decisión de modelado multi-fuente
-2. ejemplo de estructura interna/log donde se preserve `qa_id + source`
-3. 3 ejemplos auditables:
-   - producto específico
-   - contenido de línea/empresa
-   - comparativa multi-fuente
-
----
-
-## 1.4 Cobertura por agente y por producto
-**Estado:** Pendiente  
-**Bloquea avance:** Sí, después de `1.3`
-
-### Objetivo
-
-Validar cobertura funcional real, no solo conteo de Q&As.
-
-### Cobertura mínima esperada por producto
-
-- **Productos:** composición, tecnología, indicaciones, protocolos, seguridad
-- **Objeciones:** precio, eficacia, marca, comparativa
-- **Argumentos:** perfil de paciente, especialidad, pitch, diferenciadores
-
-### Evidencia requerida
-
-- tabla de cobertura por producto
-- huecos identificados
-- decisión explícita sobre qué falta cargar
+Si más adelante se quiere una auditoría más estricta del fallback real, ese ajuste deberá salir del retrieval como señal explícita.  
+No bloquea el cierre actual de `1.3`.
 
 ---
 
 ## 1.5 Política de comparativas y competencia
-**Estado:** Parcial  
+**Estado:** Parcial reforzado  
 **Bloquea avance:** Sí, antes del cierre completo del bloque 1
 
-### Objetivo
+### Estado actualizado
 
-Definir cuándo el sistema puede comparar y cuándo debe negarse.
+- `1.3` ya permite auditar mejor comparativas y respuestas multi-fuente
+- ya existe base para demostrar qué fuentes fueron entregadas al LLM
+- aún falta definir:
+  - comparativas permitidas
+  - comparativas prohibidas
+  - respuesta segura si no existe soporte documental suficiente
 
-### Falta cerrar
+### Evidencia futura requerida
 
-- comparativas permitidas
-- comparativas prohibidas
-- comportamiento seguro si no hay soporte documental suficiente
-
-### Evidencia requerida
-
-- 1 comparativa permitida
+- 1 comparativa permitida con soporte verificable
 - 1 comparativa rechazada correctamente
-- política escrita en datos o documentación operativa
-
----
-
-# BLOQUE 2 — Retrieval, routing y seguridad
-
-## 2.1 Discriminación por producto, no solo por `product_line`
-**Estado:** Parcial  
-**Bloquea avance:** Sí
-
-### Estado actual
-
-- Ya existe base estructural por `product.id`
-- Ya existen aliases y keywords por producto
-- Pero aún no está auditado que el ranking use esa señal de forma explícita
-
-### Cierre esperado
-
-- ranking con señal real por `product.id`
-- resolución correcta entre productos hermanos
-- evidencia con top-3 y scores
-
----
-
-## 2.2 Recalibración de BM25, thresholds y fallback
-**Estado:** Parcial crítico  
-**Bloquea avance:** Sí
-
-### Riesgo abierto
-
-- la normalización de scores puede debilitar thresholds absolutos
-- fallback y `NO RESULTS` necesitan recalibración real
-
-### Evidencia requerida
-
-- matriz de pruebas con scores
-- política de threshold
-- comportamiento consistente para:
-  - exactas
-  - ambiguas
-  - fuera de dominio
-
----
-
-## 2.3 Separación real entre intención y producto
-**Estado:** Sin verificar  
-**Bloquea avance:** Sí
-
-### Cierre esperado
-
-- intención decide agente
-- producto decide retrieval/contexto
-- logs o trazas que lo demuestren
-
----
-
-## 2.4 Reglas primero, LLM solo en ambigüedad
-**Estado:** Sin verificar  
-**Bloquea avance:** No, pero recomendado
+- política escrita y visible de cuándo comparar y cuándo negarse
 
 ---
 
 ## 2.5 `NO RESULTS` y anti-fabrication end-to-end
-**Estado:** Parcial  
+**Estado:** Parcial reforzado  
 **Bloquea avance:** Sí
+
+### Estado actualizado
+
+- ya se persisten:
+  - `retrieved_results`
+  - `response_text`
+  - `no_results`
+  - `fallback_used`
+- ya existe evidencia real de rechazo seguro ante consulta fuera de dominio
+- ya es posible auditar qué contexto recibió el LLM
+
+### Sigue abierto
+
+- la cobertura `low|medium|high` sigue dependiendo de la calibración de scores
+- `fallback_used` existe, pero su semántica puede endurecerse más adelante
+- esto conecta directamente con:
+  - `2.2`
+  - `2.1`
 
 ### Cierre esperado
 
-- sin contexto suficiente → respuesta segura
-- sin comparativas soportadas → rechazo seguro
-- sin claims documentados → no inventar
-
----
-
-## 2.6 Auditoría del léxico heredado y normalización clínica
-**Estado:** Pendiente crítico  
-**Bloquea avance:** Sí
-
-### Problema abierto
-
-Persisten residuos del dominio anterior en lógica o prompts visibles.  
-Debe limpiarse antes del cierre técnico.
+- rechazo seguro consistente cuando no hay soporte suficiente
+- pruebas persistidas de:
+  - `no_results`
+  - baja cobertura
+  - fallback
+  - respuesta segura
 
 ---
 
 ## 2.7 Suite mínima de regresión fija
-**Estado:** Pendiente  
+**Estado:** Pendiente preparado  
 **Bloquea avance:** Sí, antes del cierre final
 
-### Mínimo esperado
+### Estado actualizado
 
-- 25–40 queries fijas
-- esperado vs obtenido
-- cobertura de:
-  - productos
-  - objeciones
-  - argumentos
-  - comparativas
-  - fuera de dominio
-  - ambigüedad
+- `1.3` ya deja infraestructura suficiente para capturar errores reales
+- las trazas de `audit_traces.jsonl` deben alimentar esta suite más adelante
 
----
+### Regla fijada
 
-# BLOQUE 3 — Frontend y desacople real
-
-## 3.1 FAQs y chips desde datos, no desde HTML hardcodeado
-**Estado:** Pendiente  
-**Bloquea avance:** Sí
-
-## 3.2 Eliminar lógica de dominio/producto de `app.js`
-**Estado:** Pendiente  
-**Bloquea avance:** Sí
-
-## 3.3 Limpieza de residuos activos del dominio anterior
-**Estado:** Pendiente  
-**Bloquea avance:** Sí
-
-### Nota
-
-Este punto incluye revisar:
-- prompts visibles
-- constantes frontend
-- UI
-- datos servidos en runtime
+Las trazas persistidas deberán convertirse después en:
+- consultas fallidas
+- rechazos seguros
+- casos ambiguos
+- ejemplos de cobertura baja
 
 ---
 
-# BLOQUE 4 — Documentación, configuración y limpieza técnica
-
-## 4.1 Actualizar `CLAUDE.md`, `README.md`, headers y versiones internas
-**Estado:** Parcial  
-**Bloquea avance:** Sí
-
-### Estado actual
-
-- Hay progreso reportado en versionado
-- Falta auditoría completa de:
-  - `README.md`
-  - headers internos
-  - consistencia final de versiones visibles
-
----
-
-## 4.2 Centralizar configuración de modelos, providers, boosts y thresholds
-**Estado:** Pendiente  
-**Bloquea avance:** No, pero recomendado antes del cierre
-
----
-
-## 4.3 Validación automática del schema al arrancar
-**Estado:** Parcial sólido  
-**Bloquea avance:** No para `1.3`
-
-### Estado actual
-
-- KB validada en startup
-- catálogo validado en startup
-- política `warn|strict` ya existe
-
-### Falta cerrar
-
-- política por entorno
-- mensajes de error operativos
-- validación integrada y documentada como estándar del proyecto
-
----
-
-## 4.4 Higiene de despliegue: sacar páginas de prueba de `static/`
-**Estado:** Pendiente  
-**Bloquea avance:** No, pero debe cerrarse antes de producción final
-
----
-
-## 4.5 Higiene de datos: `user_data.json`
-**Estado:** Pendiente  
+## 4.5 Higiene de datos: `user_data.json` y trazas de auditoría
+**Estado:** Pendiente reforzado  
 **Bloquea avance:** Sí, si participa en runtime o contiene residuos visibles
 
----
+### Estado actualizado
 
-## 4.6 Consistencia de metadata global
-**Estado:** Pendiente  
-**Bloquea avance:** No
+- `user_data.json` sigue existiendo
+- ahora también existe:
+  - `audit_traces.jsonl`
+- la app ya persiste respuestas y contexto recuperado
+- esto refuerza la necesidad de una política explícita de:
+  - privacidad
+  - retención
+  - rotación
+  - exclusión del versionado
 
----
+### Criterio de cierre
 
-## 4.7 Modularización de `main.py` y `app.js`
-**Estado:** Pendiente no bloqueante
+- política clara para `user_data.json`
+- política clara para `audit_traces.jsonl`
+- no almacenar identidad sensible en claro si no hace falta
+- preferir:
+  - `session_id`
+  - `user_id_hash` si en el futuro aparece identidad persistente
+- definir retención y limpieza del archivo
 
 ---
 
 # Siguiente punto activo
 
-## 1.3 — Trazabilidad de fuentes
+## 1.4 — Cobertura por agente y por producto
 
-**No avanzar a 1.4 hasta cerrar `1.3`.**
+**No avanzar a `1.5` hasta cerrar `1.4`.**
 
 ### Evidencia mínima a pedir ahora
 
-1. decisión de modelado para múltiples fuentes
-2. evidencia de trazabilidad interna en runtime (`qa_id + source`)
-3. 3 ejemplos auditables:
-   - producto específico
-   - línea/empresa
-   - comparativa multi-fuente
-4. criterio seguro cuando no exista soporte documental suficiente
+1. tabla de cobertura por producto y por agente
+2. para cada producto, confirmar cobertura mínima en:
+   - **Productos**:
+     - composición
+     - tecnología
+     - indicaciones
+     - protocolos
+     - seguridad
+   - **Objeciones**:
+     - precio
+     - eficacia
+     - seguridad
+     - comparativa
+   - **Argumentos**:
+     - perfil de paciente
+     - especialidad
+     - pitch
+     - diferenciadores
+3. huecos detectados por producto
+4. decisión explícita sobre qué falta cargar en KB y qué no aplica
 
----
+### Regla
 
-# Plantilla obligatoria para cada cierre
-
-Para marcar cualquier punto como cerrado, el ejecutor debe aportar:
-
-1. **Qué cambió**
-2. **Dónde cambió**
-3. **Cómo se validó**
-4. **Evidencia concreta**
-
-Si falta una de las 4, el punto no se cierra.
+La cobertura debe validarse por **producto real**, no solo por conteo global de Q&As.
 
 ---
 
@@ -474,3 +308,11 @@ Si falta una de las 4, el punto no se cierra.
 - `product = null` es válido para contenido de empresa, nivel línea y comparativas cross-product
 - El canónico interno de producto es `product.id`
 - El nombre visible de producto es `product.name`
+- La trazabilidad persistente se implementa sin base de datos, usando `audit_traces.jsonl`
+- Neon/Postgres queda como mejora futura no bloqueante
+- `1.3` queda cerrado con persistencia de:
+  - `retrieved_results`
+  - `response_text`
+  - `no_results`
+  - `fallback_used`
+- "Aprender de errores" significa revisar trazas y convertirlas en mejoras de KB, reglas y regresión; no entrenamiento automático

@@ -7,6 +7,9 @@ import os
 import re
 import json
 import asyncio
+import hashlib
+import uuid
+from datetime import datetime, timezone
 from typing import Optional
 from contextlib import asynccontextmanager
 
@@ -110,7 +113,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Abbe - Asistente de Ventas Above Pharma",
-    version="4.1.0",
+    version="4.2.0",
     lifespan=lifespan
 )
 
@@ -129,7 +132,7 @@ async def health_check():
     """Verificar estado del sistema"""
     return {
         "status": "ok",
-        "version": "4.1.0",
+        "version": "4.2.0",
         "agents": ["productos", "objeciones", "argumentos"],
         "knowledge_base_size": len(orchestrator.agents['productos'].rag.qa_pairs) if orchestrator else 0
     }
@@ -306,6 +309,21 @@ def save_user_data(data: dict):
             json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception as e:
         print(f"[UserData] Error saving: {e}")
+
+
+# ============================================
+# Trazabilidad: audit_traces.jsonl (append-only)
+# ============================================
+AUDIT_TRACES_FILE = "audit_traces.jsonl"
+
+
+def write_audit_trace(trace: dict):
+    """Escribe una traza de auditoría en formato JSONL (append-only)."""
+    try:
+        with open(AUDIT_TRACES_FILE, 'a', encoding='utf-8') as f:
+            f.write(json.dumps(trace, ensure_ascii=False) + '\n')
+    except Exception as e:
+        print(f"[Audit] Error writing trace: {e}")
 
 
 class SearchHistoryRequest(BaseModel):
@@ -572,6 +590,9 @@ async def websocket_chat(websocket: WebSocket):
     """
     await websocket.accept()
 
+    # Session ID para trazabilidad (no vinculado a identidad)
+    session_id = uuid.uuid4().hex[:12]
+
     # Historial de conversación para mantener contexto
     conversation_history = []
     MAX_HISTORY = 10  # Mantener últimos 10 intercambios (20 mensajes)
@@ -680,22 +701,20 @@ async def websocket_chat(websocket: WebSocket):
 
                 # Instrucciones dinámicas según cobertura RAG
                 if rag_coverage == "low":
-                    rag_instruction = """⚠️ COBERTURA RAG: BAJA — Hay poca información específica para esta consulta.
+                    rag_instruction = """⚠️ COBERTURA RAG: BAJA — No hay información suficiente para responder con datos verificados.
 
-REGLAS:
-1. Respuesta CORTA (máximo 150 palabras). No generes un argumentario completo.
-2. NO inventes cifras, porcentajes ni datos específicos.
-3. SÍ puedes mencionar consenso médico general sin cifras exactas (ej: "El ácido hialurónico reticulado ofrece mayor estabilidad y menor edema").
+REGLAS ESTRICTAS:
+1. Respuesta CORTA (máximo 100 palabras). No generes un argumentario completo.
+2. NO inventes cifras, porcentajes, datos clínicos ni claims de producto.
+3. NO sintetices comparativas ni afirmes propiedades que no aparezcan en los datos verificados.
 4. Si HAY algún dato relevante en el contexto RAG de arriba (aunque sea tangencial), úsalo — son datos verificados.
-5. Redirige al usuario hacia temas que SÍ puedes cubrir con preguntas sugeridas.
-6. NO muestres secciones vacías ni uses placeholders.
+5. Si NO hay datos verificados relevantes, di claramente que no tienes información suficiente.
+6. Redirige al usuario hacia temas que SÍ puedes cubrir con preguntas sugeridas.
 
 FORMATO para cobertura baja:
 ## [Tema consultado]
 
-[Si hay datos RAG relevantes, preséntalos de forma útil y persuasiva]
-
-[1-2 frases de consenso médico general SIN cifras inventadas si aplica]
+[Si hay datos RAG, preséntalos. Si no, indica que no tienes información suficiente sobre ese tema específico.]
 
 **Te puedo ayudar con:**
 - [Pregunta sugerida 1 sobre productos/protocolos del portafolio]
@@ -891,6 +910,34 @@ REGLAS DE MODO RESUMIDO:
                 # Guardar en historial
                 conversation_history.append({"role": "user", "content": user_message})
                 conversation_history.append({"role": "assistant", "content": full_response})
+
+                # Traza de auditoría persistente
+                retrieved = []
+                for qa, score in results:
+                    if score >= 0.1:
+                        retrieved.append({
+                            "qa_id": qa.get('id'),
+                            "categoria": qa.get('categoria'),
+                            "product": qa.get('product'),
+                            "product_line": qa.get('product_line'),
+                            "normalized_sources": qa.get('normalized_sources', []),
+                            "score": round(score, 3),
+                        })
+                no_results = len(retrieved) == 0
+                fallback_used = rag_coverage == "low" and len(results) > 0
+                write_audit_trace({
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "session_id": session_id,
+                    "query": user_message,
+                    "intent": intent,
+                    "agent": agent.name,
+                    "rag_coverage": rag_coverage,
+                    "max_score": round(max_score, 3),
+                    "no_results": no_results,
+                    "fallback_used": fallback_used,
+                    "retrieved_results": retrieved,
+                    "response_text": full_response,
+                })
 
                 # Limitar historial para no exceder contexto
                 if len(conversation_history) > MAX_HISTORY * 2:

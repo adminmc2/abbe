@@ -76,10 +76,12 @@ class BaseAgent(ABC):
 
         for qa, score in results:
             if score >= min_score:
+                source = qa.get('source_doc', 'fuente no especificada')
                 context_parts.append(
                     f"HECHO VERIFICADO #{fact_num} (confianza: {score:.0%}):\n"
                     f"  Producto/Tema: {qa['pregunta']}\n"
-                    f"  Datos confirmados: {qa['respuesta']}"
+                    f"  Datos confirmados: {qa['respuesta']}\n"
+                    f"  Fuente: {source}"
                 )
                 fact_num += 1
 
