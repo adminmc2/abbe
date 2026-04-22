@@ -1,10 +1,49 @@
 """
-Clase base para todos los agentes
+Clase base para todos los agentes.
+Incluye política comparativa evaluada en runtime (no solo prompt).
 """
-from typing import List, Tuple, Optional
+import re
+from typing import List, Tuple, Optional, Dict
 from abc import ABC, abstractmethod
 from .rag_engine import get_rag_engine
-from .catalog import get_empresa
+from .catalog import get_empresa, get_product_alias_to_id_map, has_competitors
+
+
+# ════════════════════════════════════════
+# POLÍTICA COMPARATIVA — señales y reglas
+# ════════════════════════════════════════
+
+# Señales que indican intención comparativa en la consulta
+COMPARATIVE_SIGNALS = [
+    r'\bvs\b', r'\bversus\b', r'\bdiferencia\b', r'\bcomparativa\b',
+    r'\bcomparar\b', r'\bcomparado\b', r'\bmejor que\b', r'\bpeor que\b',
+    r'\botra marca\b', r'\bcompetencia\b', r'\bcompetidor\b',
+    r'\bya uso\b', r'\bcambiar de\b', r'\bcambiar a\b',
+    r'\bpor qué no usar\b', r'\bpor qué usar\b', r'\bpor qué elegir\b',
+    r'\ben vez de\b', r'\balternativa\b',
+    r'\bsi ya existen?\b', r'\bya existen?\b',
+    r'\bsuperior\b', r'\binferior\b', r'\botra empresa\b',
+    r'\botro laboratorio\b', r'\botro proveedor\b',
+]
+
+# Señales específicas de competidor de marca (subconjunto más agresivo)
+BRAND_COMPETITOR_SIGNALS = [
+    r'\botra marca\b', r'\bcompetencia\b', r'\bcompetidor\b',
+    r'\botra empresa\b', r'\botro laboratorio\b', r'\botro proveedor\b',
+    r'\bya uso otro\b',
+]
+
+# Claims de superioridad prohibidos sin soporte documental
+SUPERIORITY_CLAIMS = [
+    'mejor', 'superior', 'más eficaz', 'más seguro', 'más conveniente',
+    'el único', 'el primero', 'sin igual', 'incomparable',
+]
+
+# Categorías de KB que pueden contener soporte comparativo válido
+COMPARATIVE_CATEGORIES = {
+    'objeciones_eficacia', 'objeciones_precio', 'objeciones_seguridad',
+    'productos', 'argumentos_venta',
+}
 
 
 class BaseAgent(ABC):
@@ -94,6 +133,70 @@ class BaseAgent(ABC):
             "Cualquier dato que NO esté aquí abajo es INVENTADO y está PROHIBIDO usarlo.\n\n"
         )
         return header + "\n\n".join(context_parts)
+
+    def evaluate_comparative_query(self, query: str, results: List[Tuple[dict, float]]) -> Dict:
+        """Evalúa si la consulta es comparativa y si la comparación está soportada.
+
+        Clasificación:
+          - 'internal': compara productos del portafolio Above Pharma entre sí
+          - 'therapeutic': compara vs tratamiento convencional/alternativas terapéuticas
+          - 'competitor': compara vs marca/laboratorio externo
+
+        La decisión NO depende solo de rag_coverage — mira si los resultados
+        RAG contienen soporte comparativo válido (categoría + score mínimo).
+
+        Retorna dict con: is_comparative, type, allowed, reason, has_superiority_claims
+        """
+        query_lower = query.lower()
+
+        # 1. Detectar si la consulta es comparativa
+        is_comparative = any(re.search(signal, query_lower) for signal in COMPARATIVE_SIGNALS)
+        if not is_comparative:
+            return {"is_comparative": False, "type": None, "allowed": True, "reason": "not_comparative"}
+
+        # 2. Detectar claims de superioridad sin soporte
+        has_superiority = any(claim in query_lower for claim in SUPERIORITY_CLAIMS)
+
+        # 3. Clasificar tipo de comparativa
+        is_brand = any(re.search(signal, query_lower) for signal in BRAND_COMPETITOR_SIGNALS)
+
+        # Detectar si menciona productos internos del catálogo
+        alias_map = get_product_alias_to_id_map()
+        mentioned_products = set()
+        for alias, pid in alias_map.items():
+            if alias in query_lower:
+                mentioned_products.add(pid)
+
+        # 4. Determinar tipo y si está permitida
+        if is_brand:
+            comp_type = "competitor"
+            # Solo permitida si el catálogo tiene competidores cargados
+            allowed = has_competitors()
+            reason = "competitors_loaded" if allowed else "no_competitors_in_catalog"
+
+        elif len(mentioned_products) >= 2:
+            comp_type = "internal"
+            # Siempre permitida — comparar productos propios del portafolio
+            allowed = True
+            reason = "internal_portfolio"
+
+        else:
+            comp_type = "therapeutic"
+            # Permitida solo si hay soporte comparativo en los resultados RAG
+            has_support = any(
+                qa.get('categoria') in COMPARATIVE_CATEGORIES and score >= 0.15
+                for qa, score in results
+            )
+            allowed = has_support
+            reason = "comparative_support_in_kb" if has_support else "no_comparative_support"
+
+        return {
+            "is_comparative": True,
+            "type": comp_type,
+            "allowed": allowed,
+            "reason": reason,
+            "has_superiority_claims": has_superiority,
+        }
 
     def get_response_prompt(self, query: str, context: str) -> str:
         """Construye el prompt completo con contexto"""

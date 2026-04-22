@@ -250,6 +250,26 @@ def get_portfolio_description() -> str:
     return '\n'.join(parts)
 
 
+def has_competitors() -> bool:
+    """True si alguna línea del catálogo tiene competidores cargados.
+    Cuando se añadan competidores a catalog.json, la política comparativa
+    se activa automáticamente sin cambios de código."""
+    for line in get_catalog().get('product_lines', []):
+        if line.get('competitors', []):
+            return True
+    return False
+
+
+def get_competitors() -> List[dict]:
+    """Lista de competidores de todas las líneas, con su product_line.
+    Retorna [] mientras competitors esté vacío en catalog.json."""
+    competitors = []
+    for line in get_catalog().get('product_lines', []):
+        for comp in line.get('competitors', []):
+            competitors.append({**comp, 'product_line': line['id']})
+    return competitors
+
+
 def get_product_keywords() -> List[str]:
     """Lista plana de keywords de producto para detección de intención."""
     keywords = []

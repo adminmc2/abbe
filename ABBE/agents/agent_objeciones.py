@@ -14,7 +14,11 @@ class AgenteObjeciones(BaseAgent):
     - Objeciones de precio
     - Objeciones de eficacia
     - Objeciones de seguridad
-    - Comparativas con competencia
+    - Objeciones de competencia (reencuadre sin nombrar marcas)
+
+    Nota: las comparativas de competidor de marca se evalúan en runtime por
+    evaluate_comparative_query() (base_agent.py). Solo se permiten si
+    hay competidores cargados en catalog.json. Hoy competitors=[].
     """
 
     # Clasificador de tipo de objeción (genérico, no depende de producto)

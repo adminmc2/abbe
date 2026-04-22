@@ -13,8 +13,11 @@ class AgenteArgumentos(BaseAgent):
     Maneja:
     - Argumentos por especialidad médica
     - Perfiles de paciente
-    - Comparativas con competencia
-    - Diferenciación de productos
+    - Diferenciación de productos (solo con soporte en KB)
+
+    Nota: las comparativas con competencia se evalúan en runtime por
+    evaluate_comparative_query() (base_agent.py). Solo se permiten si
+    hay competidores cargados en catalog.json. Hoy competitors=[].
     """
 
     # Detector de especialidad médica (genérico, no depende de producto)

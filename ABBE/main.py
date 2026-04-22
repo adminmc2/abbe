@@ -1,5 +1,5 @@
 """
-Abbe - Asistente de Ventas Above Pharma RAG v4.0
+Abbe - Asistente de Ventas Above Pharma RAG v4.3
 Backend FastAPI con WebSocket para streaming
 """
 
@@ -113,7 +113,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Abbe - Asistente de Ventas Above Pharma",
-    version="4.2.0",
+    version="4.3.0",
     lifespan=lifespan
 )
 
@@ -132,7 +132,7 @@ async def health_check():
     """Verificar estado del sistema"""
     return {
         "status": "ok",
-        "version": "4.2.0",
+        "version": "4.3.0",
         "agents": ["productos", "objeciones", "argumentos"],
         "knowledge_base_size": len(orchestrator.agents['productos'].rag.qa_pairs) if orchestrator else 0
     }
@@ -688,6 +688,11 @@ async def websocket_chat(websocket: WebSocket):
                 max_score = max((r[1] for r in results), default=0.0)
                 rag_coverage = "high" if (len(strong_docs) >= 2 or max_score >= 0.5 or (len(strong_docs) >= 1 and len(relevant_docs) >= 3)) else ("medium" if len(relevant_docs) >= 1 else "low")
 
+                # Evaluar política comparativa (runtime enforcement, no solo prompt)
+                comp_policy = agent.evaluate_comparative_query(user_message, results)
+                if comp_policy["is_comparative"]:
+                    print(f"[COMPARATIVE] type={comp_policy['type']}, allowed={comp_policy['allowed']}, reason={comp_policy['reason']}")
+
                 # Enviar info del agente + cobertura RAG al frontend
                 print(f"[DEBUG] RAG coverage: {rag_coverage}, max_score: {max_score:.2f}, docs: {len(relevant_docs)}")
                 await websocket.send_json({
@@ -829,7 +834,67 @@ REGLAS DE MODO RESUMIDO:
                     "══════════════════════════════════════════\n\n"
                 )
 
-                full_prompt = f"""{anti_fabrication}{agent.system_prompt}
+                # Instrucción comparativa (inyectada solo si la consulta es comparativa)
+                comparative_instruction = ""
+                if comp_policy["is_comparative"]:
+                    if not comp_policy["allowed"]:
+                        # RECHAZO SEGURO — comparativa no soportada
+                        if comp_policy["type"] == "competitor":
+                            comparative_instruction = (
+                                "\n══════════════════════════════════════════\n"
+                                "POLÍTICA COMPARATIVA: RECHAZO — COMPETIDOR DE MARCA\n"
+                                "══════════════════════════════════════════\n"
+                                "El usuario pregunta por un competidor o marca externa.\n"
+                                "El catálogo actual NO tiene competidores cargados.\n"
+                                "REGLAS OBLIGATORIAS:\n"
+                                "1. NO compares con marcas, productos o laboratorios externos.\n"
+                                "2. NO hagas claims de superioridad ('mejor', 'superior', 'más eficaz').\n"
+                                "3. NO inventes nombres de competidores ni características de productos externos.\n"
+                                "4. Indica que no tienes información sobre productos de otros laboratorios.\n"
+                                "5. Redirige hacia las fortalezas documentadas del portafolio propio.\n"
+                                "6. Puedes ofrecer diferenciadores del producto basados SOLO en datos verificados.\n"
+                                "══════════════════════════════════════════\n\n"
+                            )
+                        else:
+                            # Comparativa terapéutica sin soporte en KB
+                            comparative_instruction = (
+                                "\n══════════════════════════════════════════\n"
+                                "POLÍTICA COMPARATIVA: RECHAZO — SIN SOPORTE DOCUMENTAL\n"
+                                "══════════════════════════════════════════\n"
+                                "El usuario pide una comparativa terapéutica pero los datos verificados\n"
+                                "NO contienen soporte comparativo suficiente para esta consulta.\n"
+                                "REGLAS OBLIGATORIAS:\n"
+                                "1. NO compares con tratamientos o alternativas no documentadas.\n"
+                                "2. NO hagas claims de superioridad sin datos verificados.\n"
+                                "3. Indica que no tienes información comparativa suficiente.\n"
+                                "4. Presenta los datos que SÍ tienes del producto consultado.\n"
+                                "5. Sugiere preguntas sobre las que SÍ tienes información.\n"
+                                "══════════════════════════════════════════\n\n"
+                            )
+                    else:
+                        # COMPARATIVA PERMITIDA — con guardarraíles
+                        superiority_warning = ""
+                        if comp_policy.get("has_superiority_claims"):
+                            superiority_warning = (
+                                "⚠ El usuario usa lenguaje de superioridad. "
+                                "Solo puedes afirmar superioridad si está EXPLÍCITAMENTE documentada en los datos verificados. "
+                                "Si no, presenta diferencias objetivas sin juicios de valor.\n"
+                            )
+                        comparative_instruction = (
+                            "\n══════════════════════════════════════════\n"
+                            f"POLÍTICA COMPARATIVA: PERMITIDA (tipo: {comp_policy['type']})\n"
+                            "══════════════════════════════════════════\n"
+                            "Esta comparativa está soportada por datos verificados.\n"
+                            "REGLAS:\n"
+                            "1. Compara SOLO usando los datos de los HECHOS VERIFICADOS.\n"
+                            "2. NO hagas claims absolutos de superioridad no documentados.\n"
+                            "3. Presenta diferencias objetivas basadas en datos, no juicios inventados.\n"
+                            "4. Cita las fuentes documentales cuando sea posible.\n"
+                            f"{superiority_warning}"
+                            "══════════════════════════════════════════\n\n"
+                        )
+
+                full_prompt = f"""{anti_fabrication}{comparative_instruction}{agent.system_prompt}
 
 {context}
 
@@ -935,6 +1000,7 @@ REGLAS DE MODO RESUMIDO:
                     "max_score": round(max_score, 3),
                     "no_results": no_results,
                     "fallback_used": fallback_used,
+                    "comparative": comp_policy if comp_policy["is_comparative"] else None,
                     "retrieved_results": retrieved,
                     "response_text": full_response,
                 })

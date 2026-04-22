@@ -73,8 +73,10 @@ Usuario → WebSocket /ws/chat
   → Orchestrator (clasifica intención con LLM + reglas)
     → Agente seleccionado (productos/objeciones/argumentos)
       → RAG Engine (busca contexto en knowledge_base.json)
-        → LLM (genera respuesta con streaming)
-          → WebSocket → Cliente (renderiza con streaming-markdown)
+        → Política comparativa (evalúa tipo + soporte en KB)
+          → LLM (genera respuesta con streaming + instrucciones comparativas)
+            → audit_traces.jsonl (traza persistente)
+              → WebSocket → Cliente (renderiza con streaming-markdown)
 ```
 
 ## Convenciones de código
@@ -82,6 +84,7 @@ Usuario → WebSocket /ws/chat
 - **Idioma del código:** Nombres de variables y funciones en inglés, comentarios y prompts en español
 - **Agentes:** Cada agente tiene un system prompt extenso con metodología de ventas específica
 - **Knowledge base:** JSON con pares pregunta/respuesta, contrato de datos obligatorio (id, categoria, pregunta, respuesta, source_doc, product_line, product). Validado al arrancar.
+- **Política comparativa:** Evaluada en runtime por `evaluate_comparative_query()` en `base_agent.py`. Clasifica consultas en `internal`/`therapeutic`/`competitor` y decide si está soportada por la KB. Comparativas de competidor solo permitidas si `catalog.json` tiene competidores cargados (`has_competitors()`). Claims de superioridad requieren soporte documental explícito.
 - **Frontend:** SPA sin framework, estado global en objeto `state`, comunicación via WebSocket
 - **Streaming:** Usar `streaming-markdown` para renderizado incremental (NO `marked.parse()` en cada token — causa O(n²), ver CHANGELOG v3.8.2)
 

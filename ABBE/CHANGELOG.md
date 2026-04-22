@@ -4,7 +4,39 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.2.0 — 2026-04-22 (ACTUAL)
+## v4.3.0 — 2026-04-22 (ACTUAL)
+
+### Bloque 1.5: política comparativa explícita con enforcement runtime
+
+**Política comparativa con evaluación en runtime (`base_agent.py`):**
+- Nuevo método `evaluate_comparative_query()` en `BaseAgent` — clasifica consultas comparativas en 3 tipos:
+  - `internal`: comparación entre productos del portafolio Above Pharma (siempre permitida)
+  - `therapeutic`: comparación vs tratamiento convencional/alternativas (permitida solo si hay soporte en KB)
+  - `competitor`: comparación vs marca/laboratorio externo (permitida solo si `catalog.json` tiene competidores cargados)
+- Detección por señales regex: `vs`, `versus`, `diferencia`, `comparar`, `mejor que`, `otra marca`, `competencia`, `ya uso`, `cambiar`, etc.
+- Detección de claims de superioridad: `mejor`, `superior`, `más eficaz`, `el único`, etc.
+- La decisión NO depende solo de `rag_coverage` — verifica si los resultados RAG contienen soporte comparativo válido (categoría + score ≥ 0.15)
+
+**Helpers de competidores data-driven (`catalog.py`):**
+- `has_competitors()` → `True` cuando se carguen competidores en `catalog.json` (hoy `False`)
+- `get_competitors()` → lista de competidores con `product_line` (hoy `[]`)
+- Diseño: cuando se añadan competidores al catálogo, la política se activa automáticamente sin cambios de código
+
+**Inyección comparativa en main.py:**
+- Instrucciones comparativas inyectadas en el prompt LLM según tipo y decisión:
+  - Rechazo de competidor: no comparar con marcas externas, redirigir a fortalezas propias
+  - Rechazo terapéutico: no comparar sin soporte documental, presentar datos disponibles
+  - Permitida: comparar solo con datos verificados, sin claims absolutos
+- Advertencia automática si el usuario usa lenguaje de superioridad sin soporte
+- Campo `comparative` añadido al audit trace (`audit_traces.jsonl`) con: `type`, `allowed`, `reason`, `has_superiority_claims`
+
+**Alineación de prompts:**
+- `agent_argumentos.py`: docstring corregido — "Comparativas con competencia" reemplazado por nota de que se evalúan en runtime
+- `agent_objeciones.py`: docstring alineado con política de competidores
+
+---
+
+## v4.2.0 — 2026-04-22
 
 ### Bloque 1.3: trazabilidad end-to-end
 
