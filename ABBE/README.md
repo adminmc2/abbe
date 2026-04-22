@@ -40,7 +40,7 @@ cp .env.example .env
 | `GROQ_API_KEY` | Sí | API key de Groq (LLM Llama 3.3 + Whisper STT) |
 | `ELEVENLABS_API_KEY` | Sí | API key de ElevenLabs (TTS) |
 | `ELEVENLABS_VOICE_ID` | No | ID de voz ElevenLabs (ver `.env.example`) |
-| `KB_VALIDATION_MODE` | No | `warn` (default) o `strict` (bloquea startup si KB inválida) |
+| `KB_VALIDATION_MODE` | No | `warn` (default) o `strict` (bloquea startup si KB o catálogo inválidos) |
 
 ## Uso
 

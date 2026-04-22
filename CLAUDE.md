@@ -63,7 +63,7 @@ uvicorn main:app --host 0.0.0.0 --port 7862 --reload
 GROQ_API_KEY=           # LLM (Llama 3.3) + Whisper STT
 ELEVENLABS_API_KEY=     # Text-to-speech
 ELEVENLABS_VOICE_ID=    # ID de voz mexicana (ver .env.example)
-KB_VALIDATION_MODE=     # 'warn' (default) o 'strict' (bloquea startup si KB inválida)
+KB_VALIDATION_MODE=     # 'warn' (default) o 'strict' (bloquea startup si KB o catálogo inválidos)
 ```
 
 ## Arquitectura: Flujo de una consulta
@@ -107,6 +107,6 @@ Usuario → WebSocket /ws/chat
 
 - El proyecto se originó como fork de `puro_omega/`, adaptado primero para Novacutan y luego transformado en plataforma multi-producto Above Pharma (v4.0+)
 - La knowledge base actual se extrajo de las fichas técnicas PDF de cada producto
-- El validador de KB se ejecuta al arrancar y verifica contrato de datos, categorías y referencias cruzadas con `catalog.json`
+- Los validadores de KB y catálogo se ejecutan al arrancar y verifican contrato de datos, categorías, IDs únicos y referencias cruzadas
 - No hay tests automatizados; verificación manual via `/api/health` y DevTools
 - El modelo LLM es configurable en `main.py` variable `LLM_MODEL`

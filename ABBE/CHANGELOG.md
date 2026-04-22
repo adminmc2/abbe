@@ -4,7 +4,31 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.0.3 — 2026-04-22 (ACTUAL)
+## v4.1.0 — 2026-04-22 (ACTUAL)
+
+### Bloque 1.2: contrato de datos del catálogo + canonicalización
+
+**Validador de catálogo:**
+- Nuevo `_validate_catalog()` en `catalog.py` con campos obligatorios por línea y producto
+- Valida IDs únicos, tipos correctos (listas, dicts), detección de aliases duplicados entre productos
+- Mismo modo `KB_VALIDATION_MODE=warn|strict` que la KB
+- `get_catalog()` ya no hace fallback silencioso: en `strict` lanza error si falta `catalog.json`
+
+**Canonicalización `product.id`:**
+- Canónico interno: `product.id` (ej: `ctm_estabilizador_renal`)
+- Nombre visible: `product.name` (ej: `CTM Estabilizador Renal`)
+- Nuevos helpers canónicos:
+  - `get_product_by_id()` — busca producto por ID
+  - `get_product_name_map()` — `product.id → product.name`
+  - `get_product_alias_to_id_map()` — `alias → product.id` (para routing/boost)
+  - `get_product_keywords_map()` — `product.id → [keywords]` (para boost estructurado)
+- `get_condition_product_map()` ahora retorna `product.id` en vez de `product.name`
+- `agent_productos.py` actualizado para resolver `id → name` via `get_product_name_map()`
+- Helpers legacy (`get_product_aliases`, `get_product_synonyms`, etc.) mantenidos sin romper consumidores
+
+---
+
+## v4.0.3 — 2026-04-22
 
 ### Bloque 1.1: contrato de datos enforced
 

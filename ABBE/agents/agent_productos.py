@@ -3,7 +3,7 @@ Agente de Productos - Especializado en información técnica de productos
 """
 from typing import List, Tuple
 from .base_agent import BaseAgent
-from .catalog import get_empresa, get_condition_product_map, get_portfolio_description
+from .catalog import get_empresa, get_condition_product_map, get_portfolio_description, get_product_name_map
 
 
 class AgenteProductos(BaseAgent):
@@ -33,13 +33,15 @@ class AgenteProductos(BaseAgent):
     def enrich_context(self, query: str, results: List[Tuple[dict, float]]) -> str:
         """Enriquece el contexto con sugerencias de productos según la condición médica detectada"""
         condition_map = get_condition_product_map()
+        name_map = get_product_name_map()
         query_lower = query.lower()
         suggestions = []
-        for condition, products in condition_map.items():
+        for condition, product_ids in condition_map.items():
             if condition in query_lower:
+                product_names = [name_map.get(pid, pid) for pid in product_ids]
                 suggestions.append(
                     f"SUGERENCIA DEL AGENTE: Para '{condition}', "
-                    f"los productos relevantes son: {', '.join(products)}. "
+                    f"los productos relevantes son: {', '.join(product_names)}. "
                     f"Busca estos nombres en los DATOS VERIFICADOS de arriba."
                 )
         return '\n'.join(suggestions) if suggestions else ""
