@@ -63,7 +63,7 @@
 |---|---|---|
 | 3.1 Inventario de residuos legacy visibles y hardcodes runtime | **Cerrado** | Inventario completo, clasificado y utilizable |
 | 3.2 Parametrización del frontend principal y eliminación de hardcodes visibles no legacy | **Cerrado** | UI principal ya no se comporta como demo/single-user por hardcodes visibles |
-| 3.3 Limpieza de residuos activos del dominio anterior | **Cerrado** | Limpieza legacy ejecutada en `main.py`, `app.js`, `orb.js`, `style.css` y eliminación de superficies públicas auxiliares |
+| 3.3 Limpieza de residuos activos del dominio anterior | **Cerrado** | Limpieza legacy ejecutada en `main.py`, `app.js`, `orb.js`, `style.css`, eliminación de HTML auxiliares públicos y validación grep `0 resultados` |
 | 4.1 Documentación / versionado y consistencia visible final | **Activo** | Falta cerrar verificación total de versión y documentación operativa tras `v4.11.0` |
 
 ---
@@ -80,11 +80,139 @@
 - `manifest.json` quedó sin hallazgos relevantes.
 - Se documentaron no-hallazgos explícitos para `BioPRO`, `FBio`, `DVS` y `Puro Omega`.
 
+### Qué se validó
+
+- `ABBE/static/index.html`
+- `ABBE/static/app.js`
+- `ABBE/static/style.css`
+- `ABBE/static/manifest.json`
+- `ABBE/static/orb.js`
+- HTML auxiliares públicos en `ABBE/static/`
+- `ABBE/main.py` en los puntos que exponían copy o vocabulario operativo
+
+### Evidencia concreta
+
+#### Hallazgos que alimentaron `3.2`
+- `Hola, Jorge` y `Tu plan, Jorge` hardcoded en `index.html`
+- `profile.jpg` fijo para todos los usuarios
+- versión visible `4.0.2` en login
+- cache-busters desalineados en `style.css`, `favicon/icons/manifest`, `orb.js` y `app.js`
+- `PLAN_TASKS` como dataset demo fijo mostrado como si fuera estado real del usuario
+- `SEED_SEARCHES` documentado como hardcode visible no crítico y no persistente
+
+#### Hallazgos que alimentaron `3.3`
+- vocabulario legacy de estética / Novacutan en `app.js`
+- `GREETING_RESPONSE` con ejemplos legacy en `main.py`
+- `/api/test-infographic` con copy legacy en `main.py`
+- `pharma_patterns` con vocabulario legacy en `main.py`
+- `novacutanHue()` en `orb.js`
+- HTML auxiliares públicos no productivos en `static/`, incluyendo páginas con copy `Novacutan` accesibles por URL directa
+
+#### Hallazgos inertes / no bloqueantes
+- comentarios `Novacutan` en `style.css` y `orb.js`
+- comentarios internos en `app.js`
+- páginas auxiliares con comentarios legacy no visibles, cuando el problema real ya quedaba cubierto por su condición de superficie pública no productiva
+
+### Decisión actual
+
+**`3.1` queda confirmado como base de `3.2` y `3.3`.**
+
+---
+
+## 3.2 Parametrización del frontend principal y eliminación de hardcodes visibles no legacy
+**Estado:** Cerrado  
+**Bloquea avance:** No
+
+### Cierre alcanzado
+
+- `Jorge` dejó de aparecer hardcoded en la UI principal.
+- La identidad visible usa `display name` separado de `abbe_user`.
+- El avatar universal `profile.jpg` fue sustituido por avatar genérico basado en iniciales.
+- La versión visible del frontend dejó de estar desalineada respecto a la versión activa.
+- Los cache-busters de assets dejaron de estar mezclados.
+- El plan dejó de mostrar dataset demo como si fueran datos reales del usuario.
+- `SEED_SEARCHES` permanece visual-only y no persistente.
+- Los residuos legacy específicos quedaron diferidos a `3.3`.
+
+### Qué cambió
+
+- Render dinámico de nombre visible en welcome y plan vía `updateGreetingUI()`
+- Separación entre:
+  - `abbe_user` → identidad normalizada
+  - `abbe_display_name` → nombre visible preservando capitalización original
+- Avatar por iniciales en lugar de imagen fija universal
+- Alineación de versión visible y cache-busters del frontend
+- `PLAN_TASKS` vaciado
+- Placeholder vacío en plan hasta disponer de datos reales
+
+### Dónde cambió
+
+- `ABBE/static/index.html`
+- `ABBE/static/app.js`
+- `ABBE/static/style.css`
+- `ABBE/main.py`
+- `ABBE/CHANGELOG.md`
+
+### Cómo se validó
+
+- Revisión directa de implementación en frontend principal
+- Verificación de persistencia de `abbe_display_name` en login y Face ID
+- Verificación de render dinámico de greeting / plan / avatar
+- Verificación de versión visible y query strings de assets
+- Verificación de plan vacío sin dataset demo hardcoded
+
+### Evidencia concreta
+
+#### `index.html`
+- Greeting base neutra: `Hola`
+- Plan base neutra: `Tu plan`
+- Avatar genérico inicial: `<span class="profile-initials">?</span>`
+- Footer visible alineado con la versión actual
+- Assets con query strings alineados entre sí
+
+#### `app.js`
+- `getDisplayName()` y `updateGreetingUI()` controlan greeting, plan y avatar
+- `handleLogin()` guarda:
+  - `abbe_user = username.trim().toLowerCase()`
+  - `abbe_display_name = username.trim()`
+- `handleFaceID()` preserva `abbe_display_name`
+- `handleLogout()` limpia `abbe_display_name`
+- `PLAN_TASKS = []`
+- `renderPlanTasks()` deja placeholder:
+  - `Aún no tienes tareas programadas`
+
+#### `style.css`
+- Nueva clase `.profile-initials` para avatar textual
+
+### Observación no bloqueante
+
+- `getDisplayName()` mantiene fallback a `abbe_user` como compatibilidad si falta `abbe_display_name` en sesiones antiguas.
+- No reabre `3.2`.
+
+### Decisión actual
+
+**`3.2` queda cerrado.**
+
+---
+
+## 3.3 Limpieza de residuos activos del dominio anterior
+**Estado:** Cerrado  
+**Bloquea avance:** No
+
+### Cierre alcanzado
+
+- Se eliminaron los residuos legacy operativos detectados en frontend y backend expuesto.
+- Se alineó el vocabulario operativo entre `app.js` y `main.py`.
+- Se neutralizó el branding runtime residual en `orb.js`.
+- Se eliminaron las superficies públicas auxiliares no productivas dentro de `static/`.
+- Se limpió el versionado visible a `v4.11.0`.
+
 ### Qué cambió
 
 - `GREETING_RESPONSE` reescrito con ejemplos CTM / Gencell actuales
 - `/api/test-infographic` reescrito a medicina regenerativa / CTM
 - `pharma_patterns` limpiado de vocabulario estética / fillers legacy
+- prompts y copy operativo backend alineados al dominio actual
 - `isActionableQuery()` limpiado y alineado con backend
 - `classifySearchIcon()` limpiado
 - mapa de iconos limpiado
@@ -123,7 +251,7 @@
 - `main.py`:
   - `GREETING_RESPONSE` ya usa ejemplos CTM / Gencell
   - `/api/test-infographic` ya usa texto de medicina regenerativa
-  - `is_greeting_or_vague()` ya no conserva vocabulario legacy de fillers / estética
+  - `pharma_patterns` y prompts operativos ya no conservan vocabulario legacy de fillers / estética
   - docstring, `FastAPI.version` y `/api/health` en `4.11.0`
 - `app.js`:
   - `isActionableQuery()` limpiado
@@ -132,7 +260,7 @@
 - `orb.js`:
   - `brandHue()` sustituye a `novacutanHue()`
 - `style.css`:
-  - comentarios branding legacy eliminados
+  - comentarios branding legacy eliminados o renombrados a Above Pharma
 - `index.html`:
   - footer visible `Versión 4.11.0`
   - assets con `?v=4.11.0`
@@ -172,7 +300,9 @@ Verificar que la versión actual, el artefacto de regresión y la documentación
 - `ABBE/static/manifest.json`
 - `ABBE/CHANGELOG.md`
 - `ABBE/README.md` si existe
-- `ABBE/regression/README.md`
+- `ABBE/regression/README.md` si existe
+- `ABBE/regression/regression_report.md` si existe
+- `ABBE/regression/smoke_26_manual.md` si existe
 
 ### Evidencia mínima requerida
 

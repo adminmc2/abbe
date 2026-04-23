@@ -22,6 +22,11 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 Validación: `grep -RInE "Novacutan|hialuron|relleno|filler|reticulante|microesfera|rejuvenecimiento facial|dermatolog|cirujano plastico" static main.py` → **0 resultados**
 
+### Bloque 4.1: Consistencia de documentación y versionado
+
+- `README.md`: corregida referencia de credenciales (apuntaba a `.env`, ahora a equipo de desarrollo)
+- `regression/smoke_26_manual.md`: versión de precondiciones actualizada de `v4.9.3+` a `v4.11.0+`
+
 ---
 
 ## v4.10.1 — 2026-04-23

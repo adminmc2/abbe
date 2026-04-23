@@ -4,7 +4,7 @@
 Validar en navegador real que el aislamiento de historial por usuario funciona correctamente en dispositivo compartido.
 
 ## Precondiciones
-- Servidor ABBE corriendo en `http://localhost:7862` (v4.9.3+)
+- Servidor ABBE corriendo en `http://localhost:7862` (v4.11.0+)
 - Chrome/Safari con DevTools disponible
 - Hard refresh (Cmd+Shift+R) para cargar JS actualizado
 - Local Storage limpio para `localhost:7862`

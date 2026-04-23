@@ -55,7 +55,7 @@ docker run -p 7862:7862 --env-file .env abbe
 
 Abrir `http://localhost:7862` en el navegador.
 
-**Credenciales de prueba:** Ver `.env` o consultar al equipo
+**Credenciales de prueba:** Consultar al equipo de desarrollo
 
 ## Arquitectura
 
