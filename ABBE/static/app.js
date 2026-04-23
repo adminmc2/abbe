@@ -413,9 +413,9 @@ const SEARCH_ICONS = {
 
 function classifySearchIcon(query) {
     const q = query.toLowerCase();
-    if (/producto|above pharma|gencell|ctm|mesenquimal|hialuronic|relleno|regenerativ/i.test(q)) return 'product';
+    if (/producto|above pharma|gencell|ctm|mesenquimal|regenerativ|celula.?madre|estabilizador/i.test(q)) return 'product';
     if (/objeción|objecion|caro|no funciona|otra marca|competencia/i.test(q)) return 'objection';
-    if (/argumento|venta|presentar|dermatólogo|cirujano|perfil|ventaja/i.test(q)) return 'argument';
+    if (/argumento|venta|presentar|especialista|perfil|ventaja/i.test(q)) return 'argument';
     return 'default';
 }
 
@@ -660,29 +660,8 @@ function escapeHtml(str) {
 // Sistema de Plan — Datos y renderizado
 // ============================================
 
-// Tareas mock con fechas reales relativas a hoy (27 enero 2026)
-const PLAN_TASKS = [
-    // --- En proceso (fecha de hoy) ---
-    { id: 1, title: 'Visita Dra. García — Dermatología', date: '2026-01-27', project: 'visitas', status: 'in_progress', tasks: 2, subtasks: 1 },
-    { id: 2, title: 'Estudiar ficha CTM Estabilizador Renal', date: '2026-01-27', project: 'formacion', status: 'in_progress', tasks: 1, subtasks: 0 },
-    { id: 3, title: 'Preparar argumentario Cirugía Plástica', date: '2026-01-27', project: 'visitas', status: 'in_progress', tasks: 3, subtasks: 2 },
-    // --- Por hacer (futuro cercano) ---
-    { id: 4, title: 'Visita Dra. López — Pediatría', date: '2026-01-28', project: 'visitas', status: 'todo', tasks: 2, subtasks: 0 },
-    { id: 5, title: 'Informe semanal de ventas', date: '2026-01-29', project: 'admin', status: 'todo', tasks: 1, subtasks: 0 },
-    { id: 6, title: 'Llamada farmacia central', date: '2026-01-30', project: 'visitas', status: 'todo', tasks: 1, subtasks: 1 },
-    { id: 7, title: 'Revisar catálogo Gencell', date: '2026-01-31', project: 'formacion', status: 'todo', tasks: 2, subtasks: 0 },
-    { id: 8, title: 'Reunión equipo zona norte', date: '2026-02-02', project: 'admin', status: 'todo', tasks: 1, subtasks: 0 },
-    { id: 9, title: 'Visita Dr. Fernández — Dermatología', date: '2026-02-03', project: 'visitas', status: 'todo', tasks: 2, subtasks: 1 },
-    { id: 10, title: 'Actualizar CRM contactos', date: '2026-02-05', project: 'admin', status: 'todo', tasks: 1, subtasks: 0 },
-    { id: 11, title: 'Preparar presentación CTM Gencell', date: '2026-02-07', project: 'formacion', status: 'todo', tasks: 3, subtasks: 2 },
-    // --- Retrasadas (antes de hoy) ---
-    { id: 12, title: 'Seguimiento Dr. Martínez', date: '2026-01-26', project: 'visitas', status: 'overdue', tasks: 1, subtasks: 1 },
-    { id: 13, title: 'Completar módulo medicina regenerativa', date: '2026-01-25', project: 'formacion', status: 'overdue', tasks: 2, subtasks: 0 },
-    { id: 14, title: 'Enviar muestras Hospital Clínic', date: '2026-01-24', project: 'visitas', status: 'overdue', tasks: 1, subtasks: 0 },
-    // --- Completadas ---
-    { id: 15, title: 'Visita Dra. Ruiz — Cirugía Plástica', date: '2026-01-23', project: 'visitas', status: 'done', tasks: 2, subtasks: 1 },
-    { id: 16, title: 'Curso online células mesenquimales', date: '2026-01-22', project: 'formacion', status: 'done', tasks: 1, subtasks: 0 },
-];
+// Plan: sin datos hasta integración con backend real
+const PLAN_TASKS = [];
 
 // Proyectos con sus colores
 const PLAN_PROJECTS = {
@@ -879,7 +858,7 @@ function renderPlanTasks() {
 
     // Si no hay tareas
     if (container.children.length === 0) {
-        container.innerHTML = '<p class="plan-tasks-empty">No hay tareas para este filtro</p>';
+        container.innerHTML = '<p class="plan-tasks-empty">Aún no tienes tareas programadas</p>';
     }
 }
 
@@ -1007,7 +986,7 @@ const ICON_MAP_HEADERS = {
     'ctm':          'drop',
     'mesenquimal':  'syringe',
     'regenerativ':  'drop',
-    'hialuronico':  'drop',
+    'estabilizador':'drop',
     'composición':  'flask',
     'composicion':  'flask',
     'ingrediente':  'flask',
@@ -1962,59 +1941,53 @@ function warmupIOSAudio() {
 /**
  * Determina si un mensaje contiene una consulta real sobre
  * productos, objeciones o argumentos de Above Pharma.
- * Solo muestra el selector de formato cuando hay contenido estética relevante.
+ * Solo muestra el selector de formato cuando hay contenido relevante.
  * Cualquier otra cosa (saludos, frases vagas, charla) se envía directo.
  */
 function isActionableQuery(text) {
     const t = text.toLowerCase().trim()
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-    // Palabras clave que indican consulta real sobre el dominio estética/ventas
+    // Palabras clave que indican consulta real sobre el dominio Above Pharma / ventas
     const pharmaKeywords = [
         // Productos y sustancias Above Pharma
         /above pharma/i, /gencell/i, /ctm/i, /mesenquimal/i, /mesenquimatosa/i,
         /celula.? madre/i, /celula.? troncal/i, /stem cell/i,
         /regenerativ/i, /exosoma/i, /inmunomodul/i,
-        /biomodulador/i, /relleno/i, /filler/i,
-        /hialuronico/i, /acido hialuronico/i,
+        /melatonina/i, /estabilizador/i,
+        // Condiciones tratadas por CTM
+        /renal/i, /hepatic/i, /pulmonar/i, /esteatosis/i,
+        /post.?covid/i, /lyme/i,
         // Médico / clínico
         /medico/i, /doctor/i, /paciente/i, /dosis/i,
         /indicaci/i, /tratamiento/i, /clinico/i, /sesion/i,
-        /dermato/i, /cirujano/i, /plastico/i, /estetico/i, /estetica/i,
-        // Técnicas y protocolos
-        /intravenosa/i, /lifting/i, /canula/i, /aguja/i,
-        /protocolo/i, /tecnica/i, /inyecci/i, /bolus/i, /fanning/i,
-        /retrotrazante/i, /subdermic/i, /supraperiostic/i,
-        // Zonas anatómicas
-        /facial/i, /ovalo/i, /pomulo/i, /mandibul/i, /menton/i,
-        /nasogeniano/i, /surco/i, /labio/i, /ojera/i, /lagrimal/i,
-        /temporal/i, /periorbital/i, /peribucal/i, /cuello/i,
-        // Condiciones estéticas
-        /flacidez/i, /arruga/i, /volumen/i, /rejuvenecimiento/i,
-        /envejecimiento/i, /firmeza/i, /colageno/i, /elastina/i,
-        /edema/i, /hinchaz/i, /hematoma/i,
+        /especialista/i, /internista/i, /nefrologo/i, /neumologo/i,
+        // Protocolos
+        /intravenosa/i, /protocolo/i, /tecnica/i, /administraci/i,
+        // Condiciones médicas
+        /envejecimiento/i, /colageno/i, /elastina/i,
+        /edema/i, /hinchaz/i, /inflamaci/i,
         // Objeciones
         /caro/i, /costoso/i, /precio/i, /barato/i, /coste/i,
         /no funciona/i, /no sirve/i, /no conoce/i,
         /efecto.? secundario/i, /contraindicac/i,
         /otra marca/i, /competencia/i, /objecion/i,
-        /competencia/i,
         // Ventas y argumentos
         /argumento/i, /vender/i, /venta/i, /presentar/i, /visita/i,
         /represent/i, /estrategi/i, /perfil/i, /diferenci/i,
         /ventaja/i, /evidencia/i, /estudio/i, /pitch/i,
         // Marca y certificaciones
-        /above pharma/i, /marcado ce/i, /certificac/i,
+        /certificac/i,
         // Producto genérico
-        /producto/i, /composici/i, /concentraci/i, /cohesividad/i,
-        /calidad/i, /pureza/i, /purificacion/i,
+        /producto/i, /composici/i, /concentraci/i,
+        /calidad/i, /pureza/i,
         // Seguridad
-        /embaraz/i, /anticoagulant/i, /herpes/i, /alergia/i,
-        /hialuronidasa/i, /complicaci/i, /vascular/i, /necrosis/i,
+        /embaraz/i, /anticoagulant/i, /alergia/i,
+        /complicaci/i,
         // Acciones del dominio
         /recomiend/i, /recomendar/i, /comparar/i, /comparativ/i,
         /que es\b/i, /para que sirve/i, /como funciona/i, /como respondo/i,
-        /como presento/i, /como vendo/i, /como aplico/i,
+        /como presento/i, /como vendo/i,
     ];
 
     return pharmaKeywords.some(kw => kw.test(t));
@@ -3028,6 +3001,7 @@ function handleLogout() {
     // Limpiar estado de sesión
     localStorage.removeItem('abbe_logged_in');
     localStorage.removeItem('abbe_user');
+    localStorage.removeItem('abbe_display_name');
 
     // Limpiar DOM de búsquedas recientes para evitar flash visual al cambiar de usuario
     const searchContainer = document.getElementById('recent-searches-list');
@@ -3053,12 +3027,34 @@ function hideLoginScreen() {
     }, 300);
 }
 
+function getDisplayName() {
+    return localStorage.getItem('abbe_display_name') || localStorage.getItem('abbe_user') || '';
+}
+
+function updateGreetingUI() {
+    const name = getDisplayName();
+    const welcomeGreeting = document.querySelector('#welcome-screen .greeting-title');
+    const planGreeting = document.querySelector('#plan-screen .greeting-title');
+    if (welcomeGreeting) welcomeGreeting.innerHTML = `Hola, ${escapeHtml(name)} <i class="ph ph-hand-waving wave"></i>`;
+    if (planGreeting) planGreeting.textContent = `Tu plan, ${name}`;
+
+    // Avatar con iniciales
+    const avatarEl = document.querySelector('.profile-btn');
+    if (avatarEl) {
+        const initials = name.split(/\s+/).map(w => w[0]?.toUpperCase() || '').join('').slice(0, 2) || '?';
+        avatarEl.innerHTML = `<span class="profile-initials">${escapeHtml(initials)}</span>`;
+    }
+}
+
 function handleLogin(username, password) {
     // Multiusuario ligero: username libre (no vacío) + password compartida
     if (username && username.trim() && password === SHARED_PASSWORD) {
         const cleanUser = username.trim().toLowerCase();
+        const displayName = username.trim(); // Preservar capitalización original
         localStorage.setItem('abbe_logged_in', 'true');
         localStorage.setItem('abbe_user', cleanUser);
+        localStorage.setItem('abbe_display_name', displayName);
+        updateGreetingUI();
         hideLoginScreen();
         // Re-render inmediato con datos del nuevo usuario (o seed si vacío)
         renderRecentSearches();
@@ -3102,15 +3098,19 @@ async function handleFaceID() {
             });
 
             if (credential) {
+                const storedDisplayName = localStorage.getItem('abbe_faceid_display_name') || storedUser;
                 localStorage.setItem('abbe_logged_in', 'true');
                 localStorage.setItem('abbe_user', storedUser);
+                localStorage.setItem('abbe_display_name', storedDisplayName);
+                updateGreetingUI();
                 hideLoginScreen();
                 renderRecentSearches();
                 syncSearchHistory();
             }
         } else {
             // Primera vez: registrar Face ID — requiere username del campo de login
-            const faceIdUser = elements.loginUser?.value?.trim()?.toLowerCase();
+            const faceIdRaw = elements.loginUser?.value?.trim();
+            const faceIdUser = faceIdRaw?.toLowerCase();
             if (!faceIdUser) {
                 alert('Escribe tu nombre de usuario antes de configurar Face ID');
                 elements.loginUser?.focus();
@@ -3143,8 +3143,11 @@ async function handleFaceID() {
                 const credId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
                 localStorage.setItem('abbe_faceid_credential', credId);
                 localStorage.setItem('abbe_faceid_user', faceIdUser);
+                localStorage.setItem('abbe_faceid_display_name', faceIdRaw);
                 localStorage.setItem('abbe_logged_in', 'true');
                 localStorage.setItem('abbe_user', faceIdUser);
+                localStorage.setItem('abbe_display_name', faceIdRaw);
+                updateGreetingUI();
                 hideLoginScreen();
                 syncSearchHistory();
             }
@@ -3164,6 +3167,7 @@ function checkAuthOnLoad() {
     if (isLoggedIn) {
         elements.loginScreen?.classList.add('hidden');
         elements.welcomeScreen?.classList.remove('hidden');
+        updateGreetingUI();
         // Rehidratar historial del usuario persistido
         syncSearchHistory();
     } else {

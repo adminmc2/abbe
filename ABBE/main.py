@@ -1,5 +1,5 @@
 """
-Abbe - Asistente de Ventas Above Pharma RAG v4.10.0
+Abbe - Asistente de Ventas Above Pharma RAG v4.11.0
 Backend FastAPI con WebSocket para streaming
 """
 
@@ -113,7 +113,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Abbe - Asistente de Ventas Above Pharma",
-    version="4.10.0",
+    version="4.11.0",
     lifespan=lifespan
 )
 
@@ -132,7 +132,7 @@ async def health_check():
     """Verificar estado del sistema"""
     return {
         "status": "ok",
-        "version": "4.10.0",
+        "version": "4.11.0",
         "agents": ["productos", "objeciones", "argumentos"],
         "knowledge_base_size": len(orchestrator.agents['productos'].rag.qa_pairs) if orchestrator else 0
     }
@@ -144,7 +144,7 @@ async def test_infographic():
     if not llm_client:
         return {"success": False, "error": "LLM client no configurado (falta GROQ_API_KEY)"}
 
-    test_text = "Producto de medicina estética con ácido hialurónico de alta concentración. Indicado para rejuvenecimiento facial y bioestimulación de tejidos. Tecnología avanzada de reticulación para mayor duración y naturalidad."
+    test_text = "Terapia de células troncales mesenquimales pretratadas con melatonina. Indicado para lesión renal, esteatosis hepática y condiciones pulmonares. Administración intravenosa con mecanismo de acción inmunomodulador y regenerativo."
 
     try:
         data = await asyncio.to_thread(_generate_infographic_sync, test_text)
@@ -540,12 +540,8 @@ def is_greeting_or_vague(message: str) -> bool:
     if any(re.search(p, t) for p in followup_patterns):
         return False
 
-    # Palabras clave que indican consulta real sobre el dominio estética/ventas
+    # Palabras clave que indican consulta real sobre el dominio Above Pharma / ventas
     pharma_patterns = [
-        # Sustancias y tecnología
-        r'biomodulador', r'relleno', r'filler',
-        r'acido hialuronico', r'hialuronico', r'\bah\b', r'reticulante',
-        r'microesfera',
         # Medicina regenerativa / CTM
         r'celula.? madre', r'celula.? troncal', r'mesenquimal', r'\bctm\b',
         r'stem cell', r'regenerativ', r'gencell', r'melatonina',
@@ -556,19 +552,12 @@ def is_greeting_or_vague(message: str) -> bool:
         # Médico / clínico
         r'medico', r'doctor', r'paciente', r'prescri', r'dosis',
         r'indicaci', r'tratamiento', r'clinico', r'sesion',
-        r'dermato', r'cirujano', r'plastico', r'estetico', r'estetica',
-        # Técnicas y protocolos
-        r'lifting', r'canula', r'aguja',
-        r'protocolo', r'tecnica', r'inyecci', r'bolus', r'fanning',
-        r'retrotrazante', r'subdermic', r'supraperiostic',
-        # Zonas anatómicas
-        r'facial', r'ovalo', r'pomulo', r'mandibul', r'menton',
-        r'nasogeniano', r'surco', r'labio', r'ojera', r'lagrimal',
-        r'temporal', r'periorbital', r'peribucal', r'cuello',
-        # Condiciones estéticas
-        r'flacidez', r'arruga', r'volumen', r'rejuvenecimiento',
-        r'envejecimiento', r'firmeza', r'colageno', r'elastina',
-        r'edema', r'hinchaz', r'hematoma',
+        r'especialista', r'internista', r'nefrologo', r'neumologo',
+        # Protocolos
+        r'protocolo', r'tecnica', r'administraci',
+        # Condiciones médicas
+        r'envejecimiento', r'colageno', r'elastina',
+        r'edema', r'hinchaz', r'inflamaci',
         # Objeciones
         r'\bcaro\b', r'costoso', r'precio', r'barato', r'coste',
         r'no funciona', r'no sirve', r'no conoce',
@@ -579,18 +568,17 @@ def is_greeting_or_vague(message: str) -> bool:
         r'represent', r'estrategi', r'perfil', r'diferenci',
         r'ventaja', r'evidencia', r'estudio', r'pitch',
         # Marca y certificaciones
-        r'above pharma', r'marcado ce', r'certificac',
-        r'dispositivo medico', r'clase iii',
+        r'above pharma', r'certificac',
         # Producto genérico
-        r'producto', r'composici', r'concentraci', r'cohesividad',
-        r'calidad', r'pureza', r'purificacion',
+        r'producto', r'composici', r'concentraci',
+        r'calidad', r'pureza',
         # Seguridad
-        r'embaraz', r'anticoagulant', r'herpes', r'alergia',
-        r'hialuronidasa', r'complicaci', r'vascular', r'necrosis',
+        r'embaraz', r'anticoagulant', r'alergia',
+        r'complicaci',
         # Acciones del dominio
         r'recomiend', r'recomendar', r'comparar', r'comparativ',
         r'que es\b', r'para que sirve', r'como funciona', r'como respondo',
-        r'como presento', r'como vendo', r'como aplico',
+        r'como presento', r'como vendo',
     ]
 
     return not any(re.search(p, t) for p in pharma_patterns)
@@ -598,9 +586,9 @@ def is_greeting_or_vague(message: str) -> bool:
 
 GREETING_RESPONSE = """Soy **Abbe**, tu asistente de ventas de Above Pharma. Para poder ayudarte, cuéntame qué necesitas. Por ejemplo:
 
-- **Producto**: *"¿Qué productos tienen para rejuvenecimiento facial?"*
+- **Producto**: *"¿Qué es el CTM Estabilizador Renal de Gencell?"*
 - **Objeción**: *"Un médico dice que es caro, ¿cómo respondo?"*
-- **Argumento**: *"¿Cómo presento nuestros productos a un dermatólogo?"*
+- **Argumento**: *"¿Cómo presento las terapias celulares a un especialista?"*
 
 > Puedes usar las **preguntas sugeridas** en la pantalla de inicio o escribir tu consulta directamente."""
 
@@ -795,7 +783,7 @@ REGLAS OBLIGATORIAS:
 2. NO añadas datos externos. Si necesitas mencionar algo fuera del contexto, di "según consenso médico general" SIN cifras.
 3. Si una sección de tu formato no tiene datos verificados, OMÍTELA entera. No incluyas tablas con celdas vacías ni secciones sin contenido real.
 4. Aprovecha al MÁXIMO los datos que SÍ tienes: preséntelos de forma persuasiva, clara y útil para vender.
-5. PROHIBIDO EXTRAPOLAR INDICACIONES: Si un producto aparece en los datos verificados con indicación X, NO lo recomiendes para indicación Y. Solo recomienda cada producto para las indicaciones que EXPLÍCITAMENTE aparecen en los datos verificados. Ejemplo: si un producto está indicado para "flacidez facial", NO lo recomiendes para relleno labial a menos que los datos verificados digan EXPLÍCITAMENTE que tiene esa indicación.
+5. PROHIBIDO EXTRAPOLAR INDICACIONES: Si un producto aparece en los datos verificados con indicación X, NO lo recomiendes para indicación Y. Solo recomienda cada producto para las indicaciones que EXPLÍCITAMENTE aparecen en los datos verificados. Ejemplo: si un producto está indicado para "lesión renal", NO lo recomiendes para condiciones pulmonares a menos que los datos verificados digan EXPLÍCITAMENTE que tiene esa indicación.
 6. Menciona SOLO los productos que tengan indicación EXPLÍCITA para la condición consultada en los datos verificados."""
                 else:
                     rag_instruction = """COBERTURA RAG: ALTA — Tienes buenos datos verificados arriba.
@@ -817,7 +805,7 @@ PROHIBIDO EXTRAPOLAR INDICACIONES: Recomienda cada producto SOLO para las indica
 
 | Parámetro | Valor |
 |-----------|-------|
-| (los 3-4 datos más importantes: composición, volumen, reticulante, zona) |
+| (los 3-4 datos más importantes: composición, mecanismo, indicación, vía de administración) |
 
 **Indicación principal**: Una frase directa con FAB.
 

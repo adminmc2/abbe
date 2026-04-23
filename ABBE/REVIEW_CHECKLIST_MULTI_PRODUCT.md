@@ -9,7 +9,8 @@
 - **No** se está migrando el DNA de Novacutan; se está desacoplando la app y cargando productos nuevos
 - La carga es **producto por producto**
 - Decisión de agentes: **por intención** (`productos`, `objeciones`, `argumentos`)
-- El siguiente punto activo es `2.4`: **coherencia agente↔retrieval, categorías nativas y fallback auditable**
+- El siguiente punto activo es `4.1`: **documentación / versionado y consistencia visible final**
+- `3.1`, `3.2` y `3.3` quedan cerrados; el **bloque 3** queda finalizado
 
 ---
 
@@ -50,240 +51,151 @@
 | Bloque | Estado | Nota |
 |---|---|---|
 | 1. Datos, gobernanza y cumplimiento | **Cerrado** | `1.1`–`1.5` cerrados; bloque 1 finalizado |
-| 2. Retrieval, routing y seguridad | **En progreso** | `2.1`–`2.3` cerrados; `2.4` siguiente subpunto pendiente de formalización en este checklist |
-| 3. Frontend y desacople real | **Pendiente** | Falta auditar frontend/data-driven y limpiar residuos activos del dominio anterior |
-| 4. Documentación, configuración e higiene | **En progreso** | Validación, trazabilidad y routing mejoraron; siguen abiertos versionado visible, privacidad y despliegue |
+| 2. Retrieval, routing y seguridad | **Cerrado** | `2.1`–`2.7` cerrados; bloque 2 finalizado |
+| 3. Frontend y desacople real | **Cerrado** | `3.1`–`3.3` cerrados; bloque 3 finalizado en `v4.11.0` |
+| 4. Documentación, configuración e higiene | **En progreso** | `main.py`, `index.html`, assets y `CHANGELOG.md` ya reflejan `v4.11.0`; queda pendiente consistencia total de documentación y superficies restantes |
 
 ---
-
-## Impacto cruzado más reciente
-
-### Dictamen aplicado según evidencias runtime aportadas para `2.3`
-
-Estado actual confirmado:
-- El runtime real usa `classify_intent_rules()` en `main.py`; no depende del path LLM para el routing operativo.
-- `agents/orchestrator.py` fue endurecido con criterio **frame > vocabulario**.
-- Se ampliaron variantes comerciales de objeción sin secuestrar consultas técnicas neutras.
-- No se añadió sticky routing.
-- No fue necesario mover lógica de routing a `main.py`.
-- Evidencia aportada:
-  - single-turn: `13/13 OK`
-  - multi-turn: `6/6 OK`
-  - adversariales: `4/4 OK`
-  - total: `23/23`, `0 misroutes`
-- La batería adversarial confirma que expresiones como:
-  - `El médico pregunta ...`
-  combinadas con consulta técnica siguen ruteando a `productos`.
-- Se reporta versión `4.6.0` y `CHANGELOG.md` actualizado.
-
-### Nota de alcance
-
-El cierre de `2.3` valida **routing por intención en runtime**.  
-No sustituye la necesidad de convertir esta batería en regresión fija dentro de `2.7`.
-
-### Observación no bloqueante
-
-- `evaluate_comparative_query()` en `base_agent.py` sigue usando `score >= 0.15` para soporte comparativo, heredado de la escala anterior normalizada.
-- No bloquea `2.3`, pero sigue pendiente de recalibración en `2.5` / hardening comparativo.
 
 ### Estado actualizado por puntos afectados
 
 | Punto | Estado | Motivo |
 |---|---|---|
-| 2.2 Thresholds, scores y cobertura RAG | **Cerrado** | Ya existe calibración con raw scores, bucket `medium` real, `no_results` separado y evidencia runtime auditada |
-| 2.3 Routing por intención y selección correcta de agente | **Cerrado** | Hay evidencia runtime suficiente en single-turn, multi-turn y adversariales, sin misroutes |
-| 2.4 Coherencia agente↔retrieval: categorías nativas y fallback auditable | **Activo** | Las categorías entre agentes se solapan mucho y la traza actual no representa fielmente si el fallback se activó realmente |
-| 2.5 `NO RESULTS` y anti-fabrication | **Parcial reforzado** | `no_results` ya es bucket explícito y auditado con score real; falta hardening final |
-| 2.7 Suite mínima de regresión fija | **Pendiente preparado** | Las baterías de `2.2` y `2.3` ya pueden convertirse en regresión estable |
+| 3.1 Inventario de residuos legacy visibles y hardcodes runtime | **Cerrado** | Inventario completo, clasificado y utilizable |
+| 3.2 Parametrización del frontend principal y eliminación de hardcodes visibles no legacy | **Cerrado** | UI principal ya no se comporta como demo/single-user por hardcodes visibles |
+| 3.3 Limpieza de residuos activos del dominio anterior | **Cerrado** | Limpieza legacy ejecutada en `main.py`, `app.js`, `orb.js`, `style.css` y eliminación de superficies públicas auxiliares |
+| 4.1 Documentación / versionado y consistencia visible final | **Activo** | Falta cerrar verificación total de versión y documentación operativa tras `v4.11.0` |
 
 ---
 
-## 2.2 Thresholds, scores y cobertura RAG
+## 3.1 Inventario de residuos legacy visibles y hardcodes runtime en frontend
 **Estado:** Cerrado  
 **Bloquea avance:** No
 
 ### Cierre alcanzado
 
-- Se eliminó la normalización artificial `[0,1]` en `search()`.
-- El ranking sigue siendo válido, pero ahora la cobertura usa scores raw reales.
-- `main.py` distingue correctamente:
-  - `high`
-  - `medium`
-  - `low`
-  - `no_results`
-- `medium` deja de ser un bucket muerto.
-- `no_results` queda separado de `low`.
-- `base_agent.py` recalibra:
-  - threshold de fallback
-  - `min_score` de contexto
-- Se validó con:
-  - 12 queries diagnósticas
-  - 3 casos runtime auditables
+- Ya existe inventario completo y clasificado de residuos legacy y hardcodes runtime en frontend.
+- Se revisaron superficies principales y auxiliares accesibles por URL dentro de `static/`.
+- Quedó separada la lista de hallazgos que alimentó `3.2` de la que alimentó `3.3`.
+- `manifest.json` quedó sin hallazgos relevantes.
+- Se documentaron no-hallazgos explícitos para `BioPRO`, `FBio`, `DVS` y `Puro Omega`.
 
-### Evidencia revisada
+### Qué cambió
 
-#### Distribución diagnóstica
-- Antes:
-  - `high: 10`
-  - `medium: 0`
-  - `low: 2`
-- Después:
-  - `high: 8`
-  - `medium: 2`
-  - `low: 0`
-  - `no_results: 2`
+- `GREETING_RESPONSE` reescrito con ejemplos CTM / Gencell actuales
+- `/api/test-infographic` reescrito a medicina regenerativa / CTM
+- `pharma_patterns` limpiado de vocabulario estética / fillers legacy
+- `isActionableQuery()` limpiado y alineado con backend
+- `classifySearchIcon()` limpiado
+- mapa de iconos limpiado
+- `novacutanHue()` renombrado a `brandHue()`
+- comentarios legacy eliminados de `orb.js` y `style.css`
+- HTML auxiliares públicos eliminados de `static/`
+- versión y cache-busters alineados a `v4.11.0`
 
-#### Casos runtime
-- **HIGH**
-  - Query: `Composición CTM Estabilizador Renal`
-  - Coverage: `high`
-  - `max_score`: `43.312`
+### Dónde cambió
 
-- **MEDIUM**
-  - Query: `¿Cómo funcionan las CTM?`
-  - Coverage: `medium`
-  - `max_score`: `6.502`
+- `ABBE/main.py`
+- `ABBE/static/app.js`
+- `ABBE/static/orb.js`
+- `ABBE/static/style.css`
+- `ABBE/static/index.html`
+- `ABBE/CHANGELOG.md`
 
-- **NO_RESULTS**
-  - Query: `Lifting temporal con hilo tensor`
-  - Coverage: `no_results`
-  - `max_score`: `0.0`
+### Superficies eliminadas
 
-### Nota no bloqueante
+- `ABBE/static/generate-icons.html`
+- `ABBE/static/icon-generator.html`
+- `ABBE/static/logo-test.html`
+- `ABBE/static/orb-preview.html`
+- `ABBE/static/orb-small-test.html`
+- `ABBE/static/preview-icon.html`
 
-Que la batería final no haya producido un caso `low` no reabre `2.2`.  
-El bucket existe y quedó correctamente separado de `no_results`; la evidencia mínima runtime ya quedó cubierta con:
-- `high`
-- `medium`
-- `no_results`
+### Cómo se validó
 
-### Decisión actual
+- Revisión directa de implementación en `main.py`, `app.js`, `orb.js`, `style.css` e `index.html`
+- Confirmación de eliminación física de HTML auxiliares en `static/`
+- Verificación de versión `v4.11.0` en backend, frontend y changelog
+- Búsqueda final de residuos legacy en `static/` y `main.py`
 
-**Punto cerrado.**
+### Evidencia concreta
 
----
+- `main.py`:
+  - `GREETING_RESPONSE` ya usa ejemplos CTM / Gencell
+  - `/api/test-infographic` ya usa texto de medicina regenerativa
+  - `is_greeting_or_vague()` ya no conserva vocabulario legacy de fillers / estética
+  - docstring, `FastAPI.version` y `/api/health` en `4.11.0`
+- `app.js`:
+  - `isActionableQuery()` limpiado
+  - `classifySearchIcon()` limpiado
+  - mapa de iconos limpiado
+- `orb.js`:
+  - `brandHue()` sustituye a `novacutanHue()`
+- `style.css`:
+  - comentarios branding legacy eliminados
+- `index.html`:
+  - footer visible `Versión 4.11.0`
+  - assets con `?v=4.11.0`
+- `static/`:
+  - ya no existen HTML auxiliares públicos no productivos
+- `CHANGELOG.md`:
+  - nueva entrada `v4.11.0`
+  - validación documentada:
+    - `grep -RInE "Novacutan|hialuron|relleno|filler|reticulante|microesfera|rejuvenecimiento facial|dermatolog|cirujano plastico" static main.py`
+    - resultado: `0 resultados`
 
-## 2.3 Routing por intención y selección correcta de agente
-**Estado:** Cerrado  
-**Bloquea avance:** No
+### Nota de alcance
 
-### Cierre alcanzado
-
-- El routing operativo se validó en la ruta real de runtime.
-- La decisión sigue viviendo en `orchestrator.py`.
-- El ajuste aplicado prioriza **frame comercial** sobre vocabulario técnico aislado.
-- No se introdujo sticky routing.
-- No se observa sobrerouting nuevo de consultas técnicas hacia `objeciones`.
-
-### Evidencia revisada
-
-- **Single-turn**
-  - `13/13 OK`
-
-- **Multi-turn**
-  - `6/6 OK`
-
-- **Adversariales**
-  - `4/4 OK`
-
-- **Total**
-  - `23/23`
-  - `0 misroutes`
-
-### Confirmaciones relevantes
-
-- `main.py` usa `classify_intent_rules()` en el routing operativo.
-- `El médico pregunta ...` + consulta técnica:
-  - rutea a `productos`
-  - no dispara objeción por sobreajuste
-- la mejora corrige los fallos detectados en Fase A sin abrir el riesgo mayor de secuestrar vocabulario técnico
+- No se reabren `agents/rag_engine.py` ni `agent_argumentos.py`.
+- Según el checklist vigente, `3.3` se limitó a superficies activas/públicas y copy backend expuesto al frontend.
 
 ### Decisión actual
 
-**Se habilita fijar y abrir `2.4` en este checklist.**
+**Se cierra `3.3`.**  
+**Se cierra el bloque 3.**  
+**Se habilita avance a `4.1`.**
 
 ---
 
-## 2.4 Coherencia agente↔retrieval: categorías nativas y fallback auditable
+## 4.1 Documentación / versionado y consistencia visible final
 **Estado:** Activo  
 **Bloquea avance:** Sí
 
 ### Objetivo real del punto
 
-Demostrar que el agente correcto no solo se selecciona bien, sino que además recupera contexto **principalmente nativo de su intención**; y que el fallback queda trazado de forma **real y auditable**, no inferida indirectamente.
+Verificar que la versión actual, el artefacto de regresión y la documentación operativa queden consistentes en todas las superficies restantes tras `v4.11.0`.
 
-### Riesgo abierto
+### Alcance mínimo
 
-- `agent_productos.py`, `agent_objeciones.py` y `agent_argumentos.py` comparten categorías amplias (`productos`, `tecnologia`, `seguridad`, `empresa`), por lo que un agente puede responder “bien” apoyándose en contexto genérico.
-- `search_knowledge_with_fallback()` vive en `base_agent.py`, pero `main.py` no persiste si el fallback se activó realmente.
-- La traza actual puede subreportar fallback, debilitando auditoría y futuras regresiones.
+- `ABBE/main.py`
+- `ABBE/static/index.html`
+- `ABBE/static/manifest.json`
+- `ABBE/CHANGELOG.md`
+- `ABBE/README.md` si existe
+- `ABBE/regression/README.md`
 
 ### Evidencia mínima requerida
 
-1. **12 queries claras**
-   - 4 de `productos`
-   - 4 de `objeciones`
-   - 4 de `argumentos`
+1. qué cambió
+2. dónde cambió
+3. cómo se validó
+4. evidencia concreta de:
+   - versión visible consistente
+   - referencias documentales consistentes
+   - ausencia de nombres de artefactos obsoletos
+   - ausencia de versiones antiguas visibles o activas fuera del changelog histórico
 
-2. **Para cada query**
-   - agente esperado
-   - agente real
-   - categorías nativas esperadas
-   - top-5 **filtrado** por categorías del agente:
-     - `qa_id`
-     - `categoria`
-     - `product`
-     - `score`
-   - indicar si el fallback se activó realmente
-   - top-5 **final** tras fallback/combinación
-   - conteo de categorías nativas en top-3
+### Decisión actual
 
-3. **3 casos runtime vía `/ws/chat`**
-   - 1 por cada agente
-   - con traza persistida
-   - mostrando si hubo o no fallback real
-
-4. **Al menos 2 casos específicos**
-   - 1 donde el retrieval nativo sea suficiente **sin fallback**
-   - 1 donde el fallback mejore realmente el resultado
-
-### Archivos a revisar
-
-- `ABBE/agents/base_agent.py`
-- `ABBE/main.py`
-- `ABBE/agents/rag_engine.py`
-- `ABBE/agents/agent_productos.py`
-- `ABBE/agents/agent_objeciones.py`
-- `ABBE/agents/agent_argumentos.py`
-- `ABBE/audit_traces.jsonl`
-
-### Regla de diseño
-
-- **No** crear agentes nuevos
-- **No** crear categorías nuevas en la KB
-- **No** resolverlo ampliando aún más el solapamiento de categorías
-- Si hace falta ajuste, hacerlo en:
-  - priorización de categorías nativas
-  - metadata / scoring
-  - contrato de retorno del fallback
-  - trazabilidad real en runtime
-
-### Criterio de cierre
-
-`2.4` solo se cierra si queda demostrado que:
-
-1. las queries claras de cada agente priorizan contexto nativo suficiente
-2. el fallback queda marcado de forma **real**, no inferida por cobertura
-3. la traza distingue cuándo el resultado vino de búsqueda filtrada vs fallback
-4. el sistema no depende sistemáticamente de contexto genérico para sostener `objeciones` y `argumentos`
+**No avanzar más en el bloque 4 sin cerrar `4.1`.**
 
 ---
 
 # Siguiente punto activo
 
-## 2.4 — Coherencia agente↔retrieval: categorías nativas y fallback auditable
+## 4.1 — Documentación / versionado y consistencia visible final
 
-**No avanzar a `2.5` hasta cerrar `2.4`.**
+**No avanzar más sin cerrar `4.1`.**
 
 ---
 
@@ -300,6 +212,9 @@ Demostrar que el agente correcto no solo se selecciona bien, sino que además re
 - El routing operativo usa `classify_intent_rules()`; no depende del path LLM
 - No se acepta sticky routing como solución
 - `El médico pregunta ...` + consulta técnica debe seguir ruteando a `productos`
-- Las baterías de `2.2` y `2.3` deberán convertirse en regresión fija en `2.7`
-- `3.3` sigue abierto por residuos activos del dominio anterior
-- `4.1` sigue parcial hasta verificar consistencia total de versión visible en toda la app
+- Las baterías de `2.2` y `2.3` se convirtieron en regresión fija en `2.7`
+- `3.1` queda cerrado con inventario clasificado de residuos legacy y hardcodes runtime en frontend, incluyendo superficies auxiliares públicas
+- `3.2` queda cerrado con display name visible, avatar genérico por iniciales, versión/cache-busters alineados y plan sin dataset demo
+- `3.3` queda cerrado con limpieza legacy en `main.py`, `app.js`, `orb.js`, `style.css`, eliminación de HTML auxiliares públicos y validación grep `0 resultados`
+- El bloque 3 queda finalizado en `v4.11.0`
+- `4.1` pasa a ser el punto activo para consistencia total de documentación y versionado visible

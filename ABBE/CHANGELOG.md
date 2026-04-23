@@ -4,13 +4,48 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.10.0 — 2026-04-23 (ACTUAL)
+## v4.11.0 — 2026-04-23 (ACTUAL)
+
+### Bloque 3.3: Limpieza de residuos legacy activos
+
+- `GREETING_RESPONSE` reescrito con ejemplos CTM/Gencell (eliminados "rejuvenecimiento facial" y "dermatólogo")
+- `/api/test-infographic` texto de prueba reescrito a medicina regenerativa (eliminados "ácido hialurónico", "medicina estética")
+- `pharma_patterns` en `is_greeting_or_vague()` limpiado de vocabulario estética/fillers (eliminados relleno, filler, hialuronico, reticulante, microesfera, zonas faciales, técnicas de inyección cosmética)
+- `isActionableQuery()` en app.js limpiado de vocabulario legacy (alineado con backend)
+- `classifySearchIcon()` limpiado: eliminados `hialuronic|relleno`, agregados `celula.?madre|estabilizador`
+- Mapa de íconos: `hialuronico` → `estabilizador`
+- `novacutanHue()` renombrado a `brandHue()` en orb.js (shader + alias)
+- Comentarios "Novacutan" eliminados de orb.js y style.css
+- 6 HTML auxiliares eliminados de `/static/`: generate-icons, icon-generator, logo-test, orb-preview, orb-small-test, preview-icon
+- System prompts en main.py actualizados: ejemplo de extrapolación y template de producto alineados a CTM
+- Versión y cache-busters alineados a v4.11.0
+
+Validación: `grep -RInE "Novacutan|hialuron|relleno|filler|reticulante|microesfera|rejuvenecimiento facial|dermatolog|cirujano plastico" static main.py` → **0 resultados**
+
+---
+
+## v4.10.1 — 2026-04-23
+
+### Bloque 3.2: Parametrización del frontend principal
+
+- `Hola, Jorge` y `Tu plan, Jorge` reemplazados por display name dinámico de sesión
+- Avatar fijo `profile.jpg` sustituido por iniciales del usuario
+- Versión visible corregida de `4.0.2` a `4.10.1` en login footer
+- Cache-busters de assets alineados a `4.10.1` (style.css, app.js, orb.js, iconos, manifest)
+- `PLAN_TASKS` dataset demo eliminado; plan muestra placeholder vacío hasta datos reales
+- Separación display name (`abbe_display_name`) de identidad normalizada (`abbe_user`)
+- Face ID preserva display name original al registrar y autenticar
+- Fix: `regression_report.txt` → `regression_report.md` en CHANGELOG anterior
+
+---
+
+## v4.10.0 — 2026-04-23
 
 ### Bloque 2.7: Suite de regresión
 
 - Nueva carpeta `ABBE/regression/` con suite de diagnóstico para bloques 2.2–2.6
 - Runner unificado `run_all.py` con modos offline/runtime y filtro por bloque
-- Artefacto de salida `regression_report.txt`
+- Artefacto de salida `regression_report.md`
 - Smoke manual de 2.6 (`smoke_26_manual.md`) documentando flujo de navegador real
 - README de ejecución
 

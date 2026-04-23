@@ -1,10 +1,10 @@
 /**
- * Novacutan - Orb WebGL Shader
+ * Above Pharma - Orb WebGL Shader
  * Logo animado con colores corporativos y transiciones intensas
  */
 
 (function() {
-    // Colores corporativos Novacutan (para referencia en mood tint)
+    // Colores corporativos (para referencia en mood tint)
     const COLORS = {
         blue: { r: 102, g: 126, b: 234 },    // #667eea
         purple: { r: 118, g: 75, b: 162 },   // #764ba2
@@ -25,7 +25,7 @@ void main() {
     gl_Position = position;
 }`;
 
-    // Fragment shader con colores Novacutan
+    // Fragment shader con colores corporativos
     const fragmentShaderSource = `#version 300 es
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
@@ -51,9 +51,9 @@ uniform float smallMode; // 1.0 = tamaño pequeño (<80px), 0.0 = normal
 #define TAU radians(360.)
 #define PI (TAU/2.)
 
-// Paleta Novacutan con transiciones suaves y elegantes
-vec3 novacutanHue(float a) {
-    // Colores Novacutan
+// Paleta corporativa con transiciones suaves y elegantes
+vec3 brandHue(float a) {
+    // Colores corporativos
     vec3 blue = vec3(0.4, 0.494, 0.918);      // #667eea
     vec3 purple = vec3(0.463, 0.294, 0.635);  // #764ba2
     vec3 pink = vec3(0.941, 0.576, 0.984);    // #f093fb
@@ -82,7 +82,7 @@ vec3 novacutanHue(float a) {
     return clamp(col, 0.0, 1.0);
 }
 
-#define hue(a) novacutanHue(a)
+#define hue(a) brandHue(a)
 
 mat2 rot(float a) {
     float c = cos(a), s = sin(a);
@@ -141,7 +141,7 @@ void main() {
     col = mix(k * tanh(c * c * c), pattern(p), 0.985);
     col *= reveal(st);
 
-    // Glow central suave con colores Novacutan (más intenso en modo pequeño)
+    // Glow central suave (más intenso en modo pequeño)
     float glowIntensity = mix(0.15 + intensity * 0.2, 0.25 + intensity * 0.3, smallMode);
     float glow = exp(-length(st) * (2.8 - intensity * 0.5)) * glowIntensity;
     vec3 glowColor = mix(

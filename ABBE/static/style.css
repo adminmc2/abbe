@@ -1,10 +1,10 @@
 /* ============================================
-   Novacutan — Material Design 3
+   Above Pharma — Material Design 3
    Tokens + Componentes
    ============================================ */
 
 :root {
-    /* ===== M3 COLOR SYSTEM (Custom Novacutan palette) ===== */
+    /* ===== M3 COLOR SYSTEM (Custom Above Pharma palette) ===== */
     /* Primary — Deep Blue */
     --md-sys-color-primary: #2D5BA0;
     --md-sys-color-on-primary: #FFFFFF;
@@ -299,6 +299,20 @@ body::before {
     object-fit: cover;
     object-position: center 20%;
     display: block;
+}
+
+.profile-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--md-sys-color-on-primary-container);
+    background: var(--md-sys-color-primary-container);
+    user-select: none;
 }
 
 /* M3 Icon Button — Standard */
