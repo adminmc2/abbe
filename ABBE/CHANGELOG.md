@@ -4,7 +4,26 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.9.3 — 2026-04-23 (ACTUAL)
+## v4.10.0 — 2026-04-23 (ACTUAL)
+
+### Bloque 2.7: Suite de regresión
+
+- Nueva carpeta `ABBE/regression/` con suite de diagnóstico para bloques 2.2–2.6
+- Runner unificado `run_all.py` con modos offline/runtime y filtro por bloque
+- Artefacto de salida `regression_report.txt`
+- Smoke manual de 2.6 (`smoke_26_manual.md`) documentando flujo de navegador real
+- README de ejecución
+
+Scripts por bloque:
+- 2.2: `diag_retrieval.py` (RAG BM25, 4 niveles de cobertura)
+- 2.3: `diag_routing.py`, `diag_adversarial.py`, `diag_multiturn.py`
+- 2.4: `diag_runtime_24.py`
+- 2.5: `diag_25_noresults.py`, `diag_25_runtime.py`
+- 2.6: `diag_26_historial.py`, `diag_26_final.py`
+
+---
+
+## v4.9.3 — 2026-04-23
 
 ### Bloque 2.6 fix: Sync no destruye búsquedas locales durante fetch
 
