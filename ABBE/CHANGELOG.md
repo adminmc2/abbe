@@ -4,15 +4,174 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.7.0 — 2026-04-22 (ACTUAL)
+## v4.9.3 — 2026-04-23 (ACTUAL)
+
+### Bloque 2.6 fix: Sync no destruye búsquedas locales durante fetch
+
+**Problema — Sync borra queries hechas durante el fetch:** `syncSearchHistory()` se dispara al login (async). Si el usuario hacía una consulta antes de que el servidor respondiera, la respuesta del sync (vacía o con datos viejos) destruía la búsqueda recién guardada.
+
+**Corrección en `app.js`:**
+- Rama servidor vacío: si hay datos locales frescos, push al servidor en vez de borrar
+- Rama servidor más reciente: re-lee localStorage post-await, mergea búsquedas locales-only con las del servidor
+- Resultado: queries hechas durante el fetch nunca se pierden
+
+---
+
+## v4.9.2 — 2026-04-23
+
+### Bloque 2.6 fix: Race condition sync + normalización de identidad
+
+**Problema 1 — Race condition en `syncSearchHistory()`:** La función capturaba `username` al inicio pero usaba `getSearchesKey()` (que lee `abbe_user` actual) al aplicar la respuesta. Si el usuario cambiaba durante el fetch, la respuesta se escribía en la key del nuevo usuario.
+
+**Corrección en `app.js`:**
+- `syncSearchHistory()` captura `syncKey` al inicio y lo usa en todo el callback
+- Guard post-fetch: si `abbe_user` cambió, descarta la respuesta
+- `pushSearchHistory()` construye `pushKey` fijo al inicio, no depende de `getSearchesKey()`
+
+**Problema 2 — Normalización de username inconsistente:** `getSearchesKey()` usaba `toLowerCase()` pero `handleLogin()` guardaba el username solo con `trim()`. El backend recibía case-sensitive, el localStorage usaba case-insensitive.
+
+**Corrección en `app.js`:**
+- `handleLogin()`: `username.trim().toLowerCase()` al guardar `abbe_user`
+- `handleFaceID()` registro: `faceIdUser` normalizado a lowercase
+- Criterio unificado: username siempre normalizado en ambos lados
+
+---
+
+## v4.9.1 — 2026-04-23
+
+### Bloque 2.6 fix: Aislamiento real de frontend multiusuario
+
+**Problema 1 — Key localStorage global:** `abbe_recent_searches` era una sola clave compartida por todos los usuarios en el mismo navegador. En dispositivo compartido, un usuario veía/empujaba historial de otro.
+
+**Corrección en `app.js`:**
+- `RECENT_SEARCHES_KEY` (constante) → `getSearchesKey()` (función dinámica)
+- Key scoped: `abbe_recent_searches:<app_id>:<username_normalizado>`
+- Sin usuario logueado, usa key anónima aislada
+
+**Problema 2 — Sync no limpiaba en servidor vacío:** Si `/api/history/load` devolvía `[]` (usuario nuevo), el frontend conservaba búsquedas del usuario anterior en localStorage.
+
+**Corrección en `app.js`:**
+- Rama `else` en `syncSearchHistory()`: cuando servidor vacío, `localStorage.removeItem(getSearchesKey())` + re-render
+
+**Problema 3 — Seed data persistente:** `init()` insertaba búsquedas demo en localStorage como historial real. En multiusuario, se subían al servidor contaminando datos.
+
+**Corrección en `app.js`:**
+- `SEED_DATA` eliminado de `init()` → `SEED_SEARCHES` como constante visual
+- `renderRecentSearches()` muestra seeds si historial vacío, sin persistir en localStorage
+
+**Problema 4 — Logout incompleto:** `handleLogout()` solo limpiaba auth keys, dejando chat DOM, `priorContext`, y WebSocket activo del usuario anterior.
+
+**Corrección en `app.js`:**
+- Logout cierra `state.websocket`, limpia `state.priorContext`, `state.currentMessage`, y `chatMessages` DOM
+
+**Problema 5 — Face ID sin username:** `handleFaceID()` seteaba `abbe_logged_in` pero nunca `abbe_user`, rompiendo toda la cadena de aislamiento.
+
+**Corrección en `app.js`:**
+- Registro Face ID: requiere username del campo login, lo vincula con `abbe_faceid_user`
+- Autenticación Face ID: usa **solo** el usuario vinculado (`abbe_faceid_user`), ignora campo manual
+- Si credencial huérfana (sin usuario vinculado), pide reconfiguración
+
+**Problema 6 — Flash visual al cambiar de usuario:** `handleLogout()` no limpiaba el DOM de búsquedas recientes. Al hacer login como usuario B, el welcome screen mostraba brevemente los items de A.
+
+**Corrección en `app.js`:**
+- `handleLogout()` limpia `recent-searches-list` DOM
+- `handleLogin()` llama `renderRecentSearches()` antes de `syncSearchHistory()` para estado inmediato correcto
+
+**Corrección en `main.py`:**
+- Versión sincronizada a `4.9.1` en docstring, `FastAPI.version` y `/api/health`
+
+---
+
+## v4.9.0 — 2026-04-23
+
+### Bloque 2.6: Persistencia y aislamiento de historial por usuario
+
+**Problema 1 — Credencial única:** `VALID_CREDENTIALS` solo permitía login como "Jorge". Todos los representantes compartían una sola identidad, imposibilitando historial individual.
+
+**Corrección en `app.js`:**
+- `VALID_CREDENTIALS` → `SHARED_PASSWORD`: cualquier username no vacío + password compartida
+- `handleLogin()` acepta `username.trim()` libre, guarda identidad real en `localStorage.abbe_user`
+
+**Problema 2 — Demo mode reset:** `checkAuthOnLoad()` borraba `abbe_logged_in` y `abbe_user` en cada recarga, forzando re-login constante.
+
+**Corrección en `app.js`:**
+- Eliminado `localStorage.removeItem()` incondicional
+- Si hay sesión activa, se llama `syncSearchHistory()` automáticamente para rehidratar
+
+**Problema 3 — Legacy contamina historial:** `user_data.json` contenía historiales de Novacutan (José Luis, Pablo) que podían hidratarse como historial actual de ABBE.
+
+**Corrección en `app.js` + `main.py`:**
+- Nuevo parámetro `app_id` en endpoints `/api/history/save` y `/api/history/load`
+- Frontend envía `app_id: "abbe_above_pharma"` en cada sync
+- Backend almacena bajo `data[username].apps[app_id]` — legacy queda en raíz, inaccesible
+- Backward compatible: sin `app_id`, endpoints funcionan como antes
+
+**Problema 4 — Trazas sin usuario:** `audit_traces.jsonl` solo tenía `session_id` anónimo, sin correlación con usuario de frontend.
+
+**Corrección en `app.js` + `main.py`:**
+- Frontend envía `username` en payload WebSocket
+- Backend captura `frontend_user` y lo persiste en `write_audit_trace()`
+
+---
+
+## v4.8.0 — 2026-04-23
+
+### Bloque 2.5: NO RESULTS, anti-fabricación y detección comparativa robusta
+
+**Problema 1 — Comparativas no detectadas:** El patrón `\bmejor que\b` exigía adyacencia, pero en español "Es mejor X que Y" interpone X entre ambas palabras. Consultas como "¿Es mejor el CTM Renal que la diálisis?" pasaban sin gobernanza comparativa.
+
+**Corrección en `base_agent.py` — COMPARATIVE_SIGNALS:**
+- `\bmejor que\b` → `\bmejor\b.{1,80}\bque\b` (no adyacente, límite 80 chars)
+- `\bpeor que\b` → `\bpeor\b.{1,80}\bque\b`
+- Agregados: `\bfrente a\b`, `\bcomparado con\b`
+- Corregidos acentos: `\bpor qué\b` → `\bpor qu[eé]\b`
+
+**Problema 2 — Threshold comparativo heredado:** `score >= 0.15` en `evaluate_comparative_query()` era un residuo de la escala normalizada antigua. Con BM25 raw (scores 3–30+), no filtraba nada.
+
+**Corrección en `base_agent.py`:**
+- `score >= 0.15` → `score >= 3.0` (alineado con `min_score` de `format_context()`)
+
+**Problema 3 — Traza sin modo runtime:** `audit_traces.jsonl` no persistía el modo final de respuesta (normal/acotada/rechazo), impidiendo auditar decisiones de runtime.
+
+**Corrección en `main.py`:**
+- Nuevo campo `effective_mode` calculado post-comparativa: `"normal"`, `"acotada"`, `"rechazo"`
+- Persistido en `write_audit_trace()`
+
+**Diagnóstico (10 queries offline + 4 runtime):**
+- Q1-Q4 (fuera de dominio / residuos): low/no_results correctos
+- Q5 (comparativa no detectada): FIX aplicado — ahora detectada como therapeutic
+- Q6 (competidor): correctamente bloqueada (competitors=[])
+- Q7-Q8 (comparativas soportadas): funcionan correctamente
+- Q9-Q10 (intra-dominio con gap): coverage HIGH por BM25 léxico, pero anti-fabricación del prompt contiene el riesgo (verificado en runtime Caso 3 — lupus)
+
+---
+
+## v4.7.1 — 2026-04-22
+
+### Bloque 2.4 (fix concurrencia): search_meta como valor de retorno
+
+**Problema resuelto:** `search_knowledge_with_fallback()` guardaba el meta del fallback en un atributo mutable del agente (`self.last_search_meta`). Como los agentes son singleton (reutilizados entre sesiones WebSocket), otra sesión concurrente podía sobreescribir el meta antes de que `main.py` lo leyera (hay múltiples `await` entre la búsqueda y la escritura de la traza).
+
+**Corrección en `base_agent.py`:**
+- `search_knowledge_with_fallback()` ahora retorna `(results, search_meta)` como tupla
+- Eliminado atributo mutable `self.last_search_meta`
+- El meta se captura como variable local en el caller — sin ventana de concurrencia
+
+**Corrección en `main.py`:**
+- `results, search_meta = agent.search_knowledge_with_fallback(...)` — captura inmediata
+- Eliminada lectura tardía de `agent.last_search_meta` (post-await)
+
+---
+
+## v4.7.0 — 2026-04-22
 
 ### Bloque 2.4: coherencia agente↔retrieval y fallback auditable
 
 **Problema resuelto:** `fallback_used` en `audit_traces.jsonl` se calculaba con una heurística en `main.py` (`rag_coverage in ("low", "no_results")`) que no correspondía al trigger real del fallback en `search_knowledge_with_fallback()` (score < 8.0). Un fallback activado con score entre 5.0 y 8.0 quedaba invisible en la auditoría.
 
 **Corrección en `base_agent.py`:**
-- Nuevo atributo `last_search_meta` en BaseAgent con estado real del fallback
-- `search_knowledge_with_fallback()` persiste: `fallback_activated`, `score_before_fallback`, `score_after_fallback`
+- `search_knowledge_with_fallback()` retorna `(results, search_meta)` con estado real del fallback
+- search_meta contiene: `fallback_activated`, `score_before_fallback`, `score_after_fallback`
 - La señal es la verdad del sistema — no hay duplicación de thresholds
 
 **Corrección en `main.py`:**

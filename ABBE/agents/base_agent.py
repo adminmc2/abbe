@@ -16,10 +16,13 @@ from .catalog import get_empresa, get_product_alias_to_id_map, has_competitors
 # Señales que indican intención comparativa en la consulta
 COMPARATIVE_SIGNALS = [
     r'\bvs\b', r'\bversus\b', r'\bdiferencia\b', r'\bcomparativa\b',
-    r'\bcomparar\b', r'\bcomparado\b', r'\bmejor que\b', r'\bpeor que\b',
+    r'\bcomparar\b', r'\bcomparado\b',
+    # Patrones no adyacentes: "Es mejor X que Y", "Es peor X que Y"
+    r'\bmejor\b.{1,80}\bque\b', r'\bpeor\b.{1,80}\bque\b',
+    r'\bfrente a\b', r'\bcomparado con\b',
     r'\botra marca\b', r'\bcompetencia\b', r'\bcompetidor\b',
     r'\bya uso\b', r'\bcambiar de\b', r'\bcambiar a\b',
-    r'\bpor qué no usar\b', r'\bpor qué usar\b', r'\bpor qué elegir\b',
+    r'\bpor qu[eé] no usar\b', r'\bpor qu[eé] usar\b', r'\bpor qu[eé] elegir\b',
     r'\ben vez de\b', r'\balternativa\b',
     r'\bsi ya existen?\b', r'\bya existen?\b',
     r'\bsuperior\b', r'\binferior\b', r'\botra empresa\b',
@@ -54,12 +57,6 @@ class BaseAgent(ABC):
         self.name = "BaseAgent"
         self.description = ""
         self.categories = []  # Categorías del RAG que este agente maneja
-        # Estado del último search — para trazabilidad en audit_traces
-        self.last_search_meta = {
-            "fallback_activated": False,
-            "score_before_fallback": 0.0,
-            "score_after_fallback": 0.0,
-        }
 
     @property
     @abstractmethod
@@ -72,9 +69,17 @@ class BaseAgent(ABC):
         return self.rag.search(query, top_k=top_k, categories=self.categories if self.categories else None)
 
     def search_knowledge_with_fallback(self, query: str, top_k: int = 5,
-                                       score_threshold: float = 8.0) -> List[Tuple[dict, float]]:
+                                       score_threshold: float = 8.0) -> Tuple[List[Tuple[dict, float]], dict]:
         """Búsqueda dual: primero filtrada por categorías, si no hay buenos resultados busca sin filtro.
-        Persiste estado real del fallback en self.last_search_meta para trazabilidad."""
+
+        Returns:
+            Tuple de (resultados, search_meta) donde search_meta contiene:
+              - fallback_activated: bool
+              - score_before_fallback: float
+              - score_after_fallback: float
+            El meta se retorna como valor (no en atributo mutable) para evitar
+            race conditions entre sesiones concurrentes (agentes son singleton).
+        """
 
         # 1. Búsqueda filtrada por categorías del agente
         filtered_results = self.rag.search(
@@ -87,12 +92,12 @@ class BaseAgent(ABC):
 
         if best_score >= score_threshold:
             # Buenos resultados — sin fallback
-            self.last_search_meta = {
+            search_meta = {
                 "fallback_activated": False,
                 "score_before_fallback": round(best_score, 3),
                 "score_after_fallback": round(best_score, 3),
             }
-            return filtered_results
+            return filtered_results, search_meta
 
         # 3. Fallback activado — log para métricas
         print(f"[FALLBACK] Query: '{query[:50]}' | Score: {best_score:.2f} | Agent: {self.name}")
@@ -116,12 +121,12 @@ class BaseAgent(ABC):
         final = results[:top_k]
 
         best_final = max((s for _, s in final), default=0.0)
-        self.last_search_meta = {
+        search_meta = {
             "fallback_activated": True,
             "score_before_fallback": round(best_score, 3),
             "score_after_fallback": round(best_final, 3),
         }
-        return final
+        return final, search_meta
 
     def enrich_context(self, query: str, results: List[Tuple[dict, float]]) -> str:
         """Enriquece el contexto RAG con conocimiento estructurado del agente.
@@ -210,7 +215,7 @@ class BaseAgent(ABC):
             comp_type = "therapeutic"
             # Permitida solo si hay soporte comparativo en los resultados RAG
             has_support = any(
-                qa.get('categoria') in COMPARATIVE_CATEGORIES and score >= 0.15
+                qa.get('categoria') in COMPARATIVE_CATEGORIES and score >= 3.0
                 for qa, score in results
             )
             allowed = has_support

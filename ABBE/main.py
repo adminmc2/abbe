@@ -1,5 +1,5 @@
 """
-Abbe - Asistente de Ventas Above Pharma RAG v4.7
+Abbe - Asistente de Ventas Above Pharma RAG v4.9.3
 Backend FastAPI con WebSocket para streaming
 """
 
@@ -113,7 +113,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Abbe - Asistente de Ventas Above Pharma",
-    version="4.7.0",
+    version="4.9.3",
     lifespan=lifespan
 )
 
@@ -132,7 +132,7 @@ async def health_check():
     """Verificar estado del sistema"""
     return {
         "status": "ok",
-        "version": "4.7.0",
+        "version": "4.9.3",
         "agents": ["productos", "objeciones", "argumentos"],
         "knowledge_base_size": len(orchestrator.agents['productos'].rag.qa_pairs) if orchestrator else 0
     }
@@ -329,15 +329,17 @@ def write_audit_trace(trace: dict):
 class SearchHistoryRequest(BaseModel):
     username: str
     searches: list  # Lista de búsquedas recientes
+    app_id: Optional[str] = None  # Scope de aplicación (aísla historial legacy)
 
 
 class GetHistoryRequest(BaseModel):
     username: str
+    app_id: Optional[str] = None
 
 
 @app.post("/api/history/save")
 async def save_search_history(req: SearchHistoryRequest):
-    """Guarda el historial de búsquedas de un usuario"""
+    """Guarda el historial de búsquedas de un usuario, opcionalmente bajo un app_id scope."""
     if not req.username:
         raise HTTPException(status_code=400, detail="Username requerido")
 
@@ -345,28 +347,48 @@ async def save_search_history(req: SearchHistoryRequest):
     if req.username not in user_data:
         user_data[req.username] = {}
 
-    user_data[req.username]["searches"] = req.searches
-    user_data[req.username]["last_sync"] = __import__('time').time()
-    save_user_data(user_data)
+    if req.app_id:
+        # Scope por app_id — aísla del historial legacy en la raíz
+        if "apps" not in user_data[req.username]:
+            user_data[req.username]["apps"] = {}
+        user_data[req.username]["apps"][req.app_id] = {
+            "searches": req.searches,
+            "last_sync": __import__('time').time(),
+        }
+    else:
+        # Sin app_id — backward compatible (raíz)
+        user_data[req.username]["searches"] = req.searches
+        user_data[req.username]["last_sync"] = __import__('time').time()
 
+    save_user_data(user_data)
     return {"status": "ok", "saved": len(req.searches)}
 
 
 @app.post("/api/history/load")
 async def load_search_history(req: GetHistoryRequest):
-    """Carga el historial de búsquedas de un usuario"""
+    """Carga el historial de búsquedas de un usuario, opcionalmente desde un app_id scope."""
     if not req.username:
         raise HTTPException(status_code=400, detail="Username requerido")
 
     user_data = load_user_data()
-    if req.username in user_data and "searches" in user_data[req.username]:
+    if req.username not in user_data:
+        return {"status": "ok", "searches": [], "last_sync": 0}
+
+    if req.app_id:
+        # Buscar bajo scope app_id
+        app_data = user_data[req.username].get("apps", {}).get(req.app_id, {})
         return {
             "status": "ok",
-            "searches": user_data[req.username]["searches"],
-            "last_sync": user_data[req.username].get("last_sync", 0)
+            "searches": app_data.get("searches", []),
+            "last_sync": app_data.get("last_sync", 0),
         }
-
-    return {"status": "ok", "searches": [], "last_sync": 0}
+    else:
+        # Sin app_id — backward compatible (raíz)
+        return {
+            "status": "ok",
+            "searches": user_data[req.username].get("searches", []),
+            "last_sync": user_data[req.username].get("last_sync", 0),
+        }
 
 
 @app.post("/api/tts")
@@ -613,6 +635,7 @@ async def websocket_chat(websocket: WebSocket):
 
             user_message = message_data.get("message", "")
             response_mode = message_data.get("response_mode", "full")  # "short" o "full"
+            frontend_user = message_data.get("username", "")  # Usuario del frontend para auditoría
 
             # Contexto previo de chat guardado — poblar historial para continuidad
             prior = message_data.get("prior_context")
@@ -673,7 +696,8 @@ async def websocket_chat(websocket: WebSocket):
                 print(f"[DEBUG] Agente: {agent.name}")
 
                 # Buscar contexto relevante en RAG (con fallback si score bajo)
-                results = agent.search_knowledge_with_fallback(user_message, top_k=5)
+                # search_meta se captura aquí como variable local — seguro bajo concurrencia
+                results, search_meta = agent.search_knowledge_with_fallback(user_message, top_k=5)
                 context = agent.format_context(results, min_score=3.0)
                 print(f"[DEBUG] RAG: {len(results)} resultados, contexto: {len(context)} chars")
 
@@ -704,6 +728,16 @@ async def websocket_chat(websocket: WebSocket):
                 comp_policy = agent.evaluate_comparative_query(user_message, results)
                 if comp_policy["is_comparative"]:
                     print(f"[COMPARATIVE] type={comp_policy['type']}, allowed={comp_policy['allowed']}, reason={comp_policy['reason']}")
+
+                # Determinar modo de respuesta final (para traza de auditoría)
+                if rag_coverage == "no_results":
+                    effective_mode = "rechazo"
+                elif rag_coverage == "low":
+                    effective_mode = "acotada"
+                elif comp_policy["is_comparative"] and not comp_policy["allowed"]:
+                    effective_mode = "rechazo"
+                else:
+                    effective_mode = "normal"
 
                 # Enviar info del agente + cobertura RAG al frontend
                 print(f"[DEBUG] RAG coverage: {rag_coverage}, max_score: {max_score:.2f}, docs: {len(relevant_docs)}")
@@ -1019,17 +1053,19 @@ REGLAS DE MODO RESUMIDO:
                             "score": round(score, 3),
                         })
                 no_results = rag_coverage == "no_results"
-                # Señal real de fallback desde base_agent (no heurística)
-                search_meta = agent.last_search_meta
+                # search_meta ya fue capturado como variable local junto con results
+                # (línea de search_knowledge_with_fallback) — seguro bajo concurrencia
                 write_audit_trace({
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                     "session_id": session_id,
+                    "frontend_user": frontend_user or None,
                     "query": user_message,
                     "intent": intent,
                     "agent": agent.name,
                     "rag_coverage": rag_coverage,
                     "max_score": round(max_score, 3),
                     "no_results": no_results,
+                    "effective_mode": effective_mode,
                     "fallback_activated": search_meta["fallback_activated"],
                     "score_before_fallback": search_meta["score_before_fallback"],
                     "score_after_fallback": search_meta["score_after_fallback"],

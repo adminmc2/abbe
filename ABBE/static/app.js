@@ -386,8 +386,21 @@ function loadMoodFromStorage() {
 // ============================================
 // Búsquedas Recientes
 // ============================================
-const RECENT_SEARCHES_KEY = 'abbe_recent_searches';
 const MAX_RECENT_SEARCHES = 10;
+const APP_ID = 'abbe_above_pharma';  // Scope para aislar historial legacy
+
+/**
+ * Key de localStorage scoped por usuario para aislar historial en dispositivos compartidos.
+ * Formato: abbe_recent_searches:<app_id>:<username_normalizado>
+ * Sin usuario logueado, usa key genérica (solo para seed visual).
+ */
+function getSearchesKey() {
+    const user = localStorage.getItem('abbe_user');
+    if (user) {
+        return `abbe_recent_searches:${APP_ID}:${user.trim().toLowerCase()}`;
+    }
+    return 'abbe_recent_searches:_anonymous';
+}
 
 // Iconos según tipo de búsqueda
 const SEARCH_ICONS = {
@@ -418,7 +431,7 @@ function getSearchDescription(query) {
 
 function loadRecentSearches() {
     try {
-        const raw = localStorage.getItem(RECENT_SEARCHES_KEY);
+        const raw = localStorage.getItem(getSearchesKey());
         return raw ? JSON.parse(raw) : [];
     } catch (e) {
         return [];
@@ -432,30 +445,61 @@ async function syncSearchHistory() {
     const username = localStorage.getItem('abbe_user');
     if (!username) return;
 
+    // Capturar key del usuario que inicia el sync para evitar race condition
+    const syncKey = `abbe_recent_searches:${APP_ID}:${username}`;
     try {
         const response = await fetch('/api/history/load', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username })
+            body: JSON.stringify({ username, app_id: APP_ID })
         });
+
+        // Guard: si el usuario cambió durante el fetch, descartar respuesta
+        if (localStorage.getItem('abbe_user') !== username) {
+            console.log('[Sync] User changed during fetch, discarding response');
+            return;
+        }
 
         if (response.ok) {
             const data = await response.json();
             if (data.searches && data.searches.length > 0) {
-                const localSearches = loadRecentSearches();
+                const raw = localStorage.getItem(syncKey);
+                const localSearches = raw ? JSON.parse(raw) : [];
                 const localTimestamp = localSearches.length > 0
                     ? Math.max(...localSearches.map(s => s.timestamp || 0))
                     : 0;
 
                 // Si el servidor tiene datos más recientes, usarlos
+                // Pero preservar búsquedas locales hechas durante el fetch (no están en servidor aún)
                 if (data.last_sync > localTimestamp) {
-                    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(data.searches));
-                    console.log('[Sync] Loaded', data.searches.length, 'searches from server');
+                    // Re-leer local por si el usuario guardó algo durante el await
+                    const freshRaw = localStorage.getItem(syncKey);
+                    const freshLocal = freshRaw ? JSON.parse(freshRaw) : [];
+                    const serverQueries = new Set(data.searches.map(s => s.query.toLowerCase()));
+                    const localOnly = freshLocal.filter(s => !serverQueries.has(s.query.toLowerCase()));
+
+                    // Merge: locales nuevas al frente + servidor
+                    const merged = [...localOnly, ...data.searches].slice(0, MAX_RECENT_SEARCHES);
+                    localStorage.setItem(syncKey, JSON.stringify(merged));
+                    console.log('[Sync] Loaded', data.searches.length, 'from server +', localOnly.length, 'local-only');
+                    if (localOnly.length > 0) await pushSearchHistory();
                     renderRecentSearches();
                 } else {
                     // Local es más reciente, subir al servidor
                     await pushSearchHistory();
                 }
+            } else {
+                // Servidor vacío: si hay datos locales frescos (el usuario ya hizo queries),
+                // subirlos al servidor en vez de borrarlos
+                const localRaw = localStorage.getItem(syncKey);
+                const localData = localRaw ? JSON.parse(localRaw) : [];
+                if (localData.length > 0) {
+                    console.log('[Sync] Server empty but local has', localData.length, 'searches, pushing');
+                    await pushSearchHistory();
+                } else {
+                    console.log('[Sync] Server empty, local empty — nothing to do');
+                }
+                renderRecentSearches();
             }
         }
     } catch (e) {
@@ -470,16 +514,19 @@ async function pushSearchHistory() {
     const username = localStorage.getItem('abbe_user');
     if (!username) return;
 
-    const searches = loadRecentSearches();
+    // Leer del key fijo del usuario que inicia el push
+    const pushKey = `abbe_recent_searches:${APP_ID}:${username}`;
+    const raw = localStorage.getItem(pushKey);
+    const searches = raw ? JSON.parse(raw) : [];
     if (searches.length === 0) return;
 
     try {
         await fetch('/api/history/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, searches })
+            body: JSON.stringify({ username, searches, app_id: APP_ID })
         });
-        console.log('[Sync] Pushed', searches.length, 'searches to server');
+        console.log('[Sync] Pushed', searches.length, 'searches to server for', username);
     } catch (e) {
         console.log('[Sync] Could not push to server:', e.message);
     }
@@ -509,7 +556,7 @@ function saveRecentSearch(query, isVoice = false) {
         searches.length = MAX_RECENT_SEARCHES;
     }
 
-    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
+    localStorage.setItem(getSearchesKey(), JSON.stringify(searches));
     renderRecentSearches();
 
     // Sincronizar con servidor (async, no bloqueante)
@@ -525,11 +572,29 @@ function updateRecentSearchAnswer(query, answer) {
     const idx = searches.findIndex(s => s.query.toLowerCase() === query.toLowerCase());
     if (idx !== -1) {
         searches[idx].answer = answer;
-        localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
+        localStorage.setItem(getSearchesKey(), JSON.stringify(searches));
         // Sincronizar con servidor
         pushSearchHistory();
     }
 }
+
+// Datos de ejemplo para usuarios sin historial (solo visual, nunca se persisten)
+const SEED_SEARCHES = [
+    {
+        query: '¿Qué es el CTM Estabilizador Renal de Gencell?',
+        icon: 'product',
+        desc: 'Consulta sobre productos Above Pharma',
+        timestamp: Date.now() - 3600000,
+        answer: 'El CTM Estabilizador Renal es una terapia de células troncales mesenquimales de Gencell® Biotechnology. Las CTM son pretratadas con melatonina (vías MT1/MT2) para potenciar su capacidad regenerativa. Está indicado para lesión renal, esteatosis hepática, condiciones pulmonares (asma), e infecciones crónicas (post-COVID, Lyme). Se administra por vía intravenosa.'
+    },
+    {
+        query: '¿Cómo manejar la objeción de que el precio es alto?',
+        icon: 'objection',
+        desc: 'Manejo de objeciones médicas',
+        timestamp: Date.now() - 7200000,
+        answer: 'Cuando un médico menciona el precio, es clave reencuadrar el valor:\n\n1) La terapia con CTM aborda la causa raíz, no solo los síntomas — menos tratamientos paliativos a largo plazo.\n2) Pretratamiento con melatonina potencia la capacidad regenerativa — mejores resultados por sesión.\n3) Mecanismo de acción multimodal único — diferenciación como centro de medicina avanzada.\n4) Propuesta de cierre: "¿Qué le parece si empezamos con un paciente candidato para que vea los resultados de primera mano?"'
+    },
+];
 
 function renderRecentSearches() {
     const container = document.getElementById('recent-searches-list');
@@ -537,7 +602,11 @@ function renderRecentSearches() {
     const emptyMsg = document.getElementById('recent-searches-empty');
     if (!container || !section) return;
 
-    const searches = loadRecentSearches();
+    let searches = loadRecentSearches();
+
+    // Si no hay historial real, mostrar seed visual (sin persistir)
+    const usingSeed = searches.length === 0;
+    if (usingSeed) searches = SEED_SEARCHES;
 
     if (searches.length === 0) {
         section.classList.add('recent-searches--empty');
@@ -1372,6 +1441,9 @@ function sendToWebSocket(message, responseMode = 'full') {
     // Función para enviar el mensaje
     const sendMessage = () => {
         const payload = { message, response_mode: responseMode };
+        // Incluir username para trazabilidad en audit_traces
+        const wsUser = localStorage.getItem('abbe_user');
+        if (wsUser) payload.username = wsUser;
         if (state.mood.submitted) {
             payload.mood = {
                 value: state.mood.value,
@@ -2927,10 +2999,8 @@ function addSpeakerButton(messageElement, fullText) {
 // ============================================
 let demoOrbClicked = false;
 
-const VALID_CREDENTIALS = {
-    usuario: 'Jorge',
-    password: 'Prisma'
-};
+// Password compartida — cualquier username no vacío es válido
+const SHARED_PASSWORD = 'Prisma';
 
 function showLoginScreen() {
     stopTTS();
@@ -2944,9 +3014,24 @@ function handleLogout() {
     // Detener TTS al cerrar sesión
     stopTTS();
 
+    // Cerrar WebSocket activo
+    if (state.websocket) {
+        state.websocket.close();
+        state.websocket = null;
+    }
+
+    // Limpiar estado conversacional
+    state.priorContext = null;
+    state.currentMessage = '';
+    if (elements.chatMessages) elements.chatMessages.innerHTML = '';
+
     // Limpiar estado de sesión
     localStorage.removeItem('abbe_logged_in');
     localStorage.removeItem('abbe_user');
+
+    // Limpiar DOM de búsquedas recientes para evitar flash visual al cambiar de usuario
+    const searchContainer = document.getElementById('recent-searches-list');
+    if (searchContainer) searchContainer.innerHTML = '';
 
     // Limpiar campos de login
     if (elements.loginUser) elements.loginUser.value = '';
@@ -2969,12 +3054,15 @@ function hideLoginScreen() {
 }
 
 function handleLogin(username, password) {
-    // Demo: validación simple (en producción sería un API call)
-    if (username === VALID_CREDENTIALS.usuario && password === VALID_CREDENTIALS.password) {
+    // Multiusuario ligero: username libre (no vacío) + password compartida
+    if (username && username.trim() && password === SHARED_PASSWORD) {
+        const cleanUser = username.trim().toLowerCase();
         localStorage.setItem('abbe_logged_in', 'true');
-        localStorage.setItem('abbe_user', username);
+        localStorage.setItem('abbe_user', cleanUser);
         hideLoginScreen();
-        // Sincronizar historial después de login
+        // Re-render inmediato con datos del nuevo usuario (o seed si vacío)
+        renderRecentSearches();
+        // Sincronizar historial después de login (async, puede sobrescribir con datos del servidor)
         syncSearchHistory();
         return true;
     }
@@ -2993,7 +3081,14 @@ async function handleFaceID() {
         const credentialId = localStorage.getItem('abbe_faceid_credential');
 
         if (credentialId) {
-            // Autenticar con credencial existente
+            // Credencial existente: usar SOLO el usuario vinculado (no el campo manual)
+            const storedUser = localStorage.getItem('abbe_faceid_user');
+            if (!storedUser) {
+                alert('Face ID configurado sin usuario vinculado. Reconfigura Face ID.');
+                localStorage.removeItem('abbe_faceid_credential');
+                return;
+            }
+
             const credential = await navigator.credentials.get({
                 publicKey: {
                     challenge: new Uint8Array(32),
@@ -3008,11 +3103,21 @@ async function handleFaceID() {
 
             if (credential) {
                 localStorage.setItem('abbe_logged_in', 'true');
+                localStorage.setItem('abbe_user', storedUser);
                 hideLoginScreen();
+                renderRecentSearches();
+                syncSearchHistory();
             }
         } else {
-            // Primera vez: registrar Face ID
-            const confirmed = confirm('¿Deseas configurar Face ID para acceder rápidamente?');
+            // Primera vez: registrar Face ID — requiere username del campo de login
+            const faceIdUser = elements.loginUser?.value?.trim()?.toLowerCase();
+            if (!faceIdUser) {
+                alert('Escribe tu nombre de usuario antes de configurar Face ID');
+                elements.loginUser?.focus();
+                return;
+            }
+
+            const confirmed = confirm(`¿Deseas configurar Face ID para "${faceIdUser}"?`);
             if (!confirmed) return;
 
             const credential = await navigator.credentials.create({
@@ -3021,8 +3126,8 @@ async function handleFaceID() {
                     rp: { name: 'Abbe', id: window.location.hostname },
                     user: {
                         id: new Uint8Array(16),
-                        name: 'usuario@abbe.app',
-                        displayName: 'Usuario Abbe'
+                        name: faceIdUser,
+                        displayName: faceIdUser
                     },
                     pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
                     timeout: 60000,
@@ -3034,11 +3139,14 @@ async function handleFaceID() {
             });
 
             if (credential) {
-                // Guardar credential ID para futuras autenticaciones
+                // Guardar credential ID y username vinculado para futuras autenticaciones
                 const credId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
                 localStorage.setItem('abbe_faceid_credential', credId);
+                localStorage.setItem('abbe_faceid_user', faceIdUser);
                 localStorage.setItem('abbe_logged_in', 'true');
+                localStorage.setItem('abbe_user', faceIdUser);
                 hideLoginScreen();
+                syncSearchHistory();
             }
         }
     } catch (err) {
@@ -3052,15 +3160,12 @@ async function handleFaceID() {
 }
 
 function checkAuthOnLoad() {
-    // DEMO MODE: Siempre mostrar login para la demo
-    // Comentar estas 2 líneas para producción
-    localStorage.removeItem('abbe_logged_in');
-    localStorage.removeItem('abbe_user');
-
     const isLoggedIn = localStorage.getItem('abbe_logged_in') === 'true';
     if (isLoggedIn) {
         elements.loginScreen?.classList.add('hidden');
         elements.welcomeScreen?.classList.remove('hidden');
+        // Rehidratar historial del usuario persistido
+        syncSearchHistory();
     } else {
         elements.loginScreen?.classList.remove('hidden');
         elements.welcomeScreen?.classList.add('hidden');
@@ -3308,31 +3413,7 @@ function init() {
     // Cargar mood del día desde localStorage
     loadMoodFromStorage();
 
-    // Seed: insertar búsquedas de ejemplo con respuesta hardcodeada
-    // Si no hay búsquedas, o si las existentes no tienen 'answer' (versión vieja), reemplazar
-    const SEED_DATA = [
-        {
-            query: '¿Qué es el CTM Estabilizador Renal de Gencell?',
-            icon: 'product',
-            desc: 'Consulta sobre productos Above Pharma',
-            timestamp: Date.now() - 3600000,
-            answer: 'El CTM Estabilizador Renal es una terapia de células troncales mesenquimales de Gencell® Biotechnology. Las CTM son pretratadas con melatonina (vías MT1/MT2) para potenciar su capacidad regenerativa. Está indicado para lesión renal, esteatosis hepática, condiciones pulmonares (asma), e infecciones crónicas (post-COVID, Lyme). Se administra por vía intravenosa.'
-        },
-        {
-            query: '¿Cómo manejar la objeción de que el precio es alto?',
-            icon: 'objection',
-            desc: 'Manejo de objeciones médicas',
-            timestamp: Date.now() - 7200000,
-            answer: 'Cuando un médico menciona el precio, es clave reencuadrar el valor:\n\n1) La terapia con CTM aborda la causa raíz, no solo los síntomas — menos tratamientos paliativos a largo plazo.\n2) Pretratamiento con melatonina potencia la capacidad regenerativa — mejores resultados por sesión.\n3) Mecanismo de acción multimodal único — diferenciación como centro de medicina avanzada.\n4) Propuesta de cierre: "¿Qué le parece si empezamos con un paciente candidato para que vea los resultados de primera mano?"'
-        },
-    ];
-    const existing = loadRecentSearches();
-    const needsSeed = existing.length === 0 || (existing.length <= 2 && !existing[0].answer);
-    if (needsSeed) {
-        localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(SEED_DATA));
-    }
-
-    // Renderizar búsquedas recientes
+    // Renderizar búsquedas recientes (seed visual automático si vacío, sin persistir)
     renderRecentSearches();
 
     // Sincronizar historial con servidor si el usuario está logueado
