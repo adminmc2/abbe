@@ -413,7 +413,7 @@ const SEARCH_ICONS = {
 
 function classifySearchIcon(query) {
     const q = query.toLowerCase();
-    if (/producto|above pharma|gencell|ctm|mesenquimal|regenerativ|celula.?madre|estabilizador/i.test(q)) return 'product';
+    if (/producto|above pharma|gencell|ctm|mesenquimal|regenerativ|celula.?madre|estabilizador|exocell|fibroblasto|rejuvenecimiento|natural killer|\bnk\b|nivolumab|oncolog|melanoma|neoplasia/i.test(q)) return 'product';
     if (/objeción|objecion|caro|no funciona|otra marca|competencia/i.test(q)) return 'objection';
     if (/argumento|venta|presentar|especialista|perfil|ventaja/i.test(q)) return 'argument';
     return 'default';
@@ -1954,7 +1954,19 @@ function isActionableQuery(text) {
         /above pharma/i, /gencell/i, /ctm/i, /mesenquimal/i, /mesenquimatosa/i,
         /celula.? madre/i, /celula.? troncal/i, /stem cell/i,
         /regenerativ/i, /exosoma/i, /inmunomodul/i,
-        /melatonina/i, /estabilizador/i,
+        /melatonina/i, /estabilizador/i, /evolocumab/i,
+        // EXOCELL / fibroblastos / estética regenerativa
+        /exocell/i, /fibroblasto/i, /rejuvenecimiento/i, /arruga/i,
+        /\bpiel\b/i, /subdermic/i, /cutane/i, /firmeza/i,
+        /elasticidad/i, /textura/i, /metaloproteinasa/i, /\bmmp\b/i,
+        /placenta/i, /dermatologo/i, /estetico/i, /estetica/i,
+        // NK Autólogas / oncología / inmunoterapia
+        /natural killer/i, /\bnk\b/i, /\bnks\b/i, /nivolumab/i,
+        /neoplasia/i, /oncolog/i, /tumor/i, /cancer/i, /melanoma/i,
+        /\bnsclc\b/i, /\bdlbcl\b/i, /\btnbc\b/i, /\blla\b/i,
+        /linfoma/i, /leucemia/i, /perforina/i, /granzima/i,
+        /pd.?1/i, /pd.?l1/i, /\bmhc\b/i, /apoptosis/i,
+        /quimioterapia/i, /antitumoral/i, /citotoxi/i,
         // Condiciones tratadas por CTM
         /renal/i, /hepatic/i, /pulmonar/i, /esteatosis/i,
         /post.?covid/i, /lyme/i,
@@ -1986,7 +1998,7 @@ function isActionableQuery(text) {
         /complicaci/i,
         // Acciones del dominio
         /recomiend/i, /recomendar/i, /comparar/i, /comparativ/i,
-        /que es\b/i, /para que sirve/i, /como funciona/i, /como respondo/i,
+        /que es\b/i, /que son\b/i, /para que sirve/i, /como funciona/i, /como respondo/i,
         /como presento/i, /como vendo/i,
     ];
 

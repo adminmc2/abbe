@@ -1,5 +1,5 @@
 """
-Abbe - Asistente de Ventas Above Pharma RAG v4.11.0
+Abbe - Asistente de Ventas Above Pharma RAG v4.13.1
 Backend FastAPI con WebSocket para streaming
 """
 
@@ -113,7 +113,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Abbe - Asistente de Ventas Above Pharma",
-    version="4.11.0",
+    version="4.13.1",
     lifespan=lifespan
 )
 
@@ -132,7 +132,7 @@ async def health_check():
     """Verificar estado del sistema"""
     return {
         "status": "ok",
-        "version": "4.11.0",
+        "version": "4.13.1",
         "agents": ["productos", "objeciones", "argumentos"],
         "knowledge_base_size": len(orchestrator.agents['productos'].rag.qa_pairs) if orchestrator else 0
     }
@@ -545,10 +545,22 @@ def is_greeting_or_vague(message: str) -> bool:
         # Medicina regenerativa / CTM
         r'celula.? madre', r'celula.? troncal', r'mesenquimal', r'\bctm\b',
         r'stem cell', r'regenerativ', r'gencell', r'melatonina',
-        r'estabilizador', r'inmunomodul', r'exosoma',
+        r'estabilizador', r'inmunomodul', r'exosoma', r'evolocumab',
         r'renal', r'ri[ñn]on', r'hepatic', r'pulmonar',
         r'post.?covid', r'lyme', r'esteatosis',
         r'tasa de filtracion', r'\btfg\b', r'intravenosa',
+        # EXOCELL / fibroblastos / estética regenerativa
+        r'exocell', r'fibroblasto', r'rejuvenecimiento', r'arruga',
+        r'\bpiel\b', r'subdermic', r'cutane', r'firmeza',
+        r'elasticidad', r'textura', r'metaloproteinasa', r'\bmmp\b',
+        r'placenta', r'dermatologo', r'estetico', r'estetica',
+        # NK Autólogas / oncología / inmunoterapia
+        r'natural killer', r'\bnk\b', r'\bnks\b', r'nivolumab',
+        r'neoplasia', r'oncolog', r'tumor', r'cancer', r'melanoma',
+        r'\bnsclc\b', r'\bdlbcl\b', r'\btnbc\b', r'\blla\b',
+        r'linfoma', r'leucemia', r'perforina', r'granzima',
+        r'pd.?1', r'pd.?l1', r'\bmhc\b', r'apoptosis',
+        r'quimioterapia', r'antitumoral', r'citotoxi',
         # Médico / clínico
         r'medico', r'doctor', r'paciente', r'prescri', r'dosis',
         r'indicaci', r'tratamiento', r'clinico', r'sesion',
@@ -577,7 +589,7 @@ def is_greeting_or_vague(message: str) -> bool:
         r'complicaci',
         # Acciones del dominio
         r'recomiend', r'recomendar', r'comparar', r'comparativ',
-        r'que es\b', r'para que sirve', r'como funciona', r'como respondo',
+        r'que es\b', r'que son\b', r'para que sirve', r'como funciona', r'como respondo',
         r'como presento', r'como vendo',
     ]
 
@@ -586,7 +598,7 @@ def is_greeting_or_vague(message: str) -> bool:
 
 GREETING_RESPONSE = """Soy **Abbe**, tu asistente de ventas de Above Pharma. Para poder ayudarte, cuéntame qué necesitas. Por ejemplo:
 
-- **Producto**: *"¿Qué es el CTM Estabilizador Renal de Gencell?"*
+- **Producto**: *"¿Qué es el CTM Estabilizador Renal de Gencell?"* o *"¿Qué es EXOCELL?"*
 - **Objeción**: *"Un médico dice que es caro, ¿cómo respondo?"*
 - **Argumento**: *"¿Cómo presento las terapias celulares a un especialista?"*
 

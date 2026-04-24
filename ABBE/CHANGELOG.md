@@ -4,7 +4,102 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.11.0 — 2026-04-23 (ACTUAL)
+## v4.13.1 — 2026-04-24 (ACTUAL)
+
+### Bloque 5.4b: Ajustes semánticos NK Autólogas
+
+- `main.py` `is_greeting_or_vague()`: añadidos 21 términos NK/oncológicos (natural killer, nk, nivolumab, neoplasia, oncolog, tumor, cancer, melanoma, nsclc, dlbcl, tnbc, lla, linfoma, leucemia, perforina, granzima, pd-1, pd-l1, mhc, apoptosis, quimioterapia, antitumoral, citotoxi)
+- `main.py` `is_greeting_or_vague()`: añadido patrón `que son` (antes solo `que es`)
+- `main.py` `is_greeting_or_vague()`: añadido `evolocumab` (gap pre-existente CTM Metabólica)
+- `app.js` `isActionableQuery()`: mismos 21 términos NK + `que son` + `evolocumab`
+- `app.js` `classifySearchIcon()`: añadidos natural killer, nk, nivolumab, oncolog, melanoma, neoplasia
+- `README.md`: corregida sección Knowledge Base (68→86 Q&As)
+- `CHECKLIST_ONBOARDING`: 5.4 cerrado para nk_autologas con evidencia detallada
+
+Validación:
+- 22/22 first-turn query smoke test passed (15 NK/oncológicas + 4 existentes + 3 greetings correctamente vague)
+
+---
+
+## v4.13.0 — 2026-04-24
+
+### Bloque 5.2b/5.3b: Onboarding Natural Killer Autólogas
+
+- Producto `nk_autologas` dado de alta en `catalog.json` bajo línea Gencell
+- Aliases: natural killer autólogas, nk autólogas, nk autologas, natural killer autologas, nk nivolumab, nks autólogas
+- Sinónimos añadidos: natural killer, nivolumab, neoplasia, nsclc, dlbcl, tnbc
+- Descripción Gencell actualizada a "medicina regenerativa, estética y oncología"
+- Technologies actualizado con "Células NK autólogas" e "Inmunoterapia oncológica"
+- 18 Q&As creados en `knowledge_base.json` (ids 69–86) cubriendo las 10 categorías
+- Fuente: `FICHA NKS natural killer autologa.pdf`
+- Q&A id 1 (corporativa): actualizada para incluir NK Autólogas + source_doc ampliado
+- Total KB: 86 Q&As (50 CTM + 18 EXOCELL + 18 NK Autólogas)
+
+Validación:
+- `[Catalog] ✓ Validation passed (1 lines, 4 products)`
+- `[RAG] ✓ KB validation passed (86 Q&As, contract OK)`
+- 13/13 queries smoke test passed
+- NK Autólogas: top correctos en 7 queries (score 4.94–38.42)
+- No regresión CTM Renal, CTM Metabólica, EXOCELL
+- Sin confusión entre los 4 productos
+
+---
+
+## v4.12.2 — 2026-04-24
+
+### Bloque 5.4: Ajustes semánticos EXOCELL + correcciones revisor
+
+- `main.py` `is_greeting_or_vague()`: añadidos 14 términos EXOCELL (exocell, fibroblasto, rejuvenecimiento, arruga, piel, subdérmica, cutáneo, firmeza, elasticidad, textura, metaloproteinasa, mmp, placenta, dermatólogo/estético)
+- `app.js` `isActionableQuery()`: mismos 14 términos añadidos al gate del frontend
+- `app.js` `classifySearchIcon()`: añadidos exocell, fibroblasto, rejuvenecimiento al clasificador de producto
+- `GREETING_RESPONSE`: añadido ejemplo EXOCELL
+- `knowledge_base.json` id 1: `source_doc` ampliado con `FICHA FIBROBLASTOS exocell.pdf`
+- `CHECKLIST_ONBOARDING`: corregida inconsistencia entre tabla global y secciones detalladas
+
+---
+
+## v4.12.1 — 2026-04-24
+
+### Correcciones post-revisión EXOCELL
+
+- Q&A id 59: eliminada referencia a productos NK no cargados (fuga de alcance)
+- Q&A id 1: actualizada descripción corporativa para incluir EXOCELL
+- Q&As 63, 64, 67: eliminadas frases comparativas sin soporte documental ("se mantiene en el tiempo", "no es un relleno", "va más allá de rellenos/bioestimulación")
+- `catalog.json`: eliminado "oncología" de descripción Gencell (producto NK aún no cargado)
+- `README.md`: actualizado a 68 Q&As y 3 productos
+- `CHECKLIST_ONBOARDING`: estado actualizado (5.2/5.3 cerrados para exocell)
+
+Validación:
+- `[Catalog] ✓ Validation passed (1 lines, 3 products)`
+- `[RAG] ✓ KB validation passed (68 Q&As, contract OK)`
+- 9/9 queries smoke test passed (EXOCELL + CTM sin regresión)
+- Sin referencias NK en Q&As de EXOCELL
+
+---
+
+## v4.12.0 — 2026-04-24
+
+### Bloque 5.2a/5.3a: Onboarding EXOCELL (fibroblastos alogénicos)
+
+- Producto EXOCELL dado de alta en `catalog.json` bajo línea Gencell (id: `exocell`)
+- Aliases: exocell, fibroblastos, fibroblastos alogénicos, fibroblastos de placenta, fibroblastos placentarios
+- Sinónimos añadidos: exocell, fibroblastos, mmp, rejuvenecimiento
+- 18 Q&As creados en `knowledge_base.json` (ids 51–68) cubriendo las 10 categorías
+- Fuente: `FICHA FIBROBLASTOS exocell.pdf`
+- Descripción de línea Gencell actualizada para incluir estética
+- Total KB: 68 Q&As (50 CTM + 18 EXOCELL)
+
+Validación:
+- `[Catalog] ✓ Validation passed (1 lines, 3 products)`
+- `[RAG] ✓ KB validation passed (68 Q&As, contract OK)`
+- Retrieval EXOCELL: top 3 correctos (score 10.28+)
+- No regresión CTM Renal: top 3 correctos (score 40.68+)
+- No regresión CTM Metabólica: top 3 correctos (score 36.80+)
+- Sin confusión entre productos
+
+---
+
+## v4.11.0 — 2026-04-23
 
 ### Bloque 3.3: Limpieza de residuos legacy activos
 

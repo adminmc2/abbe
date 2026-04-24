@@ -3,7 +3,7 @@
     "empresa": "Above Pharma",
     "version": "2.0",
     "fecha_creacion": "2026-04-21",
-    "total_preguntas": 50
+    "total_preguntas": 86
   },
   "qa_pairs": [
     {
@@ -12,8 +12,8 @@
       "product_line": "gencell",
       "product": null,
       "pregunta": "¿Qué es Gencell Biotechnology?",
-      "respuesta": "Gencell® es una empresa de biotecnología especializada en terapias con células troncales mesenquimales (CTM). Desarrolla productos de medicina regenerativa basados en CTM pre-tratadas con compuestos específicos según la indicación terapéutica (melatonina para el Estabilizador Renal, evolocumab para la línea Metabólica). Es titular de comercialización de la línea CTM.",
-      "source_doc": "FICHA CTM estabilizador renal.pdf + FICHA CTM metabolica.pdf"
+      "respuesta": "Gencell® es una empresa de biotecnología especializada en terapias celulares. Desarrolla productos de medicina regenerativa basados en células troncales mesenquimales (CTM) pre-tratadas con compuestos específicos según la indicación terapéutica (melatonina para el Estabilizador Renal, evolocumab para la línea Metabólica), fibroblastos alogénicos derivados de placenta para rejuvenecimiento facial (EXOCELL), y células Natural Killer autólogas pretratadas con nivolumab para inmunoterapia oncológica (Natural Killer Autólogas). Es titular de comercialización de toda la línea.",
+      "source_doc": "FICHA CTM estabilizador renal.pdf + FICHA CTM metabolica.pdf + FICHA FIBROBLASTOS exocell.pdf + FICHA NKS natural killer autologa.pdf"
     },
     {
       "id": 2,
@@ -469,6 +469,338 @@
       "pregunta": "¿Qué diferencia a la CTM Metabólica de otros tratamientos para el colesterol?",
       "respuesta": "Diferenciador exclusivo: es la única terapia que combina la regeneración tisular de las CTM con la inhibición de PCSK9. Mientras las estatinas inhiben la síntesis de colesterol y el evolocumab inyectable convencional solo reduce LDL, la CTM Metabólica hace ambas cosas y además: 1) Regenera el endotelio dañado por el colesterol. 2) Reduce la inflamación sistémica vascular. 3) Modula el sistema inmunitario para prevenir respuestas excesivas. 4) Promueve la homeostasis lipídica a nivel celular. Es un coadyuvante que complementa el tratamiento convencional atacando el daño ya causado, no solo previniendo más daño.",
       "source_doc": "FICHA CTM metabolica.pdf"
+    },
+    {
+      "id": 51,
+      "categoria": "empresa",
+      "product_line": "gencell",
+      "product": "exocell",
+      "pregunta": "¿Qué es EXOCELL y cómo se relaciona con Gencell Biotechnology?",
+      "respuesta": "EXOCELL es un producto de Gencell Biotechnology basado en fibroblastos alogénicos derivados de placenta, diseñado para rejuvenecimiento facial mediante aplicación subdérmica. A diferencia de los otros productos de Gencell que utilizan células troncales mesenquimales (CTM) para medicina regenerativa y metabólica, EXOCELL utiliza fibroblastos alogénicos que migran a los sitios de daño cutáneo para activar procesos regenerativos de la piel. Es comercializado por Gencell® como parte de su línea de terapias celulares.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 52,
+      "categoria": "productos",
+      "product_line": "gencell",
+      "product": "exocell",
+      "featured_faq": true,
+      "pregunta": "¿Qué es EXOCELL?",
+      "respuesta": "EXOCELL es una solución inyectable de fibroblastos alogénicos derivados de placenta, desarrollada por Gencell Biotechnology. Está indicado para procedimientos de rejuvenecimiento facial mediante aplicación subdérmica. Los fibroblastos de EXOCELL mejoran la textura de la piel, reducen arrugas y aumentan la firmeza y elasticidad cutánea. Se presenta en un monovette de 4 ml con contenedor plástico de protección, disponible en 3 presentaciones según la cantidad de células.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 53,
+      "categoria": "productos",
+      "product_line": "gencell",
+      "product": "exocell",
+      "featured_faq": true,
+      "pregunta": "¿Cuál es la composición de EXOCELL?",
+      "respuesta": "EXOCELL contiene fibroblastos alogénicos derivados de placenta en solución salina al 0.9%. Disponible en 3 presentaciones: 3.5 millones, 7 millones y 14 millones de células. El producto viene en un monovette de 4 ml protegido por un contenedor plástico. Puede contener trazas de medio RPMI.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 54,
+      "categoria": "productos",
+      "product_line": "gencell",
+      "product": "exocell",
+      "pregunta": "¿En qué presentaciones viene EXOCELL?",
+      "respuesta": "EXOCELL viene en 3 presentaciones según la cantidad de fibroblastos alogénicos: 3.5 millones de células, 7 millones de células y 14 millones de células. Todas las presentaciones vienen en un monovette de 4 ml con contenedor plástico de protección. La forma farmacéutica es solución inyectable.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 55,
+      "categoria": "tecnologia",
+      "product_line": "gencell",
+      "product": "exocell",
+      "featured_faq": true,
+      "pregunta": "¿Cuál es el mecanismo de acción de EXOCELL?",
+      "respuesta": "Los fibroblastos alogénicos de EXOCELL actúan mediante varios mecanismos: 1) Migran específicamente a los sitios de daño en la piel, donde liberan citocinas que activan procesos regenerativos. 2) Inhiben la actividad de las metaloproteinasas de matriz (MMP), responsables de la degradación de la matriz extracelular. 3) Estimulan la proliferación de los fibroblastos dérmicos del propio paciente. 4) Favorecen la producción de colágeno y otros componentes estructurales de la piel. 5) Mejoran la circulación sanguínea y promueven la formación de nuevos vasos (angiogénesis). Destacan por su baja inmunogenicidad y capacidad de adaptación al entorno donde se aplican.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 56,
+      "categoria": "tecnologia",
+      "product_line": "gencell",
+      "product": "exocell",
+      "pregunta": "¿Qué citocinas liberan los fibroblastos de EXOCELL y qué función tienen?",
+      "respuesta": "Los fibroblastos de EXOCELL secretan múltiples citocinas clave para la reparación tisular: FGF (factor de crecimiento de fibroblastos) — estimula proliferación celular y regeneración. EGF (factor de crecimiento epidérmico) — promueve renovación de la piel. VEGF (factor de crecimiento endotelial vascular) — mejora la circulación y formación de nuevos vasos. NGF (factor de crecimiento nervioso) — apoya la regeneración neural cutánea. PDGF (factor de crecimiento derivado de plaquetas) — estimula reparación tisular. CSF (factor estimulante de colonias) — modula la respuesta inmunitaria local. TNF (factor de necrosis tumoral) — participa en la señalización de reparación. Estas moléculas incrementan el grosor de la piel y favorecen la producción de matriz extracelular.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 57,
+      "categoria": "protocolos",
+      "product_line": "gencell",
+      "product": "exocell",
+      "featured_faq": true,
+      "pregunta": "¿Cómo se administra EXOCELL? ¿Cuál es el protocolo de aplicación?",
+      "respuesta": "Administración subdérmica. Protocolo: 1) Inyección con aguja de 27 a 31G de 5 a 6 mm de longitud. 2) Aplicación en las áreas a tratar del rostro. 3) Intervalo recomendado de 4 a 6 semanas entre sesiones. La administración debe ser realizada por un profesional de la salud capacitado en procedimientos de medicina estética. A diferencia de los productos CTM de Gencell que se administran por vía intravenosa, EXOCELL se aplica de forma subdérmica directamente en las zonas faciales a tratar.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 58,
+      "categoria": "productos",
+      "product_line": "gencell",
+      "product": "exocell",
+      "pregunta": "¿Cómo se almacena y conserva EXOCELL?",
+      "respuesta": "Conservar en un lugar protegido de la luz solar directa, en refrigeración entre 2 y 8 °C. No exponer a fuentes de radiación o fuego. Evitar congelar. Una vez recibido, el producto debe ser administrado de forma inmediata o en un plazo no mayor a 24 horas. IMPORTANTE: congelar o refrigerar por un periodo mayor al recomendado reduce la viabilidad del producto y puede incrementar la presencia de efectos secundarios. Manejo de residuos: diluir con cloro al 0.1% y destinar en el desagüe. Conservar fuera del alcance de niños y animales domésticos.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 59,
+      "categoria": "seguridad",
+      "product_line": "gencell",
+      "product": "exocell",
+      "pregunta": "¿Cuáles son las contraindicaciones de EXOCELL?",
+      "respuesta": "Contraindicaciones de EXOCELL: 1) Sensibilidad o alergias a algún componente de la fórmula. 2) Diagnóstico de neoplasia (cáncer). Precauciones: no se cuenta con evidencias en niños menores de 12 años. El producto puede contener trazas de medio RPMI.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 60,
+      "categoria": "seguridad",
+      "product_line": "gencell",
+      "product": "exocell",
+      "pregunta": "¿Cuáles son los efectos adversos de EXOCELL?",
+      "respuesta": "Efectos adversos comunes (autolimitados en 24-48 horas): edema, eritema, dolor local y febrícula (temperatura menor a 38°C). Reacciones raras reportadas en la literatura: reacciones de hipersensibilidad como urticaria o erupción cutánea. El perfil de seguridad de EXOCELL es favorable, con efectos adversos generalmente leves y localizados en el sitio de aplicación, consistentes con procedimientos subdérmicos faciales.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 61,
+      "categoria": "seguridad",
+      "product_line": "gencell",
+      "product": "exocell",
+      "pregunta": "¿Qué interacciones tiene EXOCELL con otros medicamentos?",
+      "respuesta": "No hay reportes extensos de interacciones adversas graves entre fibroblastos alogénicos y medicamentos específicos. Sin embargo, se recomienda precaución al combinarlos con terapias que afecten el sistema inmunológico. Los inmunosupresores como Metotrexato, Infliximab y Tocilizumab pueden intensificar la inmunosupresión, aumentando el riesgo de infecciones o comprometiendo la respuesta inmunitaria y la viabilidad de los fibroblastos alogénicos.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 62,
+      "categoria": "seguridad",
+      "product_line": "gencell",
+      "product": "exocell",
+      "pregunta": "¿Se puede usar EXOCELL en embarazo o lactancia?",
+      "respuesta": "No se cuenta con protocolos de investigación y estudio bajo estas condiciones que sustenten la seguridad del producto. Se recomienda no utilizar EXOCELL durante el embarazo y la lactancia hasta que existan evidencias clínicas que avalen su seguridad en estas condiciones.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 63,
+      "categoria": "objeciones_precio",
+      "product_line": "gencell",
+      "product": "exocell",
+      "pregunta": "El médico dice que EXOCELL es caro para rejuvenecimiento facial, ¿cómo respondo?",
+      "respuesta": "EXOCELL ofrece un enfoque regenerativo basado en fibroblastos alogénicos derivados de placenta: 1) Migran a los sitios de daño y activan procesos regenerativos, reemplazando células dañadas y restaurando la estructura de la piel. 2) Estimulan la producción de colágeno y matriz extracelular propios del paciente. 3) Inhiben las metaloproteinasas (MMP) que degradan la matriz extracelular, atacando la causa del envejecimiento cutáneo. 4) Las 3 presentaciones (3.5, 7 y 14 millones de células) permiten adaptar al caso y presupuesto. 5) Los resultados incluyen mejora de textura, reducción de arrugas y aumento de firmeza y elasticidad, con un perfil de efectos adversos leve y autolimitado (edema, eritema, dolor local, 24-48h).",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 64,
+      "categoria": "objeciones_eficacia",
+      "product_line": "gencell",
+      "product": "exocell",
+      "pregunta": "¿Por qué usar fibroblastos alogénicos en lugar de tratamientos cosméticos convencionales?",
+      "respuesta": "Los fibroblastos alogénicos de EXOCELL actúan mediante regeneración celular: 1) Migran a los sitios de daño, reemplazan células dañadas y restauran la estructura y función de la piel. 2) Estimulan los fibroblastos dérmicos propios del paciente para producir colágeno nuevo. 3) Liberan 7 citocinas clave (FGF, EGF, VEGF, NGF, PDGF, CSF, TNF) que promueven reparación tisular, mejoran la circulación sanguínea y favorecen la formación de nuevos vasos. 4) Inhiben las MMP que degradan la matriz extracelular, atacando la causa del deterioro cutáneo. 5) Presentan baja inmunogenicidad y notable capacidad de adaptación al entorno, al derivar de tejidos perinatales (placenta).",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 65,
+      "categoria": "objeciones_seguridad",
+      "product_line": "gencell",
+      "product": "exocell",
+      "pregunta": "¿Es seguro inyectar fibroblastos de otra persona (alogénicos)? ¿No hay rechazo?",
+      "respuesta": "Los fibroblastos alogénicos de EXOCELL destacan por su baja inmunogenicidad, lo que minimiza el riesgo de rechazo. Esto se debe a que derivan de tejidos perinatales (placenta), que naturalmente poseen propiedades de tolerancia inmunológica. Una vez administrados, estos fibroblastos se adaptan al entorno donde se aplican. Los efectos adversos documentados son leves y locales: edema, eritema, dolor local y febrícula que se autolimitan en 24-48 horas. Las reacciones de hipersensibilidad (urticaria o erupción cutánea) son raras. El excipiente es solución salina al 0.9%.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 66,
+      "categoria": "argumentos_venta",
+      "product_line": "gencell",
+      "product": "exocell",
+      "featured_faq": true,
+      "pregunta": "¿Cómo presento EXOCELL a un dermatólogo?",
+      "respuesta": "Para un dermatólogo: EXOCELL ofrece regeneración cutánea real mediante fibroblastos alogénicos derivados de placenta. Mecanismo diferenciador: las células migran a los sitios de daño, inhiben MMP y estimulan la producción de colágeno y matriz extracelular por parte de los fibroblastos propios del paciente. Libera 7 citocinas (FGF, EGF, VEGF, NGF, PDGF, CSF, TNF) que promueven reparación integral. Indicación: rejuvenecimiento facial subdérmico con resultados en textura, arrugas, firmeza y elasticidad. Baja inmunogenicidad por origen placentario. Protocolo: aguja 27-31G, 5-6 mm, cada 4-6 semanas. 3 presentaciones (3.5, 7, 14 millones). Efectos adversos leves y autolimitados.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 67,
+      "categoria": "argumentos_venta",
+      "product_line": "gencell",
+      "product": "exocell",
+      "featured_faq": true,
+      "pregunta": "¿Cómo presento EXOCELL a un médico estético?",
+      "respuesta": "Para un médico estético: EXOCELL utiliza fibroblastos alogénicos derivados de placenta con un enfoque de regeneración cutánea: 1) Migran a los sitios de daño y activan procesos regenerativos, reemplazando células dañadas. 2) Activan los fibroblastos dérmicos del paciente para producir colágeno propio y matriz extracelular. 3) Inhiben las MMP que degradan la piel con la edad. 4) Las citocinas liberadas (FGF, EGF, VEGF, NGF, PDGF, CSF, TNF) promueven formación de nuevos vasos y reparación tisular. Aplicación subdérmica con aguja fina (27-31G), sesiones cada 4-6 semanas. Efectos adversos leves y autolimitados (edema, eritema local, 24-48h). Contraindicado en neoplasia. 3 presentaciones (3.5, 7, 14 millones) para adaptar según necesidad del paciente.",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 68,
+      "categoria": "perfil_paciente",
+      "product_line": "gencell",
+      "product": "exocell",
+      "pregunta": "¿Cuál es el perfil de paciente ideal para EXOCELL?",
+      "respuesta": "Paciente ideal para EXOCELL: adulto mayor de 12 años que busca rejuvenecimiento facial y presenta: 1) Disminución de firmeza y elasticidad cutánea por envejecimiento. 2) Arrugas y pérdida de textura en la piel facial. 3) Interés en un tratamiento regenerativo (no solo estético superficial). 4) Candidato a procedimientos subdérmicos faciales. Criterios de exclusión: diagnóstico de neoplasia (cáncer), sensibilidad o alergia a componentes de la fórmula. Precaución: embarazo y lactancia (sin estudios de seguridad), menores de 12 años (sin evidencia), pacientes en tratamiento con inmunosupresores (Metotrexato, Infliximab, Tocilizumab).",
+      "source_doc": "FICHA FIBROBLASTOS exocell.pdf"
+    },
+    {
+      "id": 69,
+      "categoria": "empresa",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Qué son las Natural Killer Autólogas de Gencell?",
+      "respuesta": "Las Natural Killer Autólogas de Gencell son células NK autólogas pretratadas con nivolumab, diseñadas para el tratamiento de diversas neoplasias. Las células NK son componentes clave del sistema inmunitario innato con la capacidad de identificar y eliminar células neoplásicas. El pretratamiento con nivolumab bloquea la vía PD-1/PD-L1, potenciando la capacidad antitumoral de las células NK. Se comercializan bajo Gencell Biotechnology en presentación única de 7 millones de células NK autólogas.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 70,
+      "categoria": "productos",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Cuál es la composición y presentación de las Natural Killer Autólogas?",
+      "respuesta": "Composición: células Natural Killer autólogas pretratadas con nivolumab. Presentación única: 7 millones de células NK autólogas en solución inyectable. El contenedor plástico (container) protege el monovette que contiene 4 ml del producto. Excipiente: solución salina al 0.9%. Periodo de validez: debe administrarse de forma inmediata o en un plazo no mayor a 24 horas posterior a su recepción. Almacenamiento: refrigeración entre 2 y 8°C, protegido de luz solar directa, no congelar.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 71,
+      "categoria": "productos",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Para qué tipos de cáncer están indicadas las Natural Killer Autólogas?",
+      "respuesta": "Las Natural Killer Autólogas con nivolumab han demostrado eficacia en diversas neoplasias: 1) Cáncer pulmonar de células no pequeñas (NSCLC). 2) Melanoma. 3) Linfoma de células B grandes (DLBCL). 4) Leucemia linfoblástica aguda (LLA). 5) Cáncer renal. 6) Cáncer de mama metastásico y triple negativo (TNBC). 7) Cáncer de próstata. 8) Cáncer de páncreas. Esta eficacia se basa en la capacidad de las células NK para reconocer y eliminar células tumorales, potenciada por la acción de nivolumab.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 72,
+      "categoria": "tecnologia",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Cuál es el mecanismo de acción de las Natural Killer Autólogas con nivolumab?",
+      "respuesta": "Las células NK recirculan en el torrente sanguíneo y migran hacia sitios donde detectan alteraciones en la expresión del MHC-I (Complejo Principal de Histocompatibilidad de Clase I), indicando presencia de células tumorales. Al detectar estas anomalías, las NK inician degranulación proteolítica, liberando perforinas y granzimas que inducen apoptosis en las células tumorales. Además, facilitan la liberación de antígenos tumorales procesados por células dendríticas, activando una respuesta inmunitaria adaptativa (linfocitos T). El pretratamiento con nivolumab bloquea la interacción PD-1 con PD-L1 y PD-L2 en las células tumorales, lo que permite que las células NK reconozcan y ataquen tumores que previamente evadían la vigilancia inmune.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 73,
+      "categoria": "tecnologia",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Qué papel juega el nivolumab en las Natural Killer Autólogas?",
+      "respuesta": "El nivolumab es un anticuerpo que bloquea el receptor de muerte programada PD-1 y sus ligandos PD-L1 y PD-L2 en las células tumorales. Su función en las NK Autólogas es doble: 1) Permite que las células T y NK reconozcan y ataquen células tumorales que previamente estaban protegidas por la expresión de PD-L1. 2) Potencia la capacidad de las células NK para identificar y destruir células tumorales, facilitando una respuesta inmunitaria antitumoral más robusta. La combinación mejora la visibilidad de células tumorales para el sistema inmunitario, supera mecanismos de evasión inmunitaria y facilita la formación de una respuesta inmune adaptativa contra las neoplasias.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 74,
+      "categoria": "protocolos",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Cuál es el protocolo de administración de las Natural Killer Autólogas?",
+      "respuesta": "Administración intravenosa: 1) Canalizar al paciente con 100 ml de solución salina al 0.9% y asegurar la correcta colocación de la vía. 2) Recuperar el contenido del monovette (4 ml, 7 millones de células). 3) Administrar utilizando el conector en Y del equipo de venoclisis lentamente (no en bolo). 4) Pasar el resto de solución salina en 15 minutos. La administración debe realizarse bajo estricta supervisión médica, especialmente durante las primeras 24-48 horas posteriores a la aplicación.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 75,
+      "categoria": "seguridad",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Cuáles son las contraindicaciones y efectos adversos de las Natural Killer Autólogas?",
+      "respuesta": "Contraindicaciones: sensibilidad o alergias a algún componente de la fórmula. Precauciones: no se cuenta con evidencias en niños menores de 12 años. Puede contener trazas de medio RPMI. Embarazo y lactancia: no recomendable, ya que un aumento en células NK podría ocasionar complicaciones en el desarrollo del feto o durante la lactancia. Efectos adversos comunes (autolimitados en 24-48h): vértigo, náuseas, síncope, cefalea, vómito, febrícula (<38°C), fatiga y mialgias. Raros: reacciones de hipersensibilidad (urticaria o erupción cutánea). Posible: síndrome de lisis tumoral por aumento transitorio de citocinas proinflamatorias, que puede causar fiebre alta, hipotensión y síntomas gripales graves.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 76,
+      "categoria": "seguridad",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Qué interacciones medicamentosas tienen las Natural Killer Autólogas?",
+      "respuesta": "Interacciones importantes de las NK Autólogas con nivolumab: 1) Inmunosupresores/corticoides (ciclosporina): evitar uso concomitante, reducen la eficacia al inhibir la respuesta inmunológica. 2) Antraciclinas (Doxorrubicina, Epirrubicina): pueden aumentar el riesgo de toxicidad con nivolumab. 3) Antimetabolitos (Metotrexato, 5-Fluorouracilo): afectan la capacidad de las NK para proliferar y responder a estímulos tumorales. 4) Inhibidores de topoisomerasa (Irinotecán, Topotecán, Etopósido): pueden causar daño al ADN e interferir con la función NK. 5) Agentes alquilantes (Ciclofosfamida, Ifosfamida, Melphalan): causan mielosupresión significativa, reduciendo la producción y actividad de las NK. La administración secuencial de quimioterapia y terapia NK/nivolumab debe ser cuidadosamente planificada.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 77,
+      "categoria": "objeciones_precio",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "Un oncólogo dice que las Natural Killer Autólogas son caras, ¿cómo respondo?",
+      "respuesta": "Las Natural Killer Autólogas ofrecen inmunoterapia celular personalizada con un mecanismo de acción dual: 1) Las células NK del propio paciente (autólogas) identifican y eliminan células tumorales mediante degranulación con perforinas y granzimas. 2) El pretratamiento con nivolumab supera los mecanismos de evasión tumoral (vía PD-1/PD-L1), potenciando la respuesta. 3) Cubren 8 tipos de neoplasias documentadas. 4) Facilitan respuesta inmune adaptativa adicional al liberar antígenos tumorales procesados por células dendríticas. 5) Al ser autólogas, la compatibilidad inmunológica es óptima. Los efectos adversos comunes son leves y autolimitados (24-48h).",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 78,
+      "categoria": "objeciones_eficacia",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Cómo funciona la combinación NK + nivolumab contra tumores resistentes?",
+      "respuesta": "La combinación NK Autólogas + nivolumab aborda tumores resistentes mediante tres mecanismos documentados en la ficha: 1) Las células NK detectan alteraciones en el MHC-I de las células tumorales e inician degranulación proteolítica (perforinas y granzimas) para inducir apoptosis directa. 2) El nivolumab bloquea la vía PD-1/PD-L1 y PD-L2, eliminando la protección que las células tumorales usan para evadir la vigilancia inmune. 3) La degranulación de las NK libera antígenos tumorales que son procesados por células dendríticas y presentados a linfocitos T, activando una respuesta inmunitaria adaptativa específica. Esta combinación mejora la visibilidad tumoral para el sistema inmunitario y reduce el crecimiento tumoral al superar los mecanismos de evasión.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 79,
+      "categoria": "objeciones_seguridad",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Es seguro usar células NK autólogas en pacientes oncológicos?",
+      "respuesta": "Las Natural Killer Autólogas presentan un perfil de seguridad documentado: 1) Al ser autólogas (del propio paciente), no existe riesgo de rechazo inmunológico. 2) Los efectos adversos comunes son leves y autolimitados en 24-48 horas: vértigo, náuseas, cefalea, febrícula (<38°C), fatiga y mialgias. 3) Las reacciones de hipersensibilidad son raras. 4) Se debe vigilar el síndrome de lisis tumoral (aumento transitorio de citocinas proinflamatorias). 5) La administración debe realizarse bajo estricta supervisión médica en las primeras 24-48h. Contraindicación única: sensibilidad a algún componente de la fórmula. No recomendable en embarazo/lactancia ni en menores de 12 años.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 80,
+      "categoria": "argumentos_venta",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "featured_faq": true,
+      "pregunta": "¿Cómo presento las Natural Killer Autólogas a un oncólogo?",
+      "respuesta": "Para un oncólogo: las Natural Killer Autólogas de Gencell son células NK del propio paciente pretratadas con nivolumab (anti-PD-1). Mecanismo diferenciador: las NK detectan anomalías en MHC-I, inician degranulación con perforinas y granzimas, e inducen apoptosis tumoral directa. El nivolumab bloquea PD-1/PD-L1/PD-L2, superando la evasión inmunitaria. Indicaciones: NSCLC, melanoma, DLBCL, LLA, cáncer renal, mama metastásico/TNBC, próstata y páncreas. Administración IV con solución salina (no en bolo, 15 min). Presentación única: 7 millones de células. Efectos adversos leves y autolimitados (24-48h). Supervisión médica estricta post-aplicación.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 81,
+      "categoria": "argumentos_venta",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "featured_faq": true,
+      "pregunta": "¿Cómo presento las Natural Killer Autólogas a un internista?",
+      "respuesta": "Para un internista: las Natural Killer Autólogas de Gencell combinan inmunoterapia celular autóloga con bloqueo de checkpoint inmunitario (nivolumab/PD-1). Las células NK del propio paciente reconocen células tumorales por alteraciones en MHC-I y las eliminan mediante degranulación (perforinas + granzimas). Además, activan respuesta adaptativa al liberar antígenos procesados por células dendríticas para linfocitos T. Indicaciones documentadas en 8 neoplasias incluyendo NSCLC, melanoma, cáncer renal y de páncreas. Administración IV, supervisión estricta 24-48h. Interacciones relevantes: evitar inmunosupresores y planificar cuidadosamente secuencia con quimioterapia.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 82,
+      "categoria": "perfil_paciente",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Cuál es el perfil de paciente ideal para las Natural Killer Autólogas?",
+      "respuesta": "Paciente ideal para las Natural Killer Autólogas: adulto mayor de 12 años con diagnóstico de neoplasia en alguna de las indicaciones documentadas: cáncer pulmonar de células no pequeñas (NSCLC), melanoma, linfoma de células B grandes (DLBCL), leucemia linfoblástica aguda (LLA), cáncer renal, cáncer de mama metastásico o triple negativo (TNBC), cáncer de próstata o cáncer de páncreas. Criterios de exclusión: sensibilidad a componentes de la fórmula, embarazo o lactancia. Precauciones especiales: pacientes en tratamiento con inmunosupresores/corticoides, quimioterapia activa (planificar secuencia), menores de 12 años (sin evidencia). Requiere acceso intravenoso y capacidad de supervisión médica estricta 24-48h post-aplicación.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 83,
+      "categoria": "protocolos",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Cómo se almacenan y manejan las Natural Killer Autólogas?",
+      "respuesta": "Almacenamiento y manejo de las Natural Killer Autólogas: 1) Conservar en refrigeración entre 2 y 8°C. 2) Proteger de la luz solar directa. 3) No exponer a fuentes de radiación o fuego. 4) No congelar — congelar o refrigerar por un periodo mayor al recomendado reduce la viabilidad del producto y puede incrementar efectos secundarios. 5) Conservar fuera del alcance de niños y animales domésticos. 6) Periodo de validez: administrar de forma inmediata o en un plazo no mayor a 24 horas posterior a su recepción. 7) Manejo de residuos: diluir con cloro al 0.1% y destinar en el desagüe.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 84,
+      "categoria": "tecnologia",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Qué diferencia a las células NK autólogas de otros tratamientos inmunológicos?",
+      "respuesta": "Las células NK autólogas de Gencell se distinguen por: 1) Origen autólogo: provienen del propio paciente, lo que asegura compatibilidad inmunológica. 2) Pertenecen al sistema inmunitario innato, con capacidad de identificar y eliminar células neoplásicas e infectadas sin necesidad de sensibilización previa. 3) Detectan alteraciones en MHC-I (señal de células tumorales) e inician degranulación con perforinas y granzimas. 4) Facilitan la conexión entre inmunidad innata y adaptativa: la degranulación libera antígenos tumorales procesados por células dendríticas, activando linfocitos T. 5) El pretratamiento con nivolumab (anti-PD-1) supera la evasión tumoral por vía PD-L1/PD-L2.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 85,
+      "categoria": "objeciones_eficacia",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Las Natural Killer Autólogas pueden combinarse con quimioterapia?",
+      "respuesta": "La administración secuencial de quimioterapia y terapia con células NK/nivolumab debe ser cuidadosamente planificada. Interacciones documentadas: 1) Antraciclinas (Doxorrubicina, Epirrubicina): pueden aumentar el riesgo de toxicidad con nivolumab. 2) Antimetabolitos (Metotrexato, 5-Fluorouracilo): pueden afectar la capacidad de las NK para proliferar y responder a estímulos tumorales. 3) Inhibidores de topoisomerasa (Irinotecán, Topotecán, Etopósido): pueden interferir con la función NK. 4) Agentes alquilantes (Ciclofosfamida, Ifosfamida, Melphalan): causan mielosupresión que reduce producción y actividad de NK. Se debe evitar el uso concomitante de inmunosupresores o corticoides (ciclosporina) durante la terapia.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 86,
+      "categoria": "objeciones_seguridad",
+      "product_line": "gencell",
+      "product": "nk_autologas",
+      "pregunta": "¿Las Natural Killer Autólogas pueden usarse en embarazo o pacientes jóvenes?",
+      "respuesta": "Embarazo y lactancia: la evidencia sugiere que el uso de Natural Killer Autólogas no es recomendable durante el embarazo y la lactancia. Un aumento en las células NK podría ocasionar complicaciones tanto en el desarrollo del feto como durante el periodo de lactancia. Pacientes jóvenes: no se cuenta con evidencias en niños menores de 12 años. Además, la administración debe realizarse bajo estricta supervisión médica, especialmente durante las primeras 24-48 horas posteriores a la aplicación. Puede contener trazas de medio RPMI.",
+      "source_doc": "FICHA NKS natural killer autologa.pdf"
     }
   ]
 }

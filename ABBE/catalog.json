@@ -1,8 +1,8 @@
 {
   "metadata": {
     "empresa": "Above Pharma",
-    "version": "2.0",
-    "updated": "2026-04-21",
+    "version": "4.0",
+    "updated": "2026-04-24",
     "description": "Catálogo multi-producto de Above Pharma. Cada product_line agrupa productos relacionados."
   },
   "product_lines": [
@@ -10,9 +10,9 @@
       "id": "gencell",
       "name": "Gencell Biotechnology",
       "manufacturer": "Gencell®",
-      "description": "Células troncales mesenquimales para medicina regenerativa",
-      "category": "medicina_regenerativa",
-      "technologies": ["CTM", "Pretratamiento específico por indicación", "Medicina regenerativa"],
+      "description": "Terapias celulares para medicina regenerativa, estética y oncología",
+      "category": "terapias_celulares",
+      "technologies": ["CTM", "Fibroblastos alogénicos", "Células NK autólogas", "Pretratamiento específico por indicación", "Medicina regenerativa", "Inmunoterapia oncológica"],
       "products": [
         {
           "id": "ctm_estabilizador_renal",
@@ -33,6 +33,26 @@
           "aliases": ["ctm metabólica", "metabólica", "metabolica", "ctm metabolica", "ctm colesterol"],
           "conditions": ["hipercolesterolemia familiar", "dislipidemia mixta", "daño endotelial", "riesgo cardiovascular"],
           "zones": ["cardiovascular", "endotelial", "metabólico", "sistémico"]
+        },
+        {
+          "id": "exocell",
+          "name": "EXOCELL",
+          "type": "fibroblastos_alogenicos",
+          "pretreatment": null,
+          "pretreatment_mechanism": "Sin pretratamiento farmacológico — fibroblastos alogénicos nativos derivados de placenta",
+          "aliases": ["exocell", "fibroblastos", "fibroblastos alogénicos", "fibroblastos de placenta", "fibroblastos placentarios"],
+          "conditions": ["rejuvenecimiento facial", "arrugas", "firmeza cutánea", "elasticidad cutánea", "envejecimiento cutáneo", "textura de piel"],
+          "zones": ["facial", "subdérmico", "cutáneo"]
+        },
+        {
+          "id": "nk_autologas",
+          "name": "Natural Killer Autólogas",
+          "type": "celulas_nk_autologas",
+          "pretreatment": "nivolumab",
+          "pretreatment_mechanism": "Bloqueo del receptor PD-1 y sus ligandos PD-L1/PD-L2 en células tumorales (anti-PD-1)",
+          "aliases": ["natural killer autólogas", "nk autólogas", "nk autologas", "natural killer autologas", "nk nivolumab", "nks autólogas"],
+          "conditions": ["cáncer pulmonar de células no pequeñas", "NSCLC", "melanoma", "linfoma de células B grandes", "DLBCL", "leucemia linfoblástica aguda", "LLA", "cáncer renal", "cáncer de mama metastásico", "triple negativo", "TNBC", "cáncer de próstata", "cáncer de páncreas"],
+          "zones": ["intravenosa", "sistémico", "oncológico"]
         }
       ],
       "competitors": [],
@@ -47,7 +67,17 @@
         "hipercolesterolemia": ["colesterol alto", "hipercolesterolemia familiar", "colesterol elevado"],
         "dislipidemia": ["dislipidemia mixta", "desorden lipídico", "perfil lipídico alterado"],
         "colesterol": ["colesterol ldl", "ldl", "lipoproteínas de baja densidad"],
-        "endotelial": ["endotelio", "daño endotelial", "vascular"]
+        "endotelial": ["endotelio", "daño endotelial", "vascular"],
+        "exocell": ["fibroblastos alogénicos", "fibroblastos de placenta"],
+        "fibroblastos": ["fibroblastos alogénicos", "fibroblastos de placenta", "exocell"],
+        "mmp": ["metaloproteinasas", "metaloproteinasas de matriz"],
+        "rejuvenecimiento": ["rejuvenecimiento facial", "anti-envejecimiento"],
+        "natural killer": ["nk", "células nk", "nks", "células natural killer"],
+        "nivolumab": ["anti pd-1", "anti-pd1", "inhibidor pd-1", "anti pd1"],
+        "neoplasia": ["cáncer", "tumor", "neoplásico", "oncológico", "oncologia"],
+        "nsclc": ["cáncer pulmonar de células no pequeñas", "cáncer de pulmón"],
+        "dlbcl": ["linfoma de células b grandes", "linfoma difuso"],
+        "tnbc": ["triple negativo", "cáncer de mama triple negativo"]
       }
     }
   ]

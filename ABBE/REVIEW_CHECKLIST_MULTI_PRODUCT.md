@@ -9,8 +9,8 @@
 - **No** se está migrando el DNA de Novacutan; se está desacoplando la app y cargando productos nuevos
 - La carga es **producto por producto**
 - Decisión de agentes: **por intención** (`productos`, `objeciones`, `argumentos`)
-- El siguiente punto activo es `4.1`: **documentación / versionado y consistencia visible final**
-- `3.1`, `3.2` y `3.3` quedan cerrados; el **bloque 3** queda finalizado
+- **No quedan puntos activos** en este checklist
+- `3.1`, `3.2`, `3.3` y `4.1` quedan cerrados; la revisión queda finalizada
 
 ---
 
@@ -53,7 +53,7 @@
 | 1. Datos, gobernanza y cumplimiento | **Cerrado** | `1.1`–`1.5` cerrados; bloque 1 finalizado |
 | 2. Retrieval, routing y seguridad | **Cerrado** | `2.1`–`2.7` cerrados; bloque 2 finalizado |
 | 3. Frontend y desacople real | **Cerrado** | `3.1`–`3.3` cerrados; bloque 3 finalizado en `v4.11.0` |
-| 4. Documentación, configuración e higiene | **En progreso** | `main.py`, `index.html`, assets y `CHANGELOG.md` ya reflejan `v4.11.0`; queda pendiente consistencia total de documentación y superficies restantes |
+| 4. Documentación, configuración e higiene | **Cerrado** | `4.1` cerrado; documentación, versionado y superficies visibles alineadas a `v4.11.0` |
 
 ---
 
@@ -64,7 +64,7 @@
 | 3.1 Inventario de residuos legacy visibles y hardcodes runtime | **Cerrado** | Inventario completo, clasificado y utilizable |
 | 3.2 Parametrización del frontend principal y eliminación de hardcodes visibles no legacy | **Cerrado** | UI principal ya no se comporta como demo/single-user por hardcodes visibles |
 | 3.3 Limpieza de residuos activos del dominio anterior | **Cerrado** | Limpieza legacy ejecutada en `main.py`, `app.js`, `orb.js`, `style.css`, eliminación de HTML auxiliares públicos y validación grep `0 resultados` |
-| 4.1 Documentación / versionado y consistencia visible final | **Activo** | Falta cerrar verificación total de versión y documentación operativa tras `v4.11.0` |
+| 4.1 Documentación / versionado y consistencia visible final | **Cerrado** | Versión, documentación operativa y referencias visibles/documentales alineadas a `v4.11.0` |
 
 ---
 
@@ -286,46 +286,89 @@
 ---
 
 ## 4.1 Documentación / versionado y consistencia visible final
-**Estado:** Activo  
-**Bloquea avance:** Sí
+**Estado:** Cerrado  
+**Bloquea avance:** No
 
-### Objetivo real del punto
+### Cierre alcanzado
 
-Verificar que la versión actual, el artefacto de regresión y la documentación operativa queden consistentes en todas las superficies restantes tras `v4.11.0`.
+- La versión visible y operativa quedó alineada a `v4.11.0` en backend, frontend y documentación principal.
+- `README.md` dejó de apuntar a `.env` como fuente de credenciales de prueba.
+- `smoke_26_manual.md` quedó alineado a la versión operativa actual.
+- `manifest.json` quedó consistente con el branding final del proyecto.
+- `regression_report.md` se mantiene como artefacto generado vigente y no requiere edición manual.
+- No quedan referencias activas a artefactos obsoletos como `regression_report.txt`.
 
-### Alcance mínimo
+### Qué cambió
 
-- `ABBE/main.py`
-- `ABBE/static/index.html`
-- `ABBE/static/manifest.json`
+- Ajuste documental de credenciales de prueba en `README.md`
+- Alineación de versión/precondiciones en `regression/smoke_26_manual.md`
+- Registro de cierre documental en `CHANGELOG.md`
+- Verificación final de consistencia entre:
+  - `main.py`
+  - `static/index.html`
+  - `static/manifest.json`
+  - documentación raíz
+  - documentación de regresión
+
+### Dónde cambió
+
+- `ABBE/README.md`
+- `ABBE/regression/smoke_26_manual.md`
 - `ABBE/CHANGELOG.md`
-- `ABBE/README.md` si existe
-- `ABBE/regression/README.md` si existe
-- `ABBE/regression/regression_report.md` si existe
-- `ABBE/regression/smoke_26_manual.md` si existe
 
-### Evidencia mínima requerida
+### Cómo se validó
 
-1. qué cambió
-2. dónde cambió
-3. cómo se validó
-4. evidencia concreta de:
-   - versión visible consistente
-   - referencias documentales consistentes
-   - ausencia de nombres de artefactos obsoletos
-   - ausencia de versiones antiguas visibles o activas fuera del changelog histórico
+- Revisión directa de las superficies en alcance de `4.1`
+- Verificación de versión visible en frontend y backend
+- Verificación de branding en `manifest.json`
+- Confirmación de ausencia de referencias obsoletas a `regression_report.txt`
+- Revisión de documentación operativa y artefactos de regresión vigentes
+
+### Evidencia concreta
+
+- `ABBE/main.py`:
+  - docstring en `4.11.0`
+  - `FastAPI.version = "4.11.0"`
+  - `/api/health` devuelve `4.11.0`
+- `ABBE/static/index.html`:
+  - footer visible `Versión 4.11.0`
+  - assets con `?v=4.11.0`
+- `ABBE/static/manifest.json`:
+  - branding actual: `Abbe - Above Pharma`
+- `ABBE/README.md`:
+  - credenciales de prueba ya no apuntan a `.env`
+  - texto alineado a consulta con el equipo de desarrollo
+- `ABBE/regression/smoke_26_manual.md`:
+  - precondiciones actualizadas a `v4.11.0+`
+- `ABBE/regression/regression_report.md`:
+  - artefacto vigente en ruta correcta
+  - no requiere edición manual para el cierre de `4.1`
+- `ABBE/CHANGELOG.md`:
+  - `v4.11.0` documentada como versión actual
+  - cierre documental de `4.1` reflejado
+- Verificación final:
+  - no quedan referencias activas a `regression_report.txt`
+  - no quedan versiones antiguas visibles en superficies activas fuera del histórico documental
 
 ### Decisión actual
 
-**No avanzar más en el bloque 4 sin cerrar `4.1`.**
+**Se cierra `4.1`.**  
+**Se cierra el bloque 4.**  
+**Se cierra la revisión completa.**
 
 ---
 
-# Siguiente punto activo
+# Estado final de la revisión
 
-## 4.1 — Documentación / versionado y consistencia visible final
+## Revisión cerrada
 
-**No avanzar más sin cerrar `4.1`.**
+- No quedan puntos activos en este checklist.
+- Los bloques `1`, `2`, `3` y `4` quedan cerrados.
+- La versión operativa/documental final validada es `v4.11.0`.
+
+### Siguiente acción
+
+**Eliminar este archivo** tras consolidar el cierre en la documentación permanente del proyecto.
 
 ---
 
@@ -347,4 +390,6 @@ Verificar que la versión actual, el artefacto de regresión y la documentación
 - `3.2` queda cerrado con display name visible, avatar genérico por iniciales, versión/cache-busters alineados y plan sin dataset demo
 - `3.3` queda cerrado con limpieza legacy en `main.py`, `app.js`, `orb.js`, `style.css`, eliminación de HTML auxiliares públicos y validación grep `0 resultados`
 - El bloque 3 queda finalizado en `v4.11.0`
-- `4.1` pasa a ser el punto activo para consistencia total de documentación y versionado visible
+- `4.1` queda cerrado con documentación, versionado y consistencia visible final alineados a `v4.11.0`
+- El bloque 4 queda finalizado
+- La revisión completa queda cerrada y este checklist queda listo para eliminación

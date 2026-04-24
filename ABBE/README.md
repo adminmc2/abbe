@@ -102,7 +102,7 @@ ABBE/
 │   ├── style.css            # Design system con mood-theming
 │   └── manifest.json        # Configuración PWA
 ├── catalog.json             # Catálogo de productos (líneas, aliases, sinónimos)
-├── knowledge_base.json      # 50 pares Q&A con contrato de datos validado
+├── knowledge_base.json      # 86 pares Q&A con contrato de datos validado
 ├── user_data.json           # Persistencia de historial por usuario
 ├── requirements.txt         # Dependencias Python
 ├── Dockerfile               # Deploy para Hugging Face Spaces
@@ -121,9 +121,41 @@ ABBE/
 | `POST` | `/api/history/load` | Cargar historial de búsquedas |
 | `GET` | `/api/test-infographic` | Test de generación de infografías |
 
+## Documentación operativa y de revisión
+
+Este proyecto usa tres documentos internos de control con funciones distintas:
+
+### 1. Guía marco reusable
+- `../GUIA_REVISION_AGENTES_MULTI_CONTEXTO.md`
+- Define el marco general de revisión para sistemas de agentes IA aplicados a cualquier dominio.
+- Es un documento **permanente** y **transversal**; no describe solo ABBE, sino la metodología de revisión.
+
+### 2. Review multi-producto ya cerrado
+- `REVIEW_CHECKLIST_MULTI_PRODUCT.md`
+- Conserva la trazabilidad de la revisión multi-producto ya completada.
+- Es un documento **cerrado/histórico**.
+- No gobierna el batch operativo actual, pero sí conserva decisiones ya fijadas.
+
+### 3. Checklist operativo activo del batch Gencell
+- `CHECKLIST_ONBOARDING_GENCELL_5_PRODUCTOS.md`
+- Gobierna el onboarding actual de Gencell producto por producto.
+- Es el documento **activo** para los puntos `5.1`–`5.6`.
+
+### Cómo se integran
+
+- La **guía multi-contexto** define el marco metodológico general.
+- El **review multi-producto** conserva el cierre y la trazabilidad de bloques ya validados.
+- El **checklist de onboarding Gencell** aplica ese marco al batch operativo actual.
+
+### Regla de mantenimiento
+
+- Actualizar `CHECKLIST_ONBOARDING_GENCELL_5_PRODUCTOS.md` cada vez que cambie el estado del batch.
+- No reabrir `REVIEW_CHECKLIST_MULTI_PRODUCT.md` salvo que un cambio invalide un cierre previo.
+- Mantener `GUIA_REVISION_AGENTES_MULTI_CONTEXTO.md` como referencia reusable para futuras revisiones y otros contextos.
+
 ## Knowledge Base
 
-La base de conocimiento (`knowledge_base.json`) contiene 50 pares pregunta/respuesta con contrato de datos validado al arrancar. Cada Q&A incluye campos obligatorios: `id`, `categoria`, `pregunta`, `respuesta`, `source_doc`, `product_line`, `product`.
+La base de conocimiento (`knowledge_base.json`) contiene 86 pares pregunta/respuesta con contrato de datos validado al arrancar. Cada Q&A incluye campos obligatorios: `id`, `categoria`, `pregunta`, `respuesta`, `source_doc`, `product_line`, `product`.
 
 ### Categorías (lista cerrada, 10):
 
@@ -141,6 +173,8 @@ La base de conocimiento (`knowledge_base.json`) contiene 50 pares pregunta/respu
 ### Productos actuales:
 - **Gencell CTM Estabilizador Renal** — CTM pre-tratadas con melatonina (25 Q&As)
 - **Gencell CTM Metabólica** — CTM pre-tratadas con evolocumab (25 Q&As)
+- **Gencell EXOCELL** — Fibroblastos alogénicos derivados de placenta (18 Q&As)
+- **Gencell Natural Killer Autólogas** — Células NK autólogas + nivolumab para oncología (18 Q&As)
 
 ## Deploy
 
