@@ -27,6 +27,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY main.py .
 COPY agents/ ./agents/
 COPY knowledge_base.json .
+COPY catalog.json .
 
 # Copiar archivos estáticos
 COPY static/ ./static/
@@ -35,8 +36,8 @@ COPY static/ ./static/
 RUN useradd -m -u 1000 user
 USER user
 
-# Puerto por defecto de HF Spaces
-EXPOSE 7862
+# Puerto requerido por HF Spaces
+EXPOSE 7860
 
 # Comando de inicio
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7862"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
