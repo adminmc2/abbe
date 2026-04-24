@@ -102,7 +102,7 @@ ABBE/
 │   ├── style.css            # Design system con mood-theming
 │   └── manifest.json        # Configuración PWA
 ├── catalog.json             # Catálogo de productos (líneas, aliases, sinónimos)
-├── knowledge_base.json      # 86 pares Q&A con contrato de datos validado
+├── knowledge_base.json      # 104 pares Q&A con contrato de datos validado
 ├── user_data.json           # Persistencia de historial por usuario
 ├── requirements.txt         # Dependencias Python
 ├── Dockerfile               # Deploy para Hugging Face Spaces
@@ -175,6 +175,7 @@ La base de conocimiento (`knowledge_base.json`) contiene 86 pares pregunta/respu
 - **Gencell CTM Metabólica** — CTM pre-tratadas con evolocumab (25 Q&As)
 - **Gencell EXOCELL** — Fibroblastos alogénicos derivados de placenta (18 Q&As)
 - **Gencell Natural Killer Autólogas** — Células NK autólogas + nivolumab para oncología (18 Q&As)
+- **Gencell Natural Killer Doble Bloqueo** — Células NK autólogas + nivolumab + ipilimumab para oncología avanzada (18 Q&As)
 
 ## Deploy
 

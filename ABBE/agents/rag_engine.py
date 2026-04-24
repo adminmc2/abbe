@@ -397,10 +397,15 @@ class RAGEngine:
             if detected_line and qa.get('product_line') == detected_line:
                 score *= 1.3
 
-            # Metadata boost: +25% si coincide product.id
+            # Metadata boost: +50% si coincide product.id
             # product=null queda neutral (no se penaliza ni se boostea)
-            if detected_product and qa.get('product') == detected_product:
-                score *= 1.25
+            # Damping: −15% si se detectó producto y Q&A pertenece a otro producto
+            if detected_product:
+                qa_product = qa.get('product')
+                if qa_product == detected_product:
+                    score *= 1.5
+                elif qa_product and qa_product != detected_product:
+                    score *= 0.85
 
             # Boost por coincidencia directa en pregunta
             query_norm = self._normalize(query)

@@ -18,23 +18,25 @@ Este checklist forma parte de una estructura de 3 documentos con funciones disti
 
 - Batch actual: **solo Gencell**
 - Total de productos en scope: **5**
-- Productos ya cargados y validados:
+- Productos cerrados y validados:
   - `ctm_estabilizador_renal` — CTM Estabilizador Renal
   - `ctm_metabolica` — CTM Metabólica
   - `exocell` — EXOCELL
-- Productos en curso / pendientes de cierre:
-  - `nk_autologas` — validación `5.5` activa
-  - `nk_doble_bloqueo` — pendiente
+  - `nk_autologas` — Natural Killer Autólogas
+- Producto integrado con cierre revisor pendiente:
+  - `nk_doble_bloqueo` — Natural Killer Doble Bloqueo Autólogas
 - **No** entra MyFiller en este batch
 - `product_line` única del batch: `gencell`
 - Competidores del batch actual: `[]`
 - Orden operativo aprobado:
   1. `exocell` — **cerrado**
-  2. `nk_autologas` — **activo**
-  3. `nk_doble_bloqueo` — **pendiente**
+  2. `nk_autologas` — **cerrado**
+  3. `nk_doble_bloqueo` — **pendiente cierre revisor**
 - El orden **no cambia el resultado funcional final**; se usa para **aislar regresiones y detectar confusión entre productos**
 - `EXOCELL` quedó integrado y validado en **`v4.12.2`**
-- Punto activo actual: **`5.5` — validación de `nk_autologas` (pendiente cierre revisor)**
+- `NK Autólogas` quedó integrado y validado en **`v4.13.1`**
+- `NK Doble Bloqueo` quedó integrado en **`v4.14.0`**, corregido en **`v4.14.1`** — pendiente cierre revisor
+- Punto activo actual: **`5.5` — validación de `nk_doble_bloqueo` (pendiente cierre revisor)**
 
 ---
 
@@ -45,8 +47,8 @@ Este checklist forma parte de una estructura de 3 documentos con funciones disti
 | 1 | CTM Estabilizador Renal | `ctm_estabilizador_renal` | `gencell` | `FICHA CTM estabilizador renal.pdf` | Cargado y validado |
 | 2 | CTM Metabólica | `ctm_metabolica` | `gencell` | `FICHA CTM metabolica.pdf` | Cargado y validado |
 | 3 | EXOCELL | `exocell` | `gencell` | `FICHA FIBROBLASTOS exocell.pdf` | Cerrado (`5.2`–`5.6`) |
-| 4 | Natural Killer Autólogas | `nk_autologas` | `gencell` | `FICHA NKS natural killer autologa.pdf` | En validación (`5.5` activo) |
-| 5 | Natural Killer Doble Bloqueo Autólogas | `nk_doble_bloqueo` | `gencell` | `FICHA NKS natural killer DB autologa.pdf` | Pendiente |
+| 4 | Natural Killer Autólogas | `nk_autologas` | `gencell` | `FICHA NKS natural killer autologa.pdf` | Cerrado (`5.2`–`5.6`) |
+| 5 | Natural Killer Doble Bloqueo Autólogas | `nk_doble_bloqueo` | `gencell` | `FICHA NKS natural killer DB autologa.pdf` | Integrado; `5.5` pendiente cierre revisor |
 
 ### Regla fijada para `source_doc`
 
@@ -75,11 +77,11 @@ Este checklist forma parte de una estructura de 3 documentos con funciones disti
 | Punto | Estado | Nota |
 |---|---|---|
 | 5.1 Inventario y freeze de alcance | **Cerrado** | Scope, IDs, `source_doc`, orden y competidores fijados |
-| 5.2 Alta en `catalog.json` | **Cerrado (exocell, nk_autologas)** | `nk_doble_bloqueo` pendiente |
-| 5.3 Alta en `knowledge_base.json` | **Cerrado (exocell, nk_autologas)** | 18+18 Q&As cargados; `nk_doble_bloqueo` pendiente |
-| 5.4 Ajustes semánticos mínimos si hacen falta | **Cerrado (exocell, nk_autologas)** | EXOCELL + NK: runtime ajustado con vocabulario real |
-| 5.5 Regresión y validación cruzada | **Activo (nk_autologas)** | Pendiente cierre revisor |
-| 5.6 Versionado y documentación por batch | **Ejecutado por lotes** | EXOCELL: `v4.12.2`; NK Autólogas: `v4.13.1`; pendiente repetir para `nk_doble_bloqueo` |
+| 5.2 Alta en `catalog.json` | **Cerrado (batch completo)** | 5 productos cargados |
+| 5.3 Alta en `knowledge_base.json` | **Cerrado (batch completo)** | 104 Q&As totales (18+18+18 nuevos) |
+| 5.4 Ajustes semánticos mínimos si hacen falta | **Cerrado (batch completo)** | NK DB: vocabulario exclusivo añadido en v4.14.1 (ipilimumab, ctla-4, doble bloqueo, mesotelioma, colorrectal, msi) |
+| 5.5 Regresión y validación cruzada | **Activo (nk_doble_bloqueo)** | 17/17 smoke OK tras fix v4.14.1; colisión NK hermanos corregida; pendiente cierre revisor |
+| 5.6 Versionado y documentación por batch | **Ejecutado (pendiente cierre batch)** | EXOCELL: v4.12.2; NK Autólogas: v4.13.1; NK DB: v4.14.1 |
 
 ---
 
@@ -143,8 +145,8 @@ Este checklist forma parte de una estructura de 3 documentos con funciones disti
 ---
 
 ## 5.2 Alta en `catalog.json`
-**Estado:** Cerrado (exocell, nk_autologas)
-**Bloquea avance:** No (pendiente solo nk_doble_bloqueo)
+**Estado:** Cerrado (batch completo)
+**Bloquea avance:** No
 
 ### Objetivo real del punto
 
@@ -200,13 +202,26 @@ Dar de alta cada producto nuevo en `catalog.json` respetando el contrato vigente
 ### Decisión actual
 
 **`5.2` queda cerrado para `nk_autologas`.**
-**Pendiente repetir para `nk_doble_bloqueo`.**
+
+### Cierre alcanzado para `nk_doble_bloqueo`
+
+- `nk_doble_bloqueo` dado de alta como 5to producto de `gencell`
+- Aliases: 7 variantes discriminantes (incluyen "doble bloqueo", "ipilimumab", "nk db", "nks-db")
+- Sinónimos exclusivos añadidos: ipilimumab, ctla-4, doble bloqueo, mesotelioma, colorrectal
+- `pretreatment`: nivolumab + ipilimumab (diferenciador clave vs nk_autologas)
+- `pretreatment_mechanism`: Doble bloqueo PD-1 + CTLA-4
+- Validación: `[Catalog] ✓ Validation passed (1 lines, 5 products)`
+
+### Decisión actual
+
+**`5.2` queda cerrado para `nk_doble_bloqueo`.**
+**`5.2` cerrado para batch completo (5 productos).**
 
 ---
 
 ## 5.3 Alta en `knowledge_base.json`
-**Estado:** Cerrado (exocell, nk_autologas)
-**Bloquea avance:** No (pendiente solo nk_doble_bloqueo)
+**Estado:** Cerrado (batch completo)
+**Bloquea avance:** No
 
 ### Objetivo real del punto
 
@@ -263,12 +278,25 @@ Cargar Q&As reales por producto en `knowledge_base.json` respetando el contrato 
 ### Decisión actual
 
 **`5.3` queda cerrado para `nk_autologas`.**
-**Queda pendiente repetir `5.3` para `nk_doble_bloqueo`.**
+
+### Cierre alcanzado para `nk_doble_bloqueo`
+
+- 18 Q&As creados (ids 87–104) cubriendo las 10 categorías
+- `source_doc` = `FICHA NKS natural killer DB autologa.pdf`
+- Q&A id 1 (corporativa) actualizada para incluir NK Doble Bloqueo + source_doc ampliado con los 5 PDFs
+- Q&A id 92: comparación explícita NK Autólogas vs NK Doble Bloqueo (discriminación entre hermanos)
+- Sin referencia a productos fuera del batch
+- `total_preguntas` = 104
+
+### Decisión actual
+
+**`5.3` queda cerrado para `nk_doble_bloqueo`.**
+**`5.3` cerrado para batch completo (104 Q&As totales).**
 
 ---
 
 ## 5.4 Ajustes semánticos mínimos si hacen falta
-**Estado:** Cerrado (exocell, nk_autologas)
+**Estado:** Cerrado (batch completo)
 **Bloquea avance:** No
 
 ### Objetivo real del punto
@@ -334,12 +362,39 @@ El revisor detectó que consultas NK de primer turno (natural killer, nk autólo
 ### Decisión actual
 
 **`5.4` queda cerrado para `nk_autologas`.**
-**Solo se reabrirá si `nk_doble_bloqueo` muestra huecos reales de runtime.**
+
+### Apertura real para `nk_doble_bloqueo`
+
+El revisor detectó que los términos exclusivos de NK Doble Bloqueo (ipilimumab, ctla-4, doble bloqueo, mesotelioma, colorrectal, msi) no estaban en `is_greeting_or_vague()` ni en `isActionableQuery()`, lo que bloqueaba consultas de primer turno con esos términos.
+
+Además, el revisor identificó que la colisión entre hermanos NK ("nk autologas nivolumab" → nk_doble_bloqueo) era un problema de ranking en el RAG engine, no solo de contenido.
+
+### Cierre alcanzado para `nk_doble_bloqueo`
+
+- `main.py`:
+  - ampliado `is_greeting_or_vague()` con 6 términos exclusivos de NK DB
+- `static/app.js`:
+  - ampliado `isActionableQuery()` con los mismos 6 términos
+- `agents/rag_engine.py`:
+  - product.id boost aumentado de 1.25 a 1.5 (+50%)
+  - añadido mismatch damping de 0.85 (−15%) para Q&As de producto no-coincidente
+  - Q&As con product=null quedan neutrales (no penalizadas)
+
+### Evidencia concreta de `nk_doble_bloqueo`
+
+- Vocabulario añadido: `ipilimumab`, `ctla-4`, `doble bloqueo`, `mesotelioma`, `colorrectal`, `msi`
+- Colisión corregida: "nk autologas nivolumab" → nk_autologas (antes: nk_doble_bloqueo)
+- Smoke test: 17/17 queries correctas (7 gate + 6 retrieval DB + 4 no regresión)
+
+### Decisión actual
+
+**`5.4` queda cerrado para `nk_doble_bloqueo`.**
+**`5.4` cerrado para batch completo.**
 
 ---
 
 ## 5.5 Regresión y validación cruzada
-**Estado:** Activo (nk_autologas pendiente cierre revisor)
+**Estado:** Activo (nk_doble_bloqueo — pendiente cierre revisor)
 **Bloquea avance:** Sí
 
 ### Objetivo real del punto
@@ -387,13 +442,29 @@ Verificar que cada producto nuevo no rompa el comportamiento de los ya cargados 
 
 ### Decisión actual
 
-**`5.5` pendiente de cierre para `nk_autologas` (requiere aprobación del revisor).**
-**Queda pendiente repetir `5.5` para `nk_doble_bloqueo`.**
+**`5.5` queda cerrado para `nk_autologas`.**
+
+### Cierre alcanzado para `nk_doble_bloqueo`
+
+- **v4.14.0** (pre-fix): Smoke test 14/15. Colisión: "nk autologas nivolumab" → nk_doble_bloqueo
+- **v4.14.1** (post-fix): Colisión corregida vía RAG boost/damping + vocabulario DB en gates
+  - "nk autologas nivolumab" → nk_autologas (correcto)
+  - 17/17 queries smoke OK (7 gate + 6 retrieval DB + 4 no regresión)
+- No regresión sobre CTM Renal, CTM Metabólica, EXOCELL ni NK Autólogas
+- Discriminación efectiva por:
+  - Boost product.id +50% (antes +25%)
+  - Damping product mismatch −15%
+  - Términos exclusivos: nk_doble_bloqueo (ipilimumab, CTLA-4, doble bloqueo, mesotelioma, colorrectal), nk_autologas (DLBCL, LLA, TNBC)
+- Validadores: catálogo OK (5 productos), KB OK (104 Q&As)
+
+### Decisión actual
+
+**`5.5` pendiente de cierre para `nk_doble_bloqueo` (requiere aprobación del revisor).**
 
 ---
 
 ## 5.6 Versionado y documentación por batch
-**Estado:** Ejecutado por lotes (exocell: `v4.12.2`, nk_autologas: `v4.13.1`)
+**Estado:** Ejecutado por lotes (exocell: `v4.12.2`, nk_autologas: `v4.13.1`, nk_doble_bloqueo: `v4.14.1`)
 **Bloquea avance:** No
 
 ### Objetivo real del punto
@@ -440,22 +511,42 @@ Cerrar cada lote aprobado con versión nueva, documentación alineada y superfic
 ### Decisión actual
 
 **`5.6` ejecutado para `nk_autologas` en `v4.13.1`.**
-**Queda pendiente repetir para `nk_doble_bloqueo`.**
+
+### Cierre alcanzado para `nk_doble_bloqueo`
+
+- Versión: `v4.14.0` → `v4.14.1` (fix bloqueantes revisor)
+- `main.py`, `index.html`, `CHANGELOG.md` sincronizados
+- `README.md`: 104 Q&As, 5 productos actuales (incluye NK Doble Bloqueo)
+- `CHECKLIST_ONBOARDING`: actualizado con estado NK Doble Bloqueo
+
+### Dónde cambió para `nk_doble_bloqueo`
+
+- `ABBE/catalog.json` — 5to producto añadido (v4.14.0)
+- `ABBE/knowledge_base.json` — 18 Q&As (ids 87–104), id 1 actualizada (v4.14.0)
+- `ABBE/main.py` — versión v4.14.1 + vocabulario DB en gate
+- `ABBE/static/index.html` — 13 cache-busters v4.14.1
+- `ABBE/static/app.js` — vocabulario DB en isActionableQuery()
+- `ABBE/agents/rag_engine.py` — product boost 1.5 + mismatch damping 0.85
+- `ABBE/CHANGELOG.md` — entradas v4.14.0 + v4.14.1
+- `ABBE/README.md` — 104 Q&As, NK Doble Bloqueo listado
+
+### Decisión actual
+
+**`5.6` ejecutado para `nk_doble_bloqueo` en `v4.14.1`.**
+**`5.6` pendiente de cierre batch (requiere aprobación revisor).**
 
 ---
 
 ## Secuencia aprobada de ejecución
 
-1. `5.5` — cierre revisor de `nk_autologas`
-2. `5.2` — alta de `nk_doble_bloqueo` en `catalog.json`
-3. `5.3` — alta de `nk_doble_bloqueo` en `knowledge_base.json`
-4. validadores
-5. smoke mínimo y no regresión sobre CTM + EXOCELL + NK Autólogas
-6. `5.4` solo si aparecen huecos reales
-7. `5.5` — regresión y no confusión entre productos hermanos NK
-8. `5.6` — versión + `CHANGELOG.md` + documentación del lote aprobado
-9. repetir el ciclo con:
-   - `nk_doble_bloqueo`
+1. `5.2` — alta de `nk_doble_bloqueo` en `catalog.json` — **completado**
+2. `5.3` — alta de `nk_doble_bloqueo` en `knowledge_base.json` — **completado**
+3. validadores — **completado** (catálogo 5 productos, KB 104 Q&As)
+4. smoke mínimo y no regresión sobre CTM + EXOCELL + NK Autólogas — **completado y revalidado en v4.14.1**
+5. `5.4` — ajustes semánticos mínimos por huecos reales detectados — **completado en v4.14.1**
+6. `5.5` — regresión y no confusión entre productos hermanos NK — **pendiente cierre revisor**
+7. `5.6` — versión + `CHANGELOG.md` + documentación del lote aprobado — **ejecutado en v4.14.1**
+8. Todos los productos del batch ejecutados: `exocell` → `nk_autologas` → `nk_doble_bloqueo`
 
 ---
 
@@ -486,6 +577,11 @@ Cerrar cada lote aprobado con versión nueva, documentación alineada y superfic
 - `5.2` queda cerrado para `nk_autologas` (4 productos en catálogo)
 - `5.3` queda cerrado para `nk_autologas` con `18` Q&As (`ids 69–86`)
 - `5.4` queda cerrado para `nk_autologas` tras ampliar runtime/frontend con vocabulario NK/oncológico + patrón `que son`
-- `5.5` pendiente de cierre para `nk_autologas` (requiere aprobación revisor)
+- `5.5` queda cerrado para `nk_autologas`
 - `5.6` ejecutado para `nk_autologas` en `v4.13.1`
-- El siguiente punto activo: cierre de `nk_autologas` por revisor, luego arrancar con `nk_doble_bloqueo`
+- `5.2` queda cerrado para `nk_doble_bloqueo` (5 productos en catálogo)
+- `5.3` queda cerrado para `nk_doble_bloqueo` con `18` Q&As (`ids 87–104`)
+- `5.4` reabierto para `nk_doble_bloqueo` en `v4.14.1`: vocabulario DB exclusivo en gates + RAG boost/damping para discriminación NK hermanos
+- `5.5` pendiente de cierre para `nk_doble_bloqueo` (17/17 smoke OK tras fix v4.14.1 — requiere aprobación revisor)
+- `5.6` ejecutado para `nk_doble_bloqueo` en `v4.14.1`
+- Punto activo actual: `5.5` de `nk_doble_bloqueo` (pendiente cierre revisor)

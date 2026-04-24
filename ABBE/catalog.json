@@ -1,7 +1,7 @@
 {
   "metadata": {
     "empresa": "Above Pharma",
-    "version": "4.0",
+    "version": "5.0",
     "updated": "2026-04-24",
     "description": "Catálogo multi-producto de Above Pharma. Cada product_line agrupa productos relacionados."
   },
@@ -53,6 +53,16 @@
           "aliases": ["natural killer autólogas", "nk autólogas", "nk autologas", "natural killer autologas", "nk nivolumab", "nks autólogas"],
           "conditions": ["cáncer pulmonar de células no pequeñas", "NSCLC", "melanoma", "linfoma de células B grandes", "DLBCL", "leucemia linfoblástica aguda", "LLA", "cáncer renal", "cáncer de mama metastásico", "triple negativo", "TNBC", "cáncer de próstata", "cáncer de páncreas"],
           "zones": ["intravenosa", "sistémico", "oncológico"]
+        },
+        {
+          "id": "nk_doble_bloqueo",
+          "name": "Natural Killer Doble Bloqueo Autólogas",
+          "type": "celulas_nk_autologas_doble_bloqueo",
+          "pretreatment": "nivolumab + ipilimumab",
+          "pretreatment_mechanism": "Doble bloqueo: PD-1 (nivolumab) + CTLA-4 (ipilimumab) — activa inmunidad innata (NK) y adaptativa (T)",
+          "aliases": ["natural killer doble bloqueo", "nk doble bloqueo", "nks-db", "nk db", "nk doble bloqueo autólogas", "doble bloqueo", "nk ipilimumab"],
+          "conditions": ["melanoma metastásico", "cáncer de pulmón de células no pequeñas", "NSCLC", "cáncer renal avanzado", "cáncer de cabeza y cuello", "cáncer colorrectal metastásico", "inestabilidad microsatelital", "mesotelioma pleural maligno"],
+          "zones": ["intravenosa", "sistémico", "oncológico"]
         }
       ],
       "competitors": [],
@@ -77,7 +87,12 @@
         "neoplasia": ["cáncer", "tumor", "neoplásico", "oncológico", "oncologia"],
         "nsclc": ["cáncer pulmonar de células no pequeñas", "cáncer de pulmón"],
         "dlbcl": ["linfoma de células b grandes", "linfoma difuso"],
-        "tnbc": ["triple negativo", "cáncer de mama triple negativo"]
+        "tnbc": ["triple negativo", "cáncer de mama triple negativo"],
+        "ipilimumab": ["anti ctla-4", "anti-ctla4", "inhibidor ctla-4", "anti ctla4"],
+        "ctla-4": ["ctla4", "proteína reguladora de activación de células T"],
+        "doble bloqueo": ["dual checkpoint", "doble checkpoint", "pd-1 + ctla-4", "nks-db"],
+        "mesotelioma": ["mesotelioma pleural", "mesotelioma pleural maligno"],
+        "colorrectal": ["cáncer colorrectal", "colorrectal metastásico", "cáncer de colon"]
       }
     }
   ]

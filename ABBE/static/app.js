@@ -1967,6 +1967,9 @@ function isActionableQuery(text) {
         /linfoma/i, /leucemia/i, /perforina/i, /granzima/i,
         /pd.?1/i, /pd.?l1/i, /\bmhc\b/i, /apoptosis/i,
         /quimioterapia/i, /antitumoral/i, /citotoxi/i,
+        // NK Doble Bloqueo — términos exclusivos
+        /ipilimumab/i, /ctla.?4/i, /doble.bloqueo/i,
+        /mesotelioma/i, /colorrectal/i, /\bmsi\b/i,
         // Condiciones tratadas por CTM
         /renal/i, /hepatic/i, /pulmonar/i, /esteatosis/i,
         /post.?covid/i, /lyme/i,

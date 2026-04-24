@@ -4,7 +4,44 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.13.1 — 2026-04-24 (ACTUAL)
+## v4.14.1 — 2026-04-24 (ACTUAL)
+
+### Bloque 5.4c/5.5c: Fix bloqueantes revisor NK Doble Bloqueo
+
+- `main.py` `is_greeting_or_vague()`: añadidos 6 términos exclusivos NK DB (ipilimumab, ctla-4, doble bloqueo, mesotelioma, colorrectal, msi)
+- `app.js` `isActionableQuery()`: mismos 6 términos exclusivos NK DB
+- `agents/rag_engine.py`: product.id boost aumentado de 1.25 a 1.5 (+50%)
+- `agents/rag_engine.py`: añadido mismatch damping de 0.85 (−15%) para Q&As de producto no-coincidente cuando se detecta producto específico; Q&As con product=null quedan neutrales
+- Colisión NK hermanos corregida: "nk autologas nivolumab" → nk_autologas (antes: nk_doble_bloqueo)
+- Smoke test: 17/17 queries (7 gate + 6 retrieval DB + 4 no regresión)
+- `CHECKLIST_ONBOARDING`: corregidas inconsistencias de cierre prematuro detectadas por revisor
+
+---
+
+## v4.14.0 — 2026-04-24
+
+### Bloque 5.2c/5.3c: Onboarding NK Doble Bloqueo Autólogas (último producto del batch Gencell)
+
+- Producto `nk_doble_bloqueo` dado de alta en `catalog.json` v5.0 bajo línea Gencell (5to y último)
+- Aliases: 7 variantes discriminantes (incluyen "doble bloqueo", "ipilimumab", "nks-db")
+- Sinónimos añadidos: ipilimumab, ctla-4, doble bloqueo, mesotelioma, colorrectal
+- 18 Q&As creados en `knowledge_base.json` (ids 87–104) cubriendo las 10 categorías
+- Q&A id 92: comparativa explícita NK Autólogas vs NK Doble Bloqueo (diferencias de pretratamiento, indicaciones, efectos adversos)
+- Fuente: `FICHA NKS natural killer DB autologa.pdf`
+- Q&A id 1 (corporativa): actualizada para incluir NK Doble Bloqueo + source_doc completo (5 fichas)
+- Total KB: 104 Q&As (50 CTM + 18 EXOCELL + 18 NK Autólogas + 18 NK Doble Bloqueo)
+
+Validación:
+- `[Catalog] ✓ Validation passed (1 lines, 5 products)`
+- `[RAG] ✓ KB validation passed (104 Q&As, contract OK)`
+- 14/15 queries smoke test passed
+- Discriminación NK hermanos: indicaciones exclusivas resuelven correctamente (DLBCL→autólogas, mesotelioma→DB)
+- Colisión esperada: "nk autologas nivolumab" → DB (ambos usan nivolumab; Q&A 92 ayuda al LLM a discriminar)
+- No regresión CTM Renal, CTM Metabólica, EXOCELL
+
+---
+
+## v4.13.1 — 2026-04-24
 
 ### Bloque 5.4b: Ajustes semánticos NK Autólogas
 

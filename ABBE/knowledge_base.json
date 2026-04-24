@@ -3,7 +3,7 @@
     "empresa": "Above Pharma",
     "version": "2.0",
     "fecha_creacion": "2026-04-21",
-    "total_preguntas": 86
+    "total_preguntas": 104
   },
   "qa_pairs": [
     {
@@ -12,8 +12,8 @@
       "product_line": "gencell",
       "product": null,
       "pregunta": "¿Qué es Gencell Biotechnology?",
-      "respuesta": "Gencell® es una empresa de biotecnología especializada en terapias celulares. Desarrolla productos de medicina regenerativa basados en células troncales mesenquimales (CTM) pre-tratadas con compuestos específicos según la indicación terapéutica (melatonina para el Estabilizador Renal, evolocumab para la línea Metabólica), fibroblastos alogénicos derivados de placenta para rejuvenecimiento facial (EXOCELL), y células Natural Killer autólogas pretratadas con nivolumab para inmunoterapia oncológica (Natural Killer Autólogas). Es titular de comercialización de toda la línea.",
-      "source_doc": "FICHA CTM estabilizador renal.pdf + FICHA CTM metabolica.pdf + FICHA FIBROBLASTOS exocell.pdf + FICHA NKS natural killer autologa.pdf"
+      "respuesta": "Gencell® es una empresa de biotecnología especializada en terapias celulares. Desarrolla productos de medicina regenerativa basados en células troncales mesenquimales (CTM) pre-tratadas con compuestos específicos según la indicación terapéutica (melatonina para el Estabilizador Renal, evolocumab para la línea Metabólica), fibroblastos alogénicos derivados de placenta para rejuvenecimiento facial (EXOCELL), células Natural Killer autólogas pretratadas con nivolumab para inmunoterapia oncológica (Natural Killer Autólogas), y células NK autólogas pretratadas con nivolumab e ipilimumab para doble bloqueo inmunitario en neoplasias avanzadas (Natural Killer Doble Bloqueo Autólogas). Es titular de comercialización de toda la línea.",
+      "source_doc": "FICHA CTM estabilizador renal.pdf + FICHA CTM metabolica.pdf + FICHA FIBROBLASTOS exocell.pdf + FICHA NKS natural killer autologa.pdf + FICHA NKS natural killer DB autologa.pdf"
     },
     {
       "id": 2,
@@ -801,6 +801,170 @@
       "pregunta": "¿Las Natural Killer Autólogas pueden usarse en embarazo o pacientes jóvenes?",
       "respuesta": "Embarazo y lactancia: la evidencia sugiere que el uso de Natural Killer Autólogas no es recomendable durante el embarazo y la lactancia. Un aumento en las células NK podría ocasionar complicaciones tanto en el desarrollo del feto como durante el periodo de lactancia. Pacientes jóvenes: no se cuenta con evidencias en niños menores de 12 años. Además, la administración debe realizarse bajo estricta supervisión médica, especialmente durante las primeras 24-48 horas posteriores a la aplicación. Puede contener trazas de medio RPMI.",
       "source_doc": "FICHA NKS natural killer autologa.pdf"
+    },
+    {
+      "id": 87,
+      "categoria": "empresa",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Qué son las Natural Killer Doble Bloqueo Autólogas de Gencell?",
+      "respuesta": "Las Natural Killer Doble Bloqueo Autólogas (NKs-DB) de Gencell son células NK autólogas pretratadas con nivolumab e ipilimumab, diseñadas para el tratamiento de neoplasias malignas avanzadas. A diferencia de las NK Autólogas (que usan solo nivolumab/PD-1), las NKs-DB combinan el bloqueo de dos checkpoints inmunitarios: PD-1 (nivolumab) y CTLA-4 (ipilimumab), activando tanto el sistema inmunitario innato (NK) como el adaptativo (células T). Se comercializan bajo Gencell Biotechnology en presentación única de 7 millones de células NK autólogas.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 88,
+      "categoria": "productos",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Cuál es la composición y presentación de las NK Doble Bloqueo?",
+      "respuesta": "Composición: células Natural Killer autólogas pretratadas con nivolumab e ipilimumab. Presentación única: 7 millones de células NK autólogas en solución inyectable. El contenedor plástico (container) protege el monovette que contiene 4 ml del producto. Excipiente: solución salina al 0.9%. Periodo de validez: administrar de forma inmediata o en un plazo no mayor a 24 horas posterior a su recepción. Almacenamiento: refrigeración entre 2 y 8°C, protegido de luz solar directa, no congelar ni agitar. Manejo de residuos: contenedores para residuos de quimioterapia entregados al servicio de recolección.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 89,
+      "categoria": "productos",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Para qué tipos de cáncer están indicadas las NK Doble Bloqueo?",
+      "respuesta": "Las NK Doble Bloqueo Autólogas (nivolumab + ipilimumab) han demostrado ser efectivas en: 1) Melanoma metastásico. 2) Cáncer de pulmón de células no pequeñas (NSCLC). 3) Cáncer renal avanzado. 4) Cáncer de cabeza y cuello recurrente o metastásico. 5) Cáncer colorrectal metastásico con inestabilidad microsatelital. 6) Mesotelioma pleural maligno. Esta combinación proporciona una opción terapéutica para pacientes con tumores refractarios o en estadios avanzados, aumentando la tasa de supervivencia de las células NK.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 90,
+      "categoria": "tecnologia",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Cuál es el mecanismo de acción del doble bloqueo NK (nivolumab + ipilimumab)?",
+      "respuesta": "El mecanismo de acción de las NKs-DB combina tres vías: 1) Las células NK detectan alteraciones en MHC-I de células tumorales e inician degranulación con perforinas y granzimas, induciendo apoptosis. La liberación de antígenos tumorales activa células dendríticas que presentan antígenos a linfocitos T. 2) Nivolumab (anti-PD-1): bloquea la interacción PD-1/PD-L1/PD-L2, eliminando la evasión inmune tumoral y permitiendo que NK y T reconozcan células tumorales previamente inaccesibles. 3) Ipilimumab (anti-CTLA-4): inhibe CTLA-4, una proteína que suprime la activación de células T. Esto potencia la activación temprana de linfocitos T en ganglios linfáticos, permitiendo la expansión clonal de células T específicas contra el tumor. La combinación potencia tanto la inmunidad innata (NK) como la adaptativa (T).",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 91,
+      "categoria": "tecnologia",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Qué papel juega el ipilimumab en las NK Doble Bloqueo?",
+      "respuesta": "Ipilimumab es un anticuerpo monoclonal que inhibe CTLA-4, una proteína reguladora que suprime la activación de las células T. Su función en las NK Doble Bloqueo: 1) Potencia la activación de los linfocitos T, promoviendo una respuesta más agresiva y prolongada contra las células cancerosas. 2) Favorece la activación temprana de las células T en los ganglios linfáticos. 3) Permite la expansión clonal de células T específicas capaces de atacar tumores que han evadido la respuesta inmunitaria. Combinado con nivolumab (anti-PD-1), el doble bloqueo PD-1 + CTLA-4 resulta en mayor visibilidad del tumor, reducción del crecimiento y, en algunos casos, remisión prolongada.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 92,
+      "categoria": "tecnologia",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Cuál es la diferencia entre las NK Autólogas y las NK Doble Bloqueo?",
+      "respuesta": "Las dos son células NK autólogas de Gencell pero difieren en pretratamiento, mecanismo e indicaciones: NK Autólogas: pretratadas solo con nivolumab (anti-PD-1). Bloquean una vía de evasión tumoral (PD-1/PD-L1). Indicadas en NSCLC, melanoma, DLBCL, LLA, cáncer renal, mama metastásico/TNBC, próstata y páncreas. NK Doble Bloqueo: pretratadas con nivolumab + ipilimumab (anti-PD-1 + anti-CTLA-4). Bloquean dos checkpoints inmunitarios, activando tanto inmunidad innata como adaptativa. Indicadas en melanoma metastásico, NSCLC, cáncer renal avanzado, cabeza y cuello, colorrectal metastásico con inestabilidad microsatelital y mesotelioma pleural maligno. El doble bloqueo tiene un perfil de efectos adversos más amplio, incluyendo efectos inmunorrelacionados graves (colitis, hepatitis, neumonitis, hipofisitis).",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 93,
+      "categoria": "protocolos",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Cuál es el protocolo de administración de las NK Doble Bloqueo?",
+      "respuesta": "Administración intravenosa: 1) Canalizar al paciente con 100 ml de solución salina al 0.9% y asegurar la correcta colocación de la vía. 2) Recuperar el contenido del monovette (4 ml, 7 millones de células). 3) Administrar utilizando el conector en Y del equipo de venoclisis lentamente (no en bolo). 4) Pasar el resto de solución salina en 15 minutos. La administración debe realizarse bajo estricta supervisión médica, especialmente durante las primeras 24-48 horas posteriores a la aplicación. Importante: se han notificado reacciones adversas inmunomediadas que pueden ocurrir en cualquier sistema orgánico, incluso tras la interrupción del tratamiento.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 94,
+      "categoria": "seguridad",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Cuáles son los efectos adversos de las NK Doble Bloqueo?",
+      "respuesta": "Las NK Doble Bloqueo tienen un perfil de efectos adversos más amplio que las NK Autólogas debido al doble bloqueo PD-1 + CTLA-4. Efectos comunes (24-48h): vértigo, náuseas, síncope, cefalea, vómito, febrícula (<38°C), fatiga y mialgias. Raros: hipersensibilidad (urticaria, erupción cutánea). Síndrome de lisis tumoral posible. Efectos inmunorrelacionados graves (específicos del doble bloqueo): colitis, hepatitis, neumonitis, hipofisitis, dermatitis, prurito, y toxicidades endocrinas (hipotiroidismo, insuficiencia adrenal). Estos se deben a la inhibición de PD-1 y CTLA-4, que potencia la actividad inmunológica también contra tejidos sanos. Aproximadamente el 55-60% de los pacientes que reciben nivolumab + ipilimumab experimentan algún efecto adverso inmunorrelacionado. Requieren monitoreo y manejo médico oportuno.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 95,
+      "categoria": "seguridad",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Cuáles son las contraindicaciones e interacciones de las NK Doble Bloqueo?",
+      "respuesta": "Contraindicaciones: sensibilidad o alergias a algún componente de la fórmula. Precauciones: no hay evidencia en menores de 12 años; puede contener trazas de medio RPMI. Embarazo y lactancia: no recomendable, puede representar riesgo fetal y alterar la leche; si no hay alternativa, vigilar al bebé. Interacciones: 1) Inmunosupresores/corticoides (ciclosporina): evitar, reducen eficacia al inhibir la respuesta inmunológica que ambos fármacos necesitan. 2) Antraciclinas (Doxorrubicina, Epirrubicina): riesgo de toxicidad aumentado con nivolumab e ipilimumab, efectos sobre sistema inmunológico y cardiovascular. 3) Antimetabolitos (Metotrexato, 5-Fluorouracilo): disminuyen proliferación y función citotóxica de NK. 4) Inhibidores de topoisomerasa y agentes alquilantes: interfieren con función NK y causan mielosupresión.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 96,
+      "categoria": "objeciones_precio",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "Un oncólogo dice que las NK Doble Bloqueo son caras, ¿cómo respondo?",
+      "respuesta": "Las NK Doble Bloqueo ofrecen doble checkpoint inmunitario en una sola terapia celular: 1) Combinan nivolumab (anti-PD-1) + ipilimumab (anti-CTLA-4) con células NK autólogas del propio paciente. 2) Activan tanto inmunidad innata (NK) como adaptativa (células T) simultáneamente. 3) Están indicadas en neoplasias avanzadas y refractarias donde se necesita una respuesta inmunitaria más agresiva: melanoma metastásico, cáncer renal avanzado, cabeza y cuello, colorrectal MSI, mesotelioma pleural. 4) La expansión clonal de células T específicas permite una respuesta antitumoral prolongada. 5) Compatibilidad inmunológica óptima al ser autólogas.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 97,
+      "categoria": "objeciones_eficacia",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Por qué usar doble bloqueo (PD-1 + CTLA-4) en lugar de solo nivolumab?",
+      "respuesta": "El doble bloqueo NK (nivolumab + ipilimumab) ataca dos mecanismos de evasión tumoral simultáneamente: 1) Nivolumab bloquea PD-1/PD-L1/PD-L2, permitiendo que NK y T reconozcan tumores que evaden la vigilancia inmune por esa vía. 2) Ipilimumab bloquea CTLA-4, potenciando la activación temprana de linfocitos T en ganglios linfáticos y promoviendo una respuesta más agresiva y prolongada. 3) La combinación resulta en mayor visibilidad del tumor para el sistema inmunitario, reducción del crecimiento tumoral y, en algunos casos, remisión prolongada. 4) Está indicado para neoplasias donde el bloqueo simple puede no ser suficiente: melanoma metastásico, cáncer renal avanzado, cabeza y cuello, colorrectal MSI y mesotelioma pleural maligno.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 98,
+      "categoria": "objeciones_seguridad",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿El doble bloqueo no es demasiado agresivo? ¿Los efectos adversos son manejables?",
+      "respuesta": "El doble bloqueo PD-1 + CTLA-4 tiene un perfil de efectos adversos más amplio que el bloqueo simple, pero es manejable con monitoreo adecuado. Los efectos comunes (vértigo, náuseas, cefalea, febrícula, fatiga, mialgias) se resuelven en 24-48 horas. Los efectos inmunorrelacionados graves (colitis, hepatitis, neumonitis, hipofisitis, toxicidades endocrinas) requieren monitoreo y manejo médico oportuno. Aproximadamente el 55-60% de los pacientes experimentan algún efecto adverso inmunorrelacionado. Estos efectos se deben a que la inhibición de PD-1 y CTLA-4 potencia la actividad inmunológica también contra tejidos sanos. La administración requiere supervisión médica estricta durante las primeras 24-48 horas. Las reacciones inmunomediadas pueden ocurrir durante o después del tratamiento.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 99,
+      "categoria": "objeciones_seguridad",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Las NK Doble Bloqueo pueden usarse en embarazo o pacientes jóvenes?",
+      "respuesta": "Embarazo y lactancia: no recomendable. El uso puede representar riesgo fetal y alterar la producción o composición de la leche. Un aumento en las células NK podría ocasionar complicaciones en el desarrollo del feto y durante la lactancia. Si no se prescribe una alternativa, se debe vigilar al bebé para detectar efectos adversos y/o ingesta adecuada de leche. Pacientes jóvenes: no se cuenta con evidencias en niños menores de 12 años. La administración requiere supervisión médica estricta 24-48h. Precaución adicional: se han notificado reacciones adversas inmunomediadas, incluidos eventos graves o fatales, que pueden ocurrir en cualquier sistema orgánico y manifestarse incluso tras la interrupción del tratamiento.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 100,
+      "categoria": "argumentos_venta",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "featured_faq": true,
+      "pregunta": "¿Cómo presento las NK Doble Bloqueo a un oncólogo?",
+      "respuesta": "Para un oncólogo: las NK Doble Bloqueo de Gencell combinan células NK autólogas con doble checkpoint inmunitario: nivolumab (anti-PD-1) + ipilimumab (anti-CTLA-4). Mecanismo diferenciador: doble bloqueo que activa tanto inmunidad innata (NK: degranulación con perforinas y granzimas) como adaptativa (expansión clonal de linfocitos T vía inhibición de CTLA-4). Indicaciones: melanoma metastásico, NSCLC, cáncer renal avanzado, cabeza y cuello, colorrectal MSI y mesotelioma pleural. Administración IV (no en bolo, 15 min). Presentación: 7 millones de células. Perfil de seguridad: efectos inmunorrelacionados documentados (55-60%), requieren monitoreo. Supervisión estricta 24-48h. Para tumores refractarios o estadios avanzados.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 101,
+      "categoria": "argumentos_venta",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "featured_faq": true,
+      "pregunta": "¿Cómo presento las NK Doble Bloqueo a un internista?",
+      "respuesta": "Para un internista: las NK Doble Bloqueo de Gencell son células NK autólogas pretratadas con doble inhibidor de checkpoint: nivolumab (PD-1) + ipilimumab (CTLA-4). Esto activa tanto inmunidad innata como adaptativa simultáneamente. Indicaciones documentadas en 6 neoplasias avanzadas: melanoma metastásico, NSCLC, cáncer renal avanzado, cabeza y cuello, colorrectal MSI y mesotelioma pleural. Administración IV, supervisión estricta 24-48h. Interacciones relevantes: evitar inmunosupresores/corticoides, planificar cuidadosamente secuencia con quimioterapia. Perfil de seguridad: el doble bloqueo puede generar efectos inmunorrelacionados (colitis, hepatitis, neumonitis, hipofisitis, toxicidades endocrinas) en 55-60% de pacientes. Requiere monitoreo activo.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 102,
+      "categoria": "perfil_paciente",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Cuál es el perfil de paciente ideal para las NK Doble Bloqueo?",
+      "respuesta": "Paciente ideal para las NK Doble Bloqueo: adulto mayor de 12 años con neoplasia maligna avanzada o refractaria en alguna de las indicaciones documentadas: melanoma metastásico, cáncer de pulmón de células no pequeñas (NSCLC), cáncer renal avanzado, cáncer de cabeza y cuello recurrente o metastásico, cáncer colorrectal metastásico con inestabilidad microsatelital, o mesotelioma pleural maligno. Criterios de exclusión: sensibilidad a componentes, embarazo o lactancia. Precauciones: pacientes en tratamiento con inmunosupresores/corticoides, quimioterapia activa, menores de 12 años. Requiere acceso intravenoso, supervisión médica estricta 24-48h, y capacidad de monitorear efectos inmunorrelacionados graves.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 103,
+      "categoria": "protocolos",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Cómo se almacenan y manejan las NK Doble Bloqueo?",
+      "respuesta": "Almacenamiento y manejo de las NK Doble Bloqueo: 1) Conservar en refrigeración entre 2 y 8°C. 2) Proteger de la luz solar directa. 3) No exponer a fuentes de radiación o fuego. 4) No congelar ni agitar. 5) Conservar fuera del alcance de niños y animales domésticos. 6) Periodo de validez: administrar de forma inmediata o en un plazo no mayor a 24 horas posterior a su recepción. 7) Manejo de residuos: utilizar contenedores para residuos de quimioterapia que deberán entregarse al servicio de recolección (a diferencia de las NK Autólogas que se diluyen con cloro al 0.1%). Congelar o refrigerar por un periodo mayor al recomendado reduce la viabilidad y puede incrementar efectos secundarios.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 104,
+      "categoria": "objeciones_eficacia",
+      "product_line": "gencell",
+      "product": "nk_doble_bloqueo",
+      "pregunta": "¿Las NK Doble Bloqueo pueden combinarse con quimioterapia?",
+      "respuesta": "La administración secuencial de quimioterapia y terapia con NK/nivolumab/ipilimumab debe ser cuidadosamente planificada. Interacciones documentadas: 1) Inmunosupresores/corticoides (ciclosporina): evitar, ambos fármacos dependen de la activación inmune y los inmunosupresores contrarrestan este efecto. 2) Antraciclinas (Doxorrubicina, Epirrubicina): riesgo de toxicidad aumentado, agravan efectos sobre sistema inmunológico y cardiovascular. 3) Antimetabolitos (Metotrexato, 5-Fluorouracilo): disminuyen capacidad de proliferación y función citotóxica de NK. 4) Inhibidores de topoisomerasa (Irinotecán, Topotecán, Etopósido): daño al ADN e interferencia con función NK. 5) Agentes alquilantes (Ciclofosfamida, Ifosfamida, Melphalan): mielosupresión que reduce células inmunocompetentes, comprometiendo la eficacia de la combinación terapéutica.",
+      "source_doc": "FICHA NKS natural killer DB autologa.pdf"
     }
   ]
 }

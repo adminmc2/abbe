@@ -1,5 +1,5 @@
 """
-Abbe - Asistente de Ventas Above Pharma RAG v4.13.1
+Abbe - Asistente de Ventas Above Pharma RAG v4.14.1
 Backend FastAPI con WebSocket para streaming
 """
 
@@ -113,7 +113,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Abbe - Asistente de Ventas Above Pharma",
-    version="4.13.1",
+    version="4.14.1",
     lifespan=lifespan
 )
 
@@ -132,7 +132,7 @@ async def health_check():
     """Verificar estado del sistema"""
     return {
         "status": "ok",
-        "version": "4.13.1",
+        "version": "4.14.1",
         "agents": ["productos", "objeciones", "argumentos"],
         "knowledge_base_size": len(orchestrator.agents['productos'].rag.qa_pairs) if orchestrator else 0
     }
@@ -561,6 +561,9 @@ def is_greeting_or_vague(message: str) -> bool:
         r'linfoma', r'leucemia', r'perforina', r'granzima',
         r'pd.?1', r'pd.?l1', r'\bmhc\b', r'apoptosis',
         r'quimioterapia', r'antitumoral', r'citotoxi',
+        # NK Doble Bloqueo — términos exclusivos
+        r'ipilimumab', r'ctla.?4', r'doble.bloqueo',
+        r'mesotelioma', r'colorrectal', r'\bmsi\b',
         # Médico / clínico
         r'medico', r'doctor', r'paciente', r'prescri', r'dosis',
         r'indicaci', r'tratamiento', r'clinico', r'sesion',
