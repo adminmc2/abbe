@@ -4,7 +4,17 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.14.2 — 2026-04-25 (ACTUAL)
+## v4.14.3 — 2026-04-25 (ACTUAL)
+
+### UI: foto de perfil + layout header welcome
+
+- Avatar de iniciales reemplazado por `profile.jpg` en el header de bienvenida
+- Saludo "Hola, Pablo" movido al lado de la foto (misma fila, alineado a la izquierda)
+- Espaciado inferior del header ajustado con margin-bottom 24px para coherencia visual
+
+---
+
+## v4.14.2 — 2026-04-25
 
 ### Deploy en Hugging Face Spaces
 

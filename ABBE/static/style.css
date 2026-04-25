@@ -376,6 +376,16 @@ body::before {
     letter-spacing: 0;
 }
 
+.header-row > .greeting-title {
+    flex: 1;
+    margin-left: 12px;
+    text-align: left;
+}
+
+.welcome-screen > .header-row {
+    margin-bottom: var(--space-24);
+}
+
 .wave {
     display: inline-block;
     animation: wave 2.5s ease-in-out 1;

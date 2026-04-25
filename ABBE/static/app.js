@@ -3056,8 +3056,7 @@ function updateGreetingUI() {
     // Avatar con iniciales
     const avatarEl = document.querySelector('.profile-btn');
     if (avatarEl) {
-        const initials = name.split(/\s+/).map(w => w[0]?.toUpperCase() || '').join('').slice(0, 2) || '?';
-        avatarEl.innerHTML = `<span class="profile-initials">${escapeHtml(initials)}</span>`;
+        avatarEl.innerHTML = `<img src="/static/profile.jpg" alt="Perfil" class="profile-img">`;
     }
 }
 
