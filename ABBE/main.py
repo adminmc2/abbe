@@ -1,5 +1,5 @@
 """
-Abbe - Asistente de Ventas Above Pharma RAG v4.14.1
+Abbe - Asistente de Ventas Above Pharma RAG v4.14.2
 Backend FastAPI con WebSocket para streaming
 """
 
@@ -113,7 +113,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Abbe - Asistente de Ventas Above Pharma",
-    version="4.14.1",
+    version="4.14.2",
     lifespan=lifespan
 )
 
@@ -132,7 +132,7 @@ async def health_check():
     """Verificar estado del sistema"""
     return {
         "status": "ok",
-        "version": "4.14.1",
+        "version": "4.14.2",
         "agents": ["productos", "objeciones", "argumentos"],
         "knowledge_base_size": len(orchestrator.agents['productos'].rag.qa_pairs) if orchestrator else 0
     }

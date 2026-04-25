@@ -4,7 +4,19 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.14.1 — 2026-04-24 (ACTUAL)
+## v4.14.2 — 2026-04-25 (ACTUAL)
+
+### Deploy en Hugging Face Spaces
+
+- Dockerfile: puerto cambiado de 7862 a 7860 (requisito HF Spaces) + COPY catalog.json
+- Deploy en HF Space `mandocc2/abbe` (Protected, Docker, CPU Basic)
+- Dominio custom `abbe.prismaconsul.com` via Cloudflare (CNAME → `mandocc2-abbe.hf.space`)
+- Keepalive configurado en cron-job.org (ping cada 30 min a `/api/health`)
+- README.md y CLAUDE.md actualizados con info de deploy
+
+---
+
+## v4.14.1 — 2026-04-24
 
 ### Bloque 5.4c/5.5c: Fix bloqueantes revisor NK Doble Bloqueo
 

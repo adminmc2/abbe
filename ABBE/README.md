@@ -48,12 +48,12 @@ cp .env.example .env
 # Desarrollo local
 uvicorn main:app --host 0.0.0.0 --port 7862 --reload
 
-# Docker
+# Docker (local)
 docker build -t abbe .
-docker run -p 7862:7862 --env-file .env abbe
+docker run -p 7860:7860 --env-file .env abbe
 ```
 
-Abrir `http://localhost:7862` en el navegador.
+Abrir `http://localhost:7862` (local) o `http://localhost:7860` (Docker).
 
 **Credenciales de prueba:** Consultar al equipo de desarrollo
 
@@ -155,7 +155,7 @@ Este proyecto usa tres documentos internos de control con funciones distintas:
 
 ## Knowledge Base
 
-La base de conocimiento (`knowledge_base.json`) contiene 86 pares pregunta/respuesta con contrato de datos validado al arrancar. Cada Q&A incluye campos obligatorios: `id`, `categoria`, `pregunta`, `respuesta`, `source_doc`, `product_line`, `product`.
+La base de conocimiento (`knowledge_base.json`) contiene 104 pares pregunta/respuesta con contrato de datos validado al arrancar. Cada Q&A incluye campos obligatorios: `id`, `categoria`, `pregunta`, `respuesta`, `source_doc`, `product_line`, `product`.
 
 ### Categorías (lista cerrada, 10):
 
@@ -179,12 +179,34 @@ La base de conocimiento (`knowledge_base.json`) contiene 86 pares pregunta/respu
 
 ## Deploy
 
-El proyecto está configurado para **Hugging Face Spaces**:
+El proyecto está desplegado en **Hugging Face Spaces** (Docker):
+
+- **URL pública:** `https://mandocc2-abbe.hf.space`
+- **Dominio custom:** `https://abbe.prismaconsul.com` (via Cloudflare)
+- **Space:** `mandocc2/abbe` (Protected — código privado, app pública)
+- **Keepalive:** cron-job.org ping cada 30 min a `/api/health`
+
+### Deploy manual al Space
 
 ```bash
-docker build -t abbe .
-# Se ejecuta en puerto 7862 con usuario non-root (requisito HF Spaces)
+# Clonar el Space
+git clone https://huggingface.co/spaces/mandocc2/abbe /tmp/abbe-hf
+
+# Copiar archivos de ABBE/ al Space
+cp Dockerfile main.py requirements.txt knowledge_base.json catalog.json /tmp/abbe-hf/
+cp -r agents/ static/ /tmp/abbe-hf/
+
+# Push
+cd /tmp/abbe-hf && git add -A && git commit -m "Deploy vX.Y.Z" && git push
 ```
+
+### Desarrollo local
+
+```bash
+uvicorn main:app --host 0.0.0.0 --port 7862 --reload
+```
+
+Puerto local: `7862` | Puerto HF Spaces: `7860` (configurado en Dockerfile)
 
 ## Stack tecnológico
 

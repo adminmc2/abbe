@@ -29,7 +29,7 @@ above pharma/
 │   ├── knowledge_base.json         # Base de conocimiento RAG (50 Q&As, 2 productos)
 │   ├── user_data.json              # Historial de usuarios
 │   ├── requirements.txt            # Dependencias Python
-│   ├── Dockerfile                  # Deploy HF Spaces (puerto 7862)
+│   ├── Dockerfile                  # Deploy HF Spaces (puerto 7860)
 │   ├── .env                        # Variables de entorno (NO commitear)
 │   └── CHANGELOG.md                # Historial de desarrollo
 ├── ABBE.md                         # Documentación de producto y pricing
@@ -46,7 +46,7 @@ above pharma/
 - **Frontend:** Vanilla JS, streaming-markdown, marked.js (fallback), Phosphor Icons
 - **RAG:** Motor custom BM25 (Okapi) + stemming español + sinónimos dinámicos + metadata boost
 - **Catálogo:** `catalog.json` con líneas de producto, aliases, sinónimos y keywords
-- **Deploy:** Docker → Hugging Face Spaces (puerto 7862)
+- **Deploy:** Docker → Hugging Face Spaces (puerto 7860, Space `mandocc2/abbe`)
 
 ## Cómo correr el proyecto
 
@@ -94,8 +94,17 @@ Usuario → WebSocket /ws/chat
 
 ## Puertos
 
-- ABBE (Above Pharma): `7862`
+- ABBE local: `7862`
+- ABBE HF Spaces (Docker): `7860`
 - Puro Omega (proyecto hermano): `7860`
+
+## Deploy
+
+- **HF Space:** `mandocc2/abbe` (Protected, Docker)
+- **URL directa:** `https://mandocc2-abbe.hf.space`
+- **Dominio custom:** `https://abbe.prismaconsul.com` (Cloudflare proxy → HF Space)
+- **Keepalive:** cron-job.org ping cada 30 min a `/api/health`
+- **Push al Space:** clonar `https://huggingface.co/spaces/mandocc2/abbe`, copiar contenido de `ABBE/`, push
 
 ## Versionado y CHANGELOG
 
