@@ -14,18 +14,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
     <!-- Estilos -->
-    <link rel="stylesheet" href="/static/style.css?v=4.14.3">
+    <link rel="stylesheet" href="/static/style.css?v=4.14.4">
     <!-- Favicon y iconos para iOS/Android/Windows/Mac -->
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png?v=4.14.3">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png?v=4.14.3">
-    <link rel="icon" type="image/png" sizes="48x48" href="/static/favicon-48x48.png?v=4.14.3">
-    <link rel="apple-touch-icon" href="/static/apple-touch-icon.png?v=4.14.3">
-    <link rel="apple-touch-icon" sizes="152x152" href="/static/apple-touch-icon-152x152.png?v=4.14.3">
-    <link rel="apple-touch-icon" sizes="167x167" href="/static/apple-touch-icon-167x167.png?v=4.14.3">
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon-180x180.png?v=4.14.3">
-    <meta name="msapplication-TileImage" content="/static/mstile-150x150.png?v=4.14.3">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png?v=4.14.4">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png?v=4.14.4">
+    <link rel="icon" type="image/png" sizes="48x48" href="/static/favicon-48x48.png?v=4.14.4">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.png?v=4.14.4">
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/apple-touch-icon-152x152.png?v=4.14.4">
+    <link rel="apple-touch-icon" sizes="167x167" href="/static/apple-touch-icon-167x167.png?v=4.14.4">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon-180x180.png?v=4.14.4">
+    <meta name="msapplication-TileImage" content="/static/mstile-150x150.png?v=4.14.4">
     <meta name="msapplication-TileColor" content="#667eea">
-    <link rel="manifest" href="/static/manifest.json?v=4.14.3">
+    <link rel="manifest" href="/static/manifest.json?v=4.14.4">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Abbe">
@@ -80,7 +80,7 @@
                     <img src="/static/prisma-logo.svg" alt="Prisma Consul" class="login-footer__logo">
                     <span class="login-footer__company">Prisma Consul</span>
                     <span class="login-footer__copyright">© 2026 Todos los derechos reservados</span>
-                    <span class="login-footer__version">Versión 4.14.3</span>
+                    <span class="login-footer__version">Versión 4.14.4</span>
                 </footer>
             </div>
         </main>
@@ -477,6 +477,56 @@
         </div>
     </div>
 
+    <!-- ============================================
+             CATALOG OVERLAY
+             ============================================ -->
+        <div class="catalog-overlay hidden" id="catalog-overlay" role="dialog" aria-modal="true" aria-label="Catálogo de productos">
+            <div class="catalog-overlay__topbar">
+                <h2 class="catalog-overlay__title">Catálogo de productos</h2>
+                <button class="catalog-overlay__close" id="catalog-close-btn" title="Cerrar" aria-label="Cerrar">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <p class="catalog-overlay__subtitle">Fichas técnicas — Gencell Biotechnology</p>
+
+            <div class="catalog-grid">
+                <a class="catalog-card" href="/static/FICHA%20CTM%20estabilizador%20renal.pdf" target="_blank">
+                    <div class="catalog-card__icon"><i class="ph ph-drop-half-bottom"></i></div>
+                    <span class="catalog-card__label">Medicina Regenerativa</span>
+                    <h3 class="catalog-card__name">CTM Estabilizador Renal</h3>
+                    <p class="catalog-card__desc">Células troncales mesenquimales pre-tratadas con melatonina. Coadyuvante en lesiones renales, síndrome post-COVID-19 e infecciones crónicas.</p>
+                </a>
+
+                <a class="catalog-card" href="/static/FICHA%20CTM%20metabolica.pdf" target="_blank">
+                    <div class="catalog-card__icon"><i class="ph ph-pulse"></i></div>
+                    <span class="catalog-card__label">Medicina Regenerativa</span>
+                    <h3 class="catalog-card__name">CTM Metabólica</h3>
+                    <p class="catalog-card__desc">Células troncales mesenquimales pre-tratadas con evolocumab. Coadyuvante en hipercolesterolemias familiares y dislipidemias mixtas.</p>
+                </a>
+
+                <a class="catalog-card" href="/static/FICHA%20FIBROBLASTOS%20exocell.pdf" target="_blank">
+                    <div class="catalog-card__icon"><i class="ph ph-sparkle"></i></div>
+                    <span class="catalog-card__label">Medicina Estética</span>
+                    <h3 class="catalog-card__name">EXOCELL</h3>
+                    <p class="catalog-card__desc">Fibroblastos alogénicos derivados de placenta. Rejuvenecimiento facial mediante aplicación subdérmica.</p>
+                </a>
+
+                <a class="catalog-card" href="/static/FICHA%20NKS%20natural%20killer%20autologa.pdf" target="_blank">
+                    <div class="catalog-card__icon"><i class="ph ph-shield-check"></i></div>
+                    <span class="catalog-card__label">Inmunoterapia Oncológica</span>
+                    <h3 class="catalog-card__name">NK Autólogas</h3>
+                    <p class="catalog-card__desc">Células NK autólogas pre-tratadas con nivolumab (anti-PD-1). Indicada en diversas neoplasias sólidas y hematológicas.</p>
+                </a>
+
+                <a class="catalog-card" href="/static/FICHA%20NKS%20natural%20killer%20DB%20autologa.pdf" target="_blank">
+                    <div class="catalog-card__icon"><i class="ph ph-shield-plus"></i></div>
+                    <span class="catalog-card__label">Inmunoterapia Oncológica</span>
+                    <h3 class="catalog-card__name">NK Doble Bloqueo</h3>
+                    <p class="catalog-card__desc">Células NK autólogas pre-tratadas con nivolumab e ipilimumab. Neoplasias avanzadas o refractarias incl. mesotelioma pleural y colorrectal MSI-H.</p>
+                </a>
+            </div>
+        </div>
+
     <!-- Markdown rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked@17.0.1/lib/marked.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.3.1/dist/purify.min.js"></script>
@@ -488,7 +538,7 @@
     <!-- HTML to Canvas (infographic PNG export) -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <!-- Orb 3D Canvas -->
-    <script src="/static/orb.js?v=4.14.3"></script>
-    <script src="/static/app.js?v=4.14.3"></script>
+    <script src="/static/orb.js?v=4.14.4"></script>
+    <script src="/static/app.js?v=4.14.4"></script>
 </body>
 </html>

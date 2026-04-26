@@ -3359,6 +3359,29 @@ function init() {
         }
     });
 
+    // Catalog overlay
+    const catalogOverlay = document.getElementById('catalog-overlay');
+    const catalogCloseBtn = document.getElementById('catalog-close-btn');
+    const openCatalog = () => {
+        catalogOverlay?.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    };
+    const closeCatalog = () => {
+        catalogOverlay?.classList.add('hidden');
+        document.body.style.overflow = '';
+    };
+    document.getElementById('catalog-btn')?.addEventListener('click', openCatalog);
+    document.getElementById('plan-catalog-btn')?.addEventListener('click', openCatalog);
+    catalogCloseBtn?.addEventListener('click', closeCatalog);
+    catalogOverlay?.addEventListener('click', (e) => {
+        if (e.target === catalogOverlay) closeCatalog();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && catalogOverlay && !catalogOverlay.classList.contains('hidden')) {
+            closeCatalog();
+        }
+    });
+
     // Input en welcome
     elements.messageInput?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {

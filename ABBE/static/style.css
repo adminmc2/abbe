@@ -1968,6 +1968,160 @@ body[data-mood-active] .message.assistant {
 }
 
 /* ============================================
+   CATALOG OVERLAY — Fichas técnicas PDF
+   Mismo lenguaje visual que bento-card
+   ============================================ */
+.catalog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--md-sys-color-surface);
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-20);
+    padding-top: calc(var(--space-16) + var(--safe-top));
+    padding-bottom: calc(var(--space-20) + var(--safe-bottom));
+    overflow-y: auto;
+}
+
+.catalog-overlay.hidden {
+    display: none;
+}
+
+.catalog-overlay__topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.catalog-overlay__title {
+    font: var(--md-sys-typescale-title-large);
+    color: var(--md-sys-color-on-surface);
+    margin: 0;
+}
+
+.catalog-overlay__subtitle {
+    font: var(--md-sys-typescale-body-medium);
+    color: var(--md-sys-color-on-surface-variant);
+    margin: 0 0 var(--space-20) 0;
+}
+
+.catalog-overlay__close {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--md-sys-shape-full);
+    border: none;
+    background: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-on-surface-variant);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.catalog-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+}
+
+.catalog-card {
+    background: rgba(239, 237, 247, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: var(--md-sys-shape-extra-large);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: var(--space-16);
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--md-sys-color-on-surface);
+    box-shadow: var(--md-sys-elevation-1);
+    position: relative;
+    overflow: hidden;
+    transition:
+        transform var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+        box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+.catalog-card:hover {
+    transform: scale(1.02);
+    box-shadow: var(--md-sys-elevation-2);
+}
+
+.catalog-card:active {
+    transform: scale(0.98);
+    box-shadow: var(--md-sys-elevation-1);
+}
+
+.catalog-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--md-sys-color-primary);
+    opacity: 0;
+    transition: opacity var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+    pointer-events: none;
+}
+
+.catalog-card:hover::after {
+    opacity: var(--md-sys-state-hover);
+}
+
+.catalog-card:active::after {
+    opacity: var(--md-sys-state-pressed);
+}
+
+.catalog-card__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--md-sys-shape-full);
+    background: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-12);
+    color: var(--md-sys-color-primary);
+    font-size: 22px;
+}
+
+.catalog-card__label {
+    font: var(--md-sys-typescale-label-small);
+    color: var(--md-sys-color-on-surface-variant);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.catalog-card__name {
+    font: var(--md-sys-typescale-title-small);
+    color: var(--md-sys-color-on-surface);
+    margin: 0 0 6px;
+}
+
+.catalog-card__desc {
+    font: var(--md-sys-typescale-body-small);
+    color: var(--md-sys-color-on-surface-variant);
+    line-height: 1.45;
+    margin: 0;
+    flex: 1;
+}
+
+.catalog-card:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
+}
+
+@media (max-width: 399px) {
+    .catalog-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
    MOOD OVERLAY — Full-screen selector
    Fondo dinámico controlado por --mood-bg y --mood-fg via JS
    ============================================ */

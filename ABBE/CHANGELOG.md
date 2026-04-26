@@ -4,7 +4,21 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.14.3 — 2026-04-25 (ACTUAL)
+## v4.14.4 — 2026-04-26 (ACTUAL)
+
+### Catálogo de fichas técnicas PDF
+
+- Nuevo overlay "Catálogo de productos" accesible desde el icono libro en welcome y plan
+- 5 tarjetas grid (2 columnas, 1 en móvil <400px) con estilo bento-card del proyecto
+- Descripciones validadas contra fichas técnicas PDF (compliance pharma)
+- Cierre con botón X, tecla Escape y scroll lock del body
+- Focus-visible para accesibilidad WCAG 2.1
+- Icono CTM Metabólica cambiado de heartbeat a pulse (semántica correcta)
+- CTA "Ver ficha" eliminado (redundante con card clickeable completa)
+
+---
+
+## v4.14.3 — 2026-04-25
 
 ### UI: foto de perfil + layout header welcome
 
