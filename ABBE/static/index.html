@@ -489,41 +489,8 @@
             </div>
             <p class="catalog-overlay__subtitle">Fichas técnicas — Gencell Biotechnology</p>
 
-            <div class="catalog-grid">
-                <a class="catalog-card" href="/static/FICHA%20CTM%20estabilizador%20renal.pdf" target="_blank">
-                    <div class="catalog-card__icon"><i class="ph ph-drop-half-bottom"></i></div>
-                    <span class="catalog-card__label">Medicina Regenerativa</span>
-                    <h3 class="catalog-card__name">CTM Estabilizador Renal</h3>
-                    <p class="catalog-card__desc">Células troncales mesenquimales pre-tratadas con melatonina. Coadyuvante en lesiones renales, síndrome post-COVID-19 e infecciones crónicas.</p>
-                </a>
-
-                <a class="catalog-card" href="/static/FICHA%20CTM%20metabolica.pdf" target="_blank">
-                    <div class="catalog-card__icon"><i class="ph ph-pulse"></i></div>
-                    <span class="catalog-card__label">Medicina Regenerativa</span>
-                    <h3 class="catalog-card__name">CTM Metabólica</h3>
-                    <p class="catalog-card__desc">Células troncales mesenquimales pre-tratadas con evolocumab. Coadyuvante en hipercolesterolemias familiares y dislipidemias mixtas.</p>
-                </a>
-
-                <a class="catalog-card" href="/static/FICHA%20FIBROBLASTOS%20exocell.pdf" target="_blank">
-                    <div class="catalog-card__icon"><i class="ph ph-sparkle"></i></div>
-                    <span class="catalog-card__label">Medicina Estética</span>
-                    <h3 class="catalog-card__name">EXOCELL</h3>
-                    <p class="catalog-card__desc">Fibroblastos alogénicos derivados de placenta. Rejuvenecimiento facial mediante aplicación subdérmica.</p>
-                </a>
-
-                <a class="catalog-card" href="/static/FICHA%20NKS%20natural%20killer%20autologa.pdf" target="_blank">
-                    <div class="catalog-card__icon"><i class="ph ph-shield-check"></i></div>
-                    <span class="catalog-card__label">Inmunoterapia Oncológica</span>
-                    <h3 class="catalog-card__name">NK Autólogas</h3>
-                    <p class="catalog-card__desc">Células NK autólogas pre-tratadas con nivolumab (anti-PD-1). Indicada en diversas neoplasias sólidas y hematológicas.</p>
-                </a>
-
-                <a class="catalog-card" href="/static/FICHA%20NKS%20natural%20killer%20DB%20autologa.pdf" target="_blank">
-                    <div class="catalog-card__icon"><i class="ph ph-shield-plus"></i></div>
-                    <span class="catalog-card__label">Inmunoterapia Oncológica</span>
-                    <h3 class="catalog-card__name">NK Doble Bloqueo</h3>
-                    <p class="catalog-card__desc">Células NK autólogas pre-tratadas con nivolumab e ipilimumab. Neoplasias avanzadas o refractarias incl. mesotelioma pleural y colorrectal MSI-H.</p>
-                </a>
+            <div class="catalog-grid" id="catalog-grid">
+                <!-- Renderizado dinámicamente desde /api/catalog (single source of truth: catalog.json) -->
             </div>
         </div>
 

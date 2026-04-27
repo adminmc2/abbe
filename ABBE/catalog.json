@@ -22,7 +22,12 @@
           "pretreatment_mechanism": "Vías MT1/MT2",
           "aliases": ["estabilizador renal", "ctm renal", "células mesenquimales renal"],
           "conditions": ["lesión renal", "post-covid", "esteatosis hepática", "asma", "lyme", "infecciones crónicas"],
-          "zones": ["renal", "hepático", "pulmonar", "sistémico"]
+          "zones": ["renal", "hepático", "pulmonar", "sistémico"],
+          "category_label": "Medicina Regenerativa",
+          "icon": "drop-half-bottom",
+          "description_short": "Células troncales mesenquimales pre-tratadas con melatonina. Coadyuvante en lesiones renales, síndrome post-COVID-19 e infecciones crónicas.",
+          "ficha_pdf": "FICHA CTM estabilizador renal.pdf",
+          "presentations": "7, 14, 21, 28, 42 y 49 millones de células"
         },
         {
           "id": "ctm_metabolica",
@@ -32,7 +37,12 @@
           "pretreatment_mechanism": "Inhibición de PCSK9, preservación del receptor LDL",
           "aliases": ["ctm metabólica", "metabólica", "metabolica", "ctm metabolica", "ctm colesterol"],
           "conditions": ["hipercolesterolemia familiar", "dislipidemia mixta", "daño endotelial", "riesgo cardiovascular"],
-          "zones": ["cardiovascular", "endotelial", "metabólico", "sistémico"]
+          "zones": ["cardiovascular", "endotelial", "metabólico", "sistémico"],
+          "category_label": "Medicina Regenerativa",
+          "icon": "pulse",
+          "description_short": "Células troncales mesenquimales pre-tratadas con evolocumab. Coadyuvante en hipercolesterolemias familiares y dislipidemias mixtas.",
+          "ficha_pdf": "FICHA CTM metabolica.pdf",
+          "presentations": "7, 14, 21, 28, 42 y 49 millones de células"
         },
         {
           "id": "exocell",
@@ -42,7 +52,12 @@
           "pretreatment_mechanism": "Sin pretratamiento farmacológico — fibroblastos alogénicos nativos derivados de placenta",
           "aliases": ["exocell", "fibroblastos", "fibroblastos alogénicos", "fibroblastos de placenta", "fibroblastos placentarios"],
           "conditions": ["rejuvenecimiento facial", "arrugas", "firmeza cutánea", "elasticidad cutánea", "envejecimiento cutáneo", "textura de piel"],
-          "zones": ["facial", "subdérmico", "cutáneo"]
+          "zones": ["facial", "subdérmico", "cutáneo"],
+          "category_label": "Medicina Estética",
+          "icon": "sparkle",
+          "description_short": "Fibroblastos alogénicos derivados de placenta. Rejuvenecimiento facial mediante aplicación subdérmica.",
+          "ficha_pdf": "FICHA FIBROBLASTOS exocell.pdf",
+          "presentations": "7, 14, 21, 28, 42 y 49 millones de fibroblastos"
         },
         {
           "id": "nk_autologas",
@@ -52,7 +67,12 @@
           "pretreatment_mechanism": "Bloqueo del receptor PD-1 y sus ligandos PD-L1/PD-L2 en células tumorales (anti-PD-1)",
           "aliases": ["natural killer autólogas", "nk autólogas", "nk autologas", "natural killer autologas", "nk nivolumab", "nks autólogas"],
           "conditions": ["cáncer pulmonar de células no pequeñas", "NSCLC", "melanoma", "linfoma de células B grandes", "DLBCL", "leucemia linfoblástica aguda", "LLA", "cáncer renal", "cáncer de mama metastásico", "triple negativo", "TNBC", "cáncer de próstata", "cáncer de páncreas"],
-          "zones": ["intravenosa", "sistémico", "oncológico"]
+          "zones": ["intravenosa", "sistémico", "oncológico"],
+          "category_label": "Inmunoterapia Oncológica",
+          "icon": "shield-check",
+          "description_short": "Células NK autólogas pre-tratadas con nivolumab (anti-PD-1). Indicada en diversas neoplasias sólidas y hematológicas.",
+          "ficha_pdf": "FICHA NKS natural killer autologa.pdf",
+          "presentations": "7 millones de células"
         },
         {
           "id": "nk_doble_bloqueo",
@@ -62,7 +82,12 @@
           "pretreatment_mechanism": "Doble bloqueo: PD-1 (nivolumab) + CTLA-4 (ipilimumab) — activa inmunidad innata (NK) y adaptativa (T)",
           "aliases": ["natural killer doble bloqueo", "nk doble bloqueo", "nks-db", "nk db", "nk doble bloqueo autólogas", "doble bloqueo", "nk ipilimumab"],
           "conditions": ["melanoma metastásico", "cáncer de pulmón de células no pequeñas", "NSCLC", "cáncer renal avanzado", "cáncer de cabeza y cuello", "cáncer colorrectal metastásico", "inestabilidad microsatelital", "mesotelioma pleural maligno"],
-          "zones": ["intravenosa", "sistémico", "oncológico"]
+          "zones": ["intravenosa", "sistémico", "oncológico"],
+          "category_label": "Inmunoterapia Oncológica",
+          "icon": "shield-plus",
+          "description_short": "Células NK autólogas pre-tratadas con nivolumab e ipilimumab. Neoplasias avanzadas o refractarias incl. mesotelioma pleural y colorrectal MSI-H.",
+          "ficha_pdf": "FICHA NKS natural killer DB autologa.pdf",
+          "presentations": "7 millones de células"
         }
       ],
       "competitors": [],

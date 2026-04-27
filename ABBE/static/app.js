@@ -1472,6 +1472,20 @@ function sendToWebSocket(message, responseMode = 'full') {
             }
             elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
         }
+        else if (data.type === 'replace_response') {
+            // Claim verifier: backend detected fabricated data in low-coverage response
+            console.warn('[CLAIM_VERIFIER] Response replaced by backend — fabricated data detected');
+            state.currentMessage = data.content;
+            if (assistantMessage) {
+                // Kill streaming parser if active
+                if (state._smdParser) {
+                    window.smd.parser_end(state._smdParser);
+                    state._smdParser = null;
+                }
+                // Replace rendered content with safe response
+                assistantMessage.innerHTML = renderMarkdown(data.content, false);
+            }
+        }
         else if (data.type === 'end') {
             console.log('[WS] END recibido — finalizando respuesta');
 
@@ -3359,10 +3373,39 @@ function init() {
         }
     });
 
-    // Catalog overlay
+    // Catalog overlay — dynamic rendering from /api/catalog (single source of truth)
     const catalogOverlay = document.getElementById('catalog-overlay');
     const catalogCloseBtn = document.getElementById('catalog-close-btn');
+    let catalogLoaded = false;
+
+    const loadCatalog = async () => {
+        if (catalogLoaded) return;
+        const grid = document.getElementById('catalog-grid');
+        if (!grid) return;
+        try {
+            const resp = await fetch('/api/catalog');
+            const data = await resp.json();
+            const subtitle = catalogOverlay?.querySelector('.catalog-overlay__subtitle');
+            if (subtitle && data.line_name) {
+                subtitle.textContent = `Fichas técnicas — ${data.line_name}`;
+            }
+            grid.innerHTML = data.products.map(p => `
+                <a class="catalog-card" href="${p.ficha_url || '#'}" target="_blank">
+                    <div class="catalog-card__icon"><i class="ph ph-${p.icon}"></i></div>
+                    <span class="catalog-card__label">${p.category_label}</span>
+                    <h3 class="catalog-card__name">${p.name}</h3>
+                    <p class="catalog-card__desc">${p.description_short}</p>
+                </a>
+            `).join('');
+            catalogLoaded = true;
+        } catch (err) {
+            console.error('[Catalog] Error loading catalog:', err);
+            grid.innerHTML = '<p style="padding:16px;color:var(--md-sys-color-error)">Error cargando catálogo</p>';
+        }
+    };
+
     const openCatalog = () => {
+        loadCatalog();
         catalogOverlay?.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     };

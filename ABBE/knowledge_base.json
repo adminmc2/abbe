@@ -3,7 +3,7 @@
     "empresa": "Above Pharma",
     "version": "2.0",
     "fecha_creacion": "2026-04-21",
-    "total_preguntas": 104
+    "total_preguntas": 105
   },
   "qa_pairs": [
     {
@@ -12,7 +12,7 @@
       "product_line": "gencell",
       "product": null,
       "pregunta": "¿Qué es Gencell Biotechnology?",
-      "respuesta": "Gencell® es una empresa de biotecnología especializada en terapias celulares. Desarrolla productos de medicina regenerativa basados en células troncales mesenquimales (CTM) pre-tratadas con compuestos específicos según la indicación terapéutica (melatonina para el Estabilizador Renal, evolocumab para la línea Metabólica), fibroblastos alogénicos derivados de placenta para rejuvenecimiento facial (EXOCELL), células Natural Killer autólogas pretratadas con nivolumab para inmunoterapia oncológica (Natural Killer Autólogas), y células NK autólogas pretratadas con nivolumab e ipilimumab para doble bloqueo inmunitario en neoplasias avanzadas (Natural Killer Doble Bloqueo Autólogas). Es titular de comercialización de toda la línea.",
+      "respuesta": "Gencell® es una empresa de biotecnología especializada en terapias celulares. Desarrolla productos de medicina regenerativa basados en células troncales mesenquimales (CTM) pre-tratadas con compuestos específicos según la indicación terapéutica (melatonina para el Estabilizador Renal, evolocumab para la línea Metabólica), fibroblastos alogénicos derivados de placenta para rejuvenecimiento facial (EXOCELL), células Natural Killer autólogas pre-tratadas con nivolumab para inmunoterapia oncológica (Natural Killer Autólogas), y células NK autólogas pre-tratadas con nivolumab e ipilimumab para doble bloqueo inmunitario en neoplasias avanzadas (Natural Killer Doble Bloqueo Autólogas). Es titular de comercialización de toda la línea.",
       "source_doc": "FICHA CTM estabilizador renal.pdf + FICHA CTM metabolica.pdf + FICHA FIBROBLASTOS exocell.pdf + FICHA NKS natural killer autologa.pdf + FICHA NKS natural killer DB autologa.pdf"
     },
     {
@@ -644,7 +644,7 @@
       "product_line": "gencell",
       "product": "nk_autologas",
       "pregunta": "¿Qué son las Natural Killer Autólogas de Gencell?",
-      "respuesta": "Las Natural Killer Autólogas de Gencell son células NK autólogas pretratadas con nivolumab, diseñadas para el tratamiento de diversas neoplasias. Las células NK son componentes clave del sistema inmunitario innato con la capacidad de identificar y eliminar células neoplásicas. El pretratamiento con nivolumab bloquea la vía PD-1/PD-L1, potenciando la capacidad antitumoral de las células NK. Se comercializan bajo Gencell Biotechnology en presentación única de 7 millones de células NK autólogas.",
+      "respuesta": "Las Natural Killer Autólogas de Gencell son células NK autólogas pre-tratadas con nivolumab, diseñadas para el tratamiento de diversas neoplasias. Las células NK son componentes clave del sistema inmunitario innato con la capacidad de identificar y eliminar células neoplásicas. El pretratamiento con nivolumab bloquea la vía PD-1/PD-L1, potenciando la capacidad antitumoral de las células NK. Se comercializan bajo Gencell Biotechnology en presentación única de 7 millones de células NK autólogas.",
       "source_doc": "FICHA NKS natural killer autologa.pdf"
     },
     {
@@ -653,7 +653,7 @@
       "product_line": "gencell",
       "product": "nk_autologas",
       "pregunta": "¿Cuál es la composición y presentación de las Natural Killer Autólogas?",
-      "respuesta": "Composición: células Natural Killer autólogas pretratadas con nivolumab. Presentación única: 7 millones de células NK autólogas en solución inyectable. El contenedor plástico (container) protege el monovette que contiene 4 ml del producto. Excipiente: solución salina al 0.9%. Periodo de validez: debe administrarse de forma inmediata o en un plazo no mayor a 24 horas posterior a su recepción. Almacenamiento: refrigeración entre 2 y 8°C, protegido de luz solar directa, no congelar.",
+      "respuesta": "Composición: células Natural Killer autólogas pre-tratadas con nivolumab. Presentación única: 7 millones de células NK autólogas en solución inyectable. El contenedor plástico (container) protege el monovette que contiene 4 ml del producto. Excipiente: solución salina al 0.9%. Periodo de validez: debe administrarse de forma inmediata o en un plazo no mayor a 24 horas posterior a su recepción. Almacenamiento: refrigeración entre 2 y 8°C, protegido de luz solar directa, no congelar.",
       "source_doc": "FICHA NKS natural killer autologa.pdf"
     },
     {
@@ -744,7 +744,7 @@
       "product": "nk_autologas",
       "featured_faq": true,
       "pregunta": "¿Cómo presento las Natural Killer Autólogas a un oncólogo?",
-      "respuesta": "Para un oncólogo: las Natural Killer Autólogas de Gencell son células NK del propio paciente pretratadas con nivolumab (anti-PD-1). Mecanismo diferenciador: las NK detectan anomalías en MHC-I, inician degranulación con perforinas y granzimas, e inducen apoptosis tumoral directa. El nivolumab bloquea PD-1/PD-L1/PD-L2, superando la evasión inmunitaria. Indicaciones: NSCLC, melanoma, DLBCL, LLA, cáncer renal, mama metastásico/TNBC, próstata y páncreas. Administración IV con solución salina (no en bolo, 15 min). Presentación única: 7 millones de células. Efectos adversos leves y autolimitados (24-48h). Supervisión médica estricta post-aplicación.",
+      "respuesta": "Para un oncólogo: las Natural Killer Autólogas de Gencell son células NK del propio paciente pre-tratadas con nivolumab (anti-PD-1). Mecanismo diferenciador: las NK detectan anomalías en MHC-I, inician degranulación con perforinas y granzimas, e inducen apoptosis tumoral directa. El nivolumab bloquea PD-1/PD-L1/PD-L2, superando la evasión inmunitaria. Indicaciones: NSCLC, melanoma, DLBCL, LLA, cáncer renal, mama metastásico/TNBC, próstata y páncreas. Administración IV con solución salina (no en bolo, 15 min). Presentación única: 7 millones de células. Efectos adversos leves y autolimitados (24-48h). Supervisión médica estricta post-aplicación.",
       "source_doc": "FICHA NKS natural killer autologa.pdf"
     },
     {
@@ -808,7 +808,7 @@
       "product_line": "gencell",
       "product": "nk_doble_bloqueo",
       "pregunta": "¿Qué son las Natural Killer Doble Bloqueo Autólogas de Gencell?",
-      "respuesta": "Las Natural Killer Doble Bloqueo Autólogas (NKs-DB) de Gencell son células NK autólogas pretratadas con nivolumab e ipilimumab, diseñadas para el tratamiento de neoplasias malignas avanzadas. A diferencia de las NK Autólogas (que usan solo nivolumab/PD-1), las NKs-DB combinan el bloqueo de dos checkpoints inmunitarios: PD-1 (nivolumab) y CTLA-4 (ipilimumab), activando tanto el sistema inmunitario innato (NK) como el adaptativo (células T). Se comercializan bajo Gencell Biotechnology en presentación única de 7 millones de células NK autólogas.",
+      "respuesta": "Las Natural Killer Doble Bloqueo Autólogas (NKs-DB) de Gencell son células NK autólogas pre-tratadas con nivolumab e ipilimumab, diseñadas para el tratamiento de neoplasias malignas avanzadas. A diferencia de las NK Autólogas (que usan solo nivolumab/PD-1), las NKs-DB combinan el bloqueo de dos checkpoints inmunitarios: PD-1 (nivolumab) y CTLA-4 (ipilimumab), activando tanto el sistema inmunitario innato (NK) como el adaptativo (células T). Se comercializan bajo Gencell Biotechnology en presentación única de 7 millones de células NK autólogas.",
       "source_doc": "FICHA NKS natural killer DB autologa.pdf"
     },
     {
@@ -817,7 +817,7 @@
       "product_line": "gencell",
       "product": "nk_doble_bloqueo",
       "pregunta": "¿Cuál es la composición y presentación de las NK Doble Bloqueo?",
-      "respuesta": "Composición: células Natural Killer autólogas pretratadas con nivolumab e ipilimumab. Presentación única: 7 millones de células NK autólogas en solución inyectable. El contenedor plástico (container) protege el monovette que contiene 4 ml del producto. Excipiente: solución salina al 0.9%. Periodo de validez: administrar de forma inmediata o en un plazo no mayor a 24 horas posterior a su recepción. Almacenamiento: refrigeración entre 2 y 8°C, protegido de luz solar directa, no congelar ni agitar. Manejo de residuos: contenedores para residuos de quimioterapia entregados al servicio de recolección.",
+      "respuesta": "Composición: células Natural Killer autólogas pre-tratadas con nivolumab e ipilimumab. Presentación única: 7 millones de células NK autólogas en solución inyectable. El contenedor plástico (container) protege el monovette que contiene 4 ml del producto. Excipiente: solución salina al 0.9%. Periodo de validez: administrar de forma inmediata o en un plazo no mayor a 24 horas posterior a su recepción. Almacenamiento: refrigeración entre 2 y 8°C, protegido de luz solar directa, no congelar ni agitar. Manejo de residuos: contenedores para residuos de quimioterapia entregados al servicio de recolección.",
       "source_doc": "FICHA NKS natural killer DB autologa.pdf"
     },
     {
@@ -853,7 +853,7 @@
       "product_line": "gencell",
       "product": "nk_doble_bloqueo",
       "pregunta": "¿Cuál es la diferencia entre las NK Autólogas y las NK Doble Bloqueo?",
-      "respuesta": "Las dos son células NK autólogas de Gencell pero difieren en pretratamiento, mecanismo e indicaciones: NK Autólogas: pretratadas solo con nivolumab (anti-PD-1). Bloquean una vía de evasión tumoral (PD-1/PD-L1). Indicadas en NSCLC, melanoma, DLBCL, LLA, cáncer renal, mama metastásico/TNBC, próstata y páncreas. NK Doble Bloqueo: pretratadas con nivolumab + ipilimumab (anti-PD-1 + anti-CTLA-4). Bloquean dos checkpoints inmunitarios, activando tanto inmunidad innata como adaptativa. Indicadas en melanoma metastásico, NSCLC, cáncer renal avanzado, cabeza y cuello, colorrectal metastásico con inestabilidad microsatelital y mesotelioma pleural maligno. El doble bloqueo tiene un perfil de efectos adversos más amplio, incluyendo efectos inmunorrelacionados graves (colitis, hepatitis, neumonitis, hipofisitis).",
+      "respuesta": "Las dos son células NK autólogas de Gencell pero difieren en pretratamiento, mecanismo e indicaciones: NK Autólogas: pre-tratadas solo con nivolumab (anti-PD-1). Bloquean una vía de evasión tumoral (PD-1/PD-L1). Indicadas en NSCLC, melanoma, DLBCL, LLA, cáncer renal, mama metastásico/TNBC, próstata y páncreas. NK Doble Bloqueo: pre-tratadas con nivolumab + ipilimumab (anti-PD-1 + anti-CTLA-4). Bloquean dos checkpoints inmunitarios, activando tanto inmunidad innata como adaptativa. Indicadas en melanoma metastásico, NSCLC, cáncer renal avanzado, cabeza y cuello, colorrectal metastásico con inestabilidad microsatelital y mesotelioma pleural maligno. El doble bloqueo tiene un perfil de efectos adversos más amplio, incluyendo efectos inmunorrelacionados graves (colitis, hepatitis, neumonitis, hipofisitis).",
       "source_doc": "FICHA NKS natural killer DB autologa.pdf"
     },
     {
@@ -936,7 +936,7 @@
       "product": "nk_doble_bloqueo",
       "featured_faq": true,
       "pregunta": "¿Cómo presento las NK Doble Bloqueo a un internista?",
-      "respuesta": "Para un internista: las NK Doble Bloqueo de Gencell son células NK autólogas pretratadas con doble inhibidor de checkpoint: nivolumab (PD-1) + ipilimumab (CTLA-4). Esto activa tanto inmunidad innata como adaptativa simultáneamente. Indicaciones documentadas en 6 neoplasias avanzadas: melanoma metastásico, NSCLC, cáncer renal avanzado, cabeza y cuello, colorrectal MSI y mesotelioma pleural. Administración IV, supervisión estricta 24-48h. Interacciones relevantes: evitar inmunosupresores/corticoides, planificar cuidadosamente secuencia con quimioterapia. Perfil de seguridad: el doble bloqueo puede generar efectos inmunorrelacionados (colitis, hepatitis, neumonitis, hipofisitis, toxicidades endocrinas) en 55-60% de pacientes. Requiere monitoreo activo.",
+      "respuesta": "Para un internista: las NK Doble Bloqueo de Gencell son células NK autólogas pre-tratadas con doble inhibidor de checkpoint: nivolumab (PD-1) + ipilimumab (CTLA-4). Esto activa tanto inmunidad innata como adaptativa simultáneamente. Indicaciones documentadas en 6 neoplasias avanzadas: melanoma metastásico, NSCLC, cáncer renal avanzado, cabeza y cuello, colorrectal MSI y mesotelioma pleural. Administración IV, supervisión estricta 24-48h. Interacciones relevantes: evitar inmunosupresores/corticoides, planificar cuidadosamente secuencia con quimioterapia. Perfil de seguridad: el doble bloqueo puede generar efectos inmunorrelacionados (colitis, hepatitis, neumonitis, hipofisitis, toxicidades endocrinas) en 55-60% de pacientes. Requiere monitoreo activo.",
       "source_doc": "FICHA NKS natural killer DB autologa.pdf"
     },
     {
@@ -965,6 +965,23 @@
       "pregunta": "¿Las NK Doble Bloqueo pueden combinarse con quimioterapia?",
       "respuesta": "La administración secuencial de quimioterapia y terapia con NK/nivolumab/ipilimumab debe ser cuidadosamente planificada. Interacciones documentadas: 1) Inmunosupresores/corticoides (ciclosporina): evitar, ambos fármacos dependen de la activación inmune y los inmunosupresores contrarrestan este efecto. 2) Antraciclinas (Doxorrubicina, Epirrubicina): riesgo de toxicidad aumentado, agravan efectos sobre sistema inmunológico y cardiovascular. 3) Antimetabolitos (Metotrexato, 5-Fluorouracilo): disminuyen capacidad de proliferación y función citotóxica de NK. 4) Inhibidores de topoisomerasa (Irinotecán, Topotecán, Etopósido): daño al ADN e interferencia con función NK. 5) Agentes alquilantes (Ciclofosfamida, Ifosfamida, Melphalan): mielosupresión que reduce células inmunocompetentes, comprometiendo la eficacia de la combinación terapéutica.",
       "source_doc": "FICHA NKS natural killer DB autologa.pdf"
+    },
+    {
+      "id": 105,
+      "categoria": "empresa",
+      "product_line": "gencell",
+      "product": null,
+      "pregunta": "¿Qué productos tiene Above Pharma?",
+      "alt_questions": [
+        "¿Cuál es el catálogo completo de Above Pharma?",
+        "¿Qué portafolio de productos ofrece Gencell?",
+        "¿Cuántos productos vende Above Pharma?",
+        "¿Qué ofrece Above Pharma?",
+        "¿Qué vende Above Pharma?",
+        "Dame la lista de productos"
+      ],
+      "respuesta": "Above Pharma comercializa 5 productos de la línea Gencell Biotechnology (terapias celulares para medicina regenerativa, estética y oncología):\n\n1. CTM Estabilizador Renal — Células troncales mesenquimales pre-tratadas con melatonina. Indicación: coadyuvante en lesiones renales (TFG >26 mL/min), síndrome post-COVID-19, esteatosis hepática, asma en fase aguda, enfermedad de Lyme e infecciones crónicas. Presentaciones: 7, 14, 21, 28, 42 y 49 millones de células.\n\n2. CTM Metabólica — Células troncales mesenquimales pre-tratadas con evolocumab (inhibidor de PCSK9). Indicación: coadyuvante en hipercolesterolemias familiares, dislipidemias mixtas, daño endotelial y riesgo cardiovascular elevado. Presentaciones: 7, 14, 21, 28, 42 y 49 millones de células.\n\n3. EXOCELL — Fibroblastos alogénicos derivados de placenta. Indicación: rejuvenecimiento facial mediante aplicación subdérmica. Presentaciones: 7, 14, 21, 28, 42 y 49 millones de fibroblastos.\n\n4. Natural Killer Autólogas — Células NK autólogas pre-tratadas con nivolumab (anti-PD-1). Indicación: NSCLC, melanoma, DLBCL, LLA, cáncer renal, mama metastásico/TNBC, próstata y páncreas. Presentación: 7 millones de células.\n\n5. Natural Killer Doble Bloqueo Autólogas — Células NK autólogas pre-tratadas con nivolumab + ipilimumab (anti-PD-1 + anti-CTLA-4). Indicación: melanoma metastásico, NSCLC, cáncer renal avanzado, cabeza y cuello, colorrectal MSI-H y mesotelioma pleural maligno. Presentación: 7 millones de células.\n\nTodos los productos se administran por vía intravenosa bajo supervisión médica.",
+      "source_doc": "FICHA CTM estabilizador renal.pdf + FICHA CTM metabolica.pdf + FICHA FIBROBLASTOS exocell.pdf + FICHA NKS natural killer autologa.pdf + FICHA NKS natural killer DB autologa.pdf"
     }
   ]
 }

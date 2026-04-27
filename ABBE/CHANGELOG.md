@@ -4,7 +4,52 @@ Historial completo de desarrollo, problemas encontrados y soluciones aplicadas.
 
 ---
 
-## v4.14.4 — 2026-04-26 (ACTUAL)
+## v4.16.0 — 2026-04-27 (ACTUAL)
+
+### catalog.json como single source of truth (M4)
+
+**Arquitectura:**
+- `catalog.json` extendido con campos de UI: `description_short`, `category_label`, `icon`, `ficha_pdf`, `presentations` por producto
+- Nuevo endpoint `GET /api/catalog` que sirve datos de catálogo al frontend
+- Overlay de catálogo ahora se renderiza dinámicamente desde `/api/catalog` (ya no es HTML estático)
+- Elimina duplicación: antes las descripciones vivían en 3 lugares (catalog.json, knowledge_base.json, index.html). Ahora catalog.json es la fuente y el overlay lee de ahí
+
+**Pendiente para siguiente sprint:**
+- M7 — Provenance granular en KB: extender `source_doc` con `source_refs: [{doc, page, section, version}]` para trazabilidad COFEPRIS/INVIMA. Requiere revisar 105 Q&As contra 5 PDFs (~4-6h). Priorizar cuando haya auditoría regulatoria inminente.
+
+---
+
+## v4.15.0 — 2026-04-27
+
+### RAG robustez + compliance pharma (auditoría del revisor)
+
+**KB & RAG:**
+- Q&A #105: resumen del portafolio completo (5 productos, indicaciones, presentaciones). Reestructurada en formato markdown con bullets por producto
+- Nuevo campo `alt_questions` en schema KB para variantes de query (escalable a todas las Q&As)
+- RAG indexa `pregunta + alt_questions + respuesta` en BM25 (peso implícito via tf)
+- Validación de `alt_questions` en KB validator (lista de strings no vacíos)
+- Sinónimos ampliados: catálogo, portafolio, lista, vende, ofrece, tiene, completo, manejan
+- Unificación editorial: pretratadas → pre-tratadas en toda la KB (9 ocurrencias)
+
+**Compliance (pharma):**
+- Instrucción `low` endurecida: prohibido generar tablas, cifras, indicaciones o datos clínicos no verificados
+- Claim verifier post-respuesta: detecta tablas markdown, %, mg, semanas, sesiones, estudios en respuestas low-coverage y las reemplaza con mensaje seguro
+- Frontend maneja `replace_response` para sustituir contenido streameado cuando el verifier detecta violaciones
+- Trazas de auditoría incluyen `claim_verification` con violaciones detectadas
+
+**Testing:**
+- Nuevo test de regresión `diag_meta_queries.py` (bloque 2.7): 13 casos (11 positivos + 2 negativos), 13/13 pasan
+- Registrado en `run_all.py` como bloque 2.7
+
+**Scores antes/después:**
+- "qué productos tiene Above Pharma": 3.78 → 28.68 (LOW → HIGH)
+- "catálogo completo": 3.78 → 50.63 (LOW → HIGH)
+- "qué vende gencell": ~0 → 14.52 (NONE → MEDIUM)
+- Queries específicas sin regresión: CTM Renal 62→61, CTM Metabólica 61→60
+
+---
+
+## v4.14.4 — 2026-04-26
 
 ### Catálogo de fichas técnicas PDF
 

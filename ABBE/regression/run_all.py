@@ -40,6 +40,10 @@ SUITES = {
         "offline": [],
         "runtime": ["diag_26_historial.py", "diag_26_final.py"],
     },
+    "2.7": {
+        "offline": ["diag_meta_queries.py"],
+        "runtime": [],
+    },
 }
 
 def run_script(script_name):

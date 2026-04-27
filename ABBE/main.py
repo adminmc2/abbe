@@ -1,5 +1,5 @@
 """
-Abbe - Asistente de Ventas Above Pharma RAG v4.14.4
+Abbe - Asistente de Ventas Above Pharma RAG v4.16.0
 Backend FastAPI con WebSocket para streaming
 """
 
@@ -113,7 +113,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Abbe - Asistente de Ventas Above Pharma",
-    version="4.14.4",
+    version="4.16.0",
     lifespan=lifespan
 )
 
@@ -132,10 +132,32 @@ async def health_check():
     """Verificar estado del sistema"""
     return {
         "status": "ok",
-        "version": "4.14.4",
+        "version": "4.16.0",
         "agents": ["productos", "objeciones", "argumentos"],
         "knowledge_base_size": len(orchestrator.agents['productos'].rag.qa_pairs) if orchestrator else 0
     }
+
+
+@app.get("/api/catalog")
+async def get_catalog():
+    """Catálogo de productos para el overlay del frontend.
+    Single source of truth: lee de catalog.json."""
+    from agents.catalog import get_catalog as _get_catalog
+    catalog = _get_catalog()
+    products = []
+    for line in catalog.get("product_lines", []):
+        for prod in line.get("products", []):
+            ficha = prod.get("ficha_pdf", "")
+            products.append({
+                "id": prod["id"],
+                "name": prod["name"],
+                "category_label": prod.get("category_label", ""),
+                "icon": prod.get("icon", "pill"),
+                "description_short": prod.get("description_short", ""),
+                "ficha_url": f"/static/{ficha.replace(' ', '%20')}" if ficha else None,
+                "presentations": prod.get("presentations", ""),
+            })
+    return {"products": products, "line_name": catalog.get("product_lines", [{}])[0].get("name", "")}
 
 
 @app.get("/api/test-infographic")
@@ -608,6 +630,52 @@ GREETING_RESPONSE = """Soy **Abbe**, tu asistente de ventas de Above Pharma. Par
 > Puedes usar las **preguntas sugeridas** en la pantalla de inicio o escribir tu consulta directamente."""
 
 
+# ============================================
+# Claim verifier para cobertura baja (pharma compliance)
+# ============================================
+# Patrones que indican datos fabricados cuando coverage=low
+_LOW_COVERAGE_VIOLATIONS = [
+    (re.compile(r'\|.*\|.*\|', re.MULTILINE), "markdown_table"),
+    (re.compile(r'\d+\s*%'), "percentage"),
+    (re.compile(r'\d+\s*mg'), "dosage_mg"),
+    (re.compile(r'\d+\s*ml'), "dosage_ml"),
+    (re.compile(r'\d+\s*semanas'), "weeks_claim"),
+    (re.compile(r'\d+\s*sesiones'), "sessions_claim"),
+    (re.compile(r'n\s*=\s*\d+'), "sample_size"),
+    (re.compile(r'estudio\s+\w+', re.IGNORECASE), "study_reference"),
+]
+
+_SAFE_LOW_RESPONSE = (
+    "No tengo información verificada suficiente sobre este tema. "
+    "Te puedo ayudar con preguntas específicas de nuestro portafolio.\n\n"
+    "**Prueba preguntar:**\n"
+    "- ¿Qué es el CTM Estabilizador Renal?\n"
+    "- ¿Cuáles son las indicaciones de la CTM Metabólica?\n"
+    "- ¿Cómo presento las Natural Killer Autólogas a un oncólogo?"
+)
+
+
+def verify_low_coverage_response(response: str) -> dict:
+    """Verifica si una respuesta con coverage=low contiene datos fabricados.
+
+    Returns:
+        dict con: violated (bool), violations (list of str), safe_response (str or None)
+    """
+    violations = []
+    for pattern, label in _LOW_COVERAGE_VIOLATIONS:
+        if pattern.search(response):
+            violations.append(label)
+
+    if violations:
+        print(f"[CLAIM_VERIFIER] Violations detected in low-coverage response: {violations}")
+        return {
+            "violated": True,
+            "violations": violations,
+            "safe_response": _SAFE_LOW_RESPONSE,
+        }
+    return {"violated": False, "violations": [], "safe_response": None}
+
+
 @app.websocket("/ws/chat")
 async def websocket_chat(websocket: WebSocket):
     """
@@ -773,21 +841,19 @@ No tengo información sobre [tema]. Mi especialidad es el portafolio de Above Ph
                 elif rag_coverage == "low":
                     rag_instruction = """⚠️ COBERTURA RAG: BAJA — Los datos encontrados son muy débiles o tangenciales.
 
-REGLAS ESTRICTAS:
-1. Respuesta CORTA (máximo 100 palabras). No generes un argumentario completo.
-2. NO inventes cifras, porcentajes, datos clínicos ni claims de producto.
-3. NO sintetices comparativas ni afirmes propiedades que no aparezcan en los datos verificados.
-4. Si HAY algún dato relevante en el contexto RAG de arriba (aunque sea tangencial), úsalo — son datos verificados.
-5. Si NO hay datos verificados relevantes, di claramente que no tienes información suficiente.
-6. Redirige al usuario hacia temas que SÍ puedes cubrir con preguntas sugeridas.
+REGLAS ESTRICTAS (PHARMA COMPLIANCE):
+1. Respuesta CORTA (máximo 80 palabras).
+2. PROHIBIDO generar tablas, listas de productos, cifras, porcentajes o datos clínicos que NO estén en los HECHOS VERIFICADOS de arriba.
+3. PROHIBIDO inventar descripciones de productos, indicaciones, dosis o protocolos.
+4. Si HAY algún dato relevante en el contexto RAG de arriba, úsalo brevemente.
+5. Si NO hay datos verificados relevantes, di claramente que no tienes información verificada sobre ese tema.
+6. SIEMPRE redirige al usuario con preguntas específicas del portafolio.
 
-FORMATO para cobertura baja:
-## [Tema consultado]
+FORMATO OBLIGATORIO (no uses otro):
+No tengo información verificada suficiente sobre [tema]. Te puedo ayudar con preguntas específicas de nuestro portafolio.
 
-[Si hay datos RAG, preséntalos. Si no, indica que no tienes información suficiente sobre ese tema específico.]
-
-**Te puedo ayudar con:**
-- [Pregunta sugerida 1 sobre productos/protocolos del portafolio]
+**Prueba preguntar:**
+- [Pregunta sugerida 1 — específica de un producto real del portafolio]
 - [Pregunta sugerida 2]
 - [Pregunta sugerida 3]"""
                 elif rag_coverage == "medium":
@@ -1039,6 +1105,20 @@ REGLAS DE MODO RESUMIDO:
                         })
                 print(f"[DEBUG] Stream terminado — {token_count} tokens enviados")
 
+                # Claim verifier: si coverage=low, verificar que no haya datos fabricados
+                claim_verification = None
+                if rag_coverage == "low":
+                    claim_verification = verify_low_coverage_response(full_response)
+                    if claim_verification["violated"]:
+                        # Reemplazar respuesta con mensaje seguro
+                        full_response = claim_verification["safe_response"]
+                        # Enviar corrección al frontend (replace streamed content)
+                        await websocket.send_json({
+                            "type": "replace_response",
+                            "content": full_response
+                        })
+                        print(f"[CLAIM_VERIFIER] Response replaced — violations: {claim_verification['violations']}")
+
                 # Guardar en historial
                 conversation_history.append({"role": "user", "content": user_message})
                 conversation_history.append({"role": "assistant", "content": full_response})
@@ -1073,6 +1153,10 @@ REGLAS DE MODO RESUMIDO:
                     "score_before_fallback": search_meta["score_before_fallback"],
                     "score_after_fallback": search_meta["score_after_fallback"],
                     "comparative": comp_policy if comp_policy["is_comparative"] else None,
+                    "claim_verification": {
+                        "violated": claim_verification["violated"],
+                        "violations": claim_verification["violations"],
+                    } if claim_verification and claim_verification["violated"] else None,
                     "retrieved_results": retrieved,
                     "response_text": full_response,
                 })

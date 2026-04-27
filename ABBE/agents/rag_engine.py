@@ -81,6 +81,17 @@ MEDICAL_SYNONYMS: Dict[str, List[str]] = {
     'rejuvenecimiento': ['anti-aging', 'regeneración', 'juventud'],
     'edema': ['hinchazón', 'inflamación', 'hinchado'],
 
+    # Meta-queries de catálogo / portafolio
+    'catálogo': ['productos', 'portafolio', 'lista', 'gencell'],
+    'catalogo': ['productos', 'portafolio', 'lista', 'gencell'],
+    'portafolio': ['productos', 'catálogo', 'lista', 'gencell'],
+    'lista': ['productos', 'catálogo', 'portafolio', 'enumerar'],
+    'vende': ['productos', 'portafolio', 'catálogo', 'ofrece'],
+    'ofrece': ['productos', 'portafolio', 'catálogo', 'vende'],
+    'tiene': ['productos', 'portafolio', 'catálogo'],
+    'completo': ['productos', 'portafolio', 'catálogo', 'todos'],
+    'manejan': ['productos', 'portafolio', 'catálogo', 'vende'],
+
     # Comparativas y objeciones
     'mejor': ['superior', 'óptimo', 'ideal', 'recomendado', 'preferible'],
     'diferencia': ['comparar', 'comparativa', 'versus', 'contra', 'diferente'],
@@ -251,6 +262,14 @@ class RAGEngine:
             elif prod and valid_products.get(prod) != pl:
                 errors.append(f"Q&A #{qid}: product '{prod}' not in line '{pl}'")
 
+            # alt_questions debe ser lista de strings si existe
+            alt_q = qa.get('alt_questions')
+            if alt_q is not None:
+                if not isinstance(alt_q, list):
+                    errors.append(f"Q&A #{qid}: alt_questions must be a list")
+                elif not all(isinstance(q, str) and q for q in alt_q):
+                    errors.append(f"Q&A #{qid}: alt_questions contains non-string or empty items")
+
         if errors:
             mode = os.environ.get('KB_VALIDATION_MODE', 'warn')
             print(f"[RAG] ⚠ KB validation: {len(errors)} errors:")
@@ -262,13 +281,20 @@ class RAGEngine:
             print(f"[RAG] ✓ KB validation passed ({len(self.qa_pairs)} Q&As, contract OK)")
 
     def _build_bm25_index(self):
-        """Construye el índice BM25 sobre pregunta + respuesta."""
+        """Construye el índice BM25 sobre pregunta + alt_questions + respuesta."""
         if not self.qa_pairs:
             self.bm25 = BM25Index([])
             print("[RAG] KB vacía — índice BM25 vacío")
             return
 
-        documents = [qa['pregunta'] + ' ' + qa['respuesta'] for qa in self.qa_pairs]
+        documents = []
+        for qa in self.qa_pairs:
+            parts = [qa['pregunta']]
+            # Incluir alt_questions en el documento indexado (peso implícito via BM25 tf)
+            for alt in qa.get('alt_questions', []):
+                parts.append(alt)
+            parts.append(qa['respuesta'])
+            documents.append(' '.join(parts))
         tokenized = [self._tokenize(doc) for doc in documents]
         self.bm25 = BM25Index(tokenized)
         vocab_size = len(self.bm25.df)
