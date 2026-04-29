@@ -1,5 +1,18 @@
 # CLAUDE.md — ABBE (Above Pharma)
 
+## Ecosistema de repositorios
+
+Este repo es uno de varios que conforman el sistema PRISMA:
+
+- **`above-pharma`** (este, ABBE) — Asistente de ventas IA para Above Pharma (Hugging Face Spaces).
+- **`web-de-prisma`** — Web pública + Prisma APEX (sistema interno).
+- **`prisma-trabajo-clientes`** (privado) — Texto colaborativo de PRISMA por cliente.
+- **`prisma-consulting`** — Metodología APEX.
+- **`apex-agents`** — Plataforma de agentes IA (CrewAI).
+- **`prisma-server-ops`** — Operación del VPS IONOS.
+
+Mapa completo, flujos cruzados y convenciones entre repos: ver [`ECOSISTEMA.md`](../web-de-prisma/ECOSISTEMA.md) en `web-de-prisma`.
+
 ## Qué es este proyecto
 
 ABBE es un asistente de ventas IA multi-producto para representantes médicos de Above Pharma. Es una aplicación web con backend FastAPI y frontend vanilla JS, desplegada en Hugging Face Spaces via Docker.
